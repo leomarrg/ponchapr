@@ -138,7 +138,16 @@ class AttendeeAdmin(admin.ModelAdmin):
         
         for attendee in queryset:
             try:
-                # Resend email using your existing email function
+                # Reset confirmation status if fields exist
+                try:
+                    attendee.code_confirmed = False
+                    attendee.code_confirmed_at = None
+                    attendee.save()
+                except Exception:
+                    # Fields might not exist yet if migrations haven't run
+                    pass
+                
+                # Resend email
                 send_registration_email_async(attendee, attendee.unique_id)
                 success_count += 1
             except Exception as e:
@@ -146,12 +155,10 @@ class AttendeeAdmin(admin.ModelAdmin):
                 error_count += 1
         
         if success_count:
-            self.message_user(request, f"Successfully resent {success_count} email(s).", level='SUCCESS')
+            self.message_user(request, f"Successfully resent {success_count} email(s). Confirmation status reset.", level='SUCCESS')
         
         if error_count:
             self.message_user(request, f"Failed to send {error_count} email(s). Check logs for details.", level='WARNING')
-    
-    resend_email.short_description = "Resend confirmation email to selected attendees"
 
     def resend_email_button(self, obj):
         return format_html('<a class="button" href="{}">Resend Email</a>', 
@@ -202,14 +209,29 @@ class AttendeeAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def resend_individual_email(self, request, object_id):
-        attendee = self.get_object(request, object_id)
-        if attendee:
+    attendee = self.get_object(request, object_id)
+    if attendee:
+        try:
+            # Reset confirmation status if fields exist (check for production before migrations)
             try:
-                send_registration_email_async(attendee, attendee.unique_id)
-                self.message_user(request, f"Email resent successfully to {attendee.email}", level='SUCCESS')
-            except Exception as e:
-                self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
-        return redirect('admin:ponchapr_app_attendee_changelist')
+                attendee.code_confirmed = False
+                attendee.code_confirmed_at = None
+                attendee.save()
+                confirmation_reset = True
+            except Exception:
+                confirmation_reset = False
+            
+            # Send email
+            send_registration_email_async(attendee, attendee.unique_id)
+            
+            if confirmation_reset:
+                self.message_user(request, f"Email resent successfully to {attendee.email}. Confirmation status reset.", level='SUCCESS')
+            else:
+                self.message_user(request, f"Email resent successfully to {attendee.email}.", level='SUCCESS')
+                
+        except Exception as e:
+            self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
+    return redirect('admin:ponchapr_app_attendee_changelist')
     
     def checkin_qr_code_verify(self, request):
         return render(request, 'admin/ponchapr_app/checkin_qr_code_verify.html')

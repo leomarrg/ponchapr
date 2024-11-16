@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmación de Recibo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 15px; margin: 20px 0; }
+        .code { font-family: monospace; font-size: 24px; font-weight: bold; text-align: center; margin: 15px 0; letter-spacing: 2px; }
+        .details { margin-top: 25px; }
+        .details table { width: 100%; border-collapse: collapse; }
+        .details table td { padding: 8px; border-bottom: 1px solid #dee2e6; }
+        .details table td:first-child { font-weight: bold; width: 40%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if success %}
+            <div class="header">
+                <h1 class="success">¡Gracias por confirmar!</h1>
+                <p>Hemos registrado que usted ha recibido el correo electrónico con su código único.</p>
+            </div>
+            
+            <div class="info-box">
+                <h2 style="text-align: center; margin-top: 0;">Su Código Único</h2>
+                <div class="code">{{ attendee.unique_id }}</div>
+                <p style="text-align: center;">Por favor guarde este código. Lo necesitará para el evento.</p>
+            </div>
+            
+            <div class="details">
+                <h2>Información del Registro</h2>
+                <table>
+                    <tr>
+                        <td>Nombre:</td>
+                        <td>{{ attendee.name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Apellidos:</td>
+                        <td>{{ attendee.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td>Correo Electrónico:</td>
+                        <td>{{ attendee.email }}</td>
+                    </tr>
+                    {% if attendee.phone_number %}
+                    <tr>
+                        <td>Teléfono:</td>
+                        <td>{{ attendee.phone_number }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if attendee.region %}
+                    <tr>
+                        <td>Región:</td>
+                        <td>{{ attendee.region.name }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if attendee.organization %}
+                    <tr>
+                        <td>Organización:</td>
+                        <td>{{ attendee.organization }}</td>
+                    </tr>
+                    {% endif %}
+                </table>
+            </div>
+            
+            <p>Por favor confirme que ha recibido este correo haciendo clic en el siguiente botón:</p>
+
+            <table cellspacing="0" cellpadding="0" style="margin: 20px auto;">
+            <tr>
+                <td style="border-radius: 4px; background-color: #4CAF50; text-align: center;">
+                <a href="https://www.registratepr.com/confirm-receipt/{{ unique_id }}/" 
+                    style="padding: 12px 24px; border-radius: 4px; color: white; display: inline-block; text-decoration: none; font-weight: bold; font-family: Arial, sans-serif;">
+                    Confirmar Recepción
+                </a>
+                </td>
+            </tr>
+            </table>
+
+            <p>Si el botón no funciona, copie y pegue el siguiente enlace en su navegador:</p>
+            <p>https://www.registratepr.com/confirm-receipt/{{ unique_id }}/</p>
+        {% else %}
+            <h1 class="error">Error de Confirmación</h1>
+            <p>No pudimos encontrar su registro. Por favor contacte al organizador del evento.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
