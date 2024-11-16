@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
+from .utils import send_registration_email_async
 
 
 
