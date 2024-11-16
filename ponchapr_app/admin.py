@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db.models import Count, F
+from django.db.models import Count, F, Q
 from django.utils.html import format_html
 from django.urls import path
 from .models import Attendee, Table, Review, Region
@@ -68,11 +68,66 @@ class CustomAdminSite(admin.AdminSite):
         })
         
         return super().index(request, extra_context)
+
+class DuplicateNameFilter(admin.SimpleListFilter):
+    title = "Duplicate Names"
+    parameter_name = "duplicate_name"
+    
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Show duplicates only'),
+        )
+    
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            # Find names that appear more than once
+            duplicate_names = Attendee.objects.values('name', 'last_name').\
+                annotate(name_count=Count('id')).\
+                filter(name_count__gt=1)
+            
+            # Get the names and last names that are duplicated
+            duplicate_name_values = [(item['name'], item['last_name']) for item in duplicate_names]
+            
+            # Filter original queryset to only include these duplicates
+            if duplicate_name_values:
+                q_objects = Q()
+                for name, last_name in duplicate_name_values:
+                    q_objects |= Q(name=name, last_name=last_name)
+                return queryset.filter(q_objects)
+            return queryset.none()
+        return queryset
+
+
+class DuplicatePhoneFilter(admin.SimpleListFilter):
+    title = "Duplicate Phone Numbers"
+    parameter_name = "duplicate_phone"
+    
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Show duplicates only'),
+        )
+    
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            # Find phone numbers that appear more than once, excluding empty phones
+            duplicate_phones = Attendee.objects.exclude(phone_number='').\
+                values('phone_number').\
+                annotate(phone_count=Count('id')).\
+                filter(phone_count__gt=1)
+            
+            # Get the phone numbers that are duplicated
+            duplicate_phone_values = [item['phone_number'] for item in duplicate_phones]
+            
+            # Filter original queryset to only include these duplicates
+            if duplicate_phone_values:
+                return queryset.filter(phone_number__in=duplicate_phone_values)
+            return queryset.none()
+        return queryset
     
 
 class AttendeeAdmin(admin.ModelAdmin):
     list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'created_at', 'unique_id', 'checkout_time', 'checked_out', 'resend_email_button')  # Use 'created_at' instead
-    list_filter = ('pre_registered', 'registered_at_event', 'arrived', 'arrival_time')
+    list_filter = ('pre_registered', 'registered_at_event', 'arrived', 'arrival_time', DuplicateNameFilter, DuplicatePhoneFilter)
     search_fields = ['name', 'last_name', 'email']
 
     actions = ['export_to_text', 'resend_email']  # Add to existing actions if any
