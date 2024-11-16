@@ -209,30 +209,30 @@ class AttendeeAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def resend_individual_email(self, request, object_id):
-    attendee = self.get_object(request, object_id)
-    if attendee:
-        try:
-            # Reset confirmation status if fields exist (check for production before migrations)
+        attendee = self.get_object(request, object_id)
+        if attendee:
             try:
-                attendee.code_confirmed = False
-                attendee.code_confirmed_at = None
-                attendee.save()
-                confirmation_reset = True
-            except Exception:
-                confirmation_reset = False
-            
-            # Send email
-            send_registration_email_async(attendee, attendee.unique_id)
-            
-            if confirmation_reset:
-                self.message_user(request, f"Email resent successfully to {attendee.email}. Confirmation status reset.", level='SUCCESS')
-            else:
-                self.message_user(request, f"Email resent successfully to {attendee.email}.", level='SUCCESS')
+                # Reset confirmation status if fields exist (check for production before migrations)
+                try:
+                    attendee.code_confirmed = False
+                    attendee.code_confirmed_at = None
+                    attendee.save()
+                    confirmation_reset = True
+                except Exception:
+                    confirmation_reset = False
                 
-        except Exception as e:
-            self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
-    return redirect('admin:ponchapr_app_attendee_changelist')
-    
+                # Send email
+                send_registration_email_async(attendee, attendee.unique_id)
+                
+                if confirmation_reset:
+                    self.message_user(request, f"Email resent successfully to {attendee.email}. Confirmation status reset.", level='SUCCESS')
+                else:
+                    self.message_user(request, f"Email resent successfully to {attendee.email}.", level='SUCCESS')
+                    
+            except Exception as e:
+                self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
+        return redirect('admin:ponchapr_app_attendee_changelist')
+        
     def checkin_qr_code_verify(self, request):
         return render(request, 'admin/ponchapr_app/checkin_qr_code_verify.html')
     
