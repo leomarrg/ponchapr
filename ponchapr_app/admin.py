@@ -141,8 +141,20 @@ class AttendeeAdmin(admin.ModelAdmin):
             path('<path:object_id>/unmark_arrived/', self.admin_site.admin_view(self.unmark_arrived), name='attendee-unmark-arrived'),
             path('checkin-qr/', self.admin_site.admin_view(self.checkin_qr_code_verify), name='checkin_qr_code_verify'),
             path('checkout-qr/', self.admin_site.admin_view(self.checkout_qr_code_verify), name='checkout_qr_code_verify'),
+            path('<path:object_id>/resend_email/', self.admin_site.admin_view(self.resend_individual_email), name='attendee-resend-email'),
+
         ]
         return custom_urls + urls
+
+    def resend_individual_email(self, request, object_id):
+        attendee = self.get_object(request, object_id)
+        if attendee:
+            try:
+                send_registration_email_async(attendee, attendee.unique_id)
+                self.message_user(request, f"Email resent successfully to {attendee.email}", level='SUCCESS')
+            except Exception as e:
+                self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
+        return redirect('admin:ponchapr_app_attendee_changelist')
     
     def checkin_qr_code_verify(self, request):
         return render(request, 'admin/ponchapr_app/checkin_qr_code_verify.html')
