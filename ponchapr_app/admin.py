@@ -137,12 +137,11 @@ class AttendeeAdmin(admin.ModelAdmin):
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
+            path('<path:object_id>/resend_email/', self.admin_site.admin_view(self.resend_individual_email), name='attendee-resend-email'),
             path('<path:object_id>/mark_arrived/', self.admin_site.admin_view(self.mark_arrived), name='attendee-mark-arrived'),
             path('<path:object_id>/unmark_arrived/', self.admin_site.admin_view(self.unmark_arrived), name='attendee-unmark-arrived'),
             path('checkin-qr/', self.admin_site.admin_view(self.checkin_qr_code_verify), name='checkin_qr_code_verify'),
             path('checkout-qr/', self.admin_site.admin_view(self.checkout_qr_code_verify), name='checkout_qr_code_verify'),
-            path('<path:object_id>/resend_email/', self.admin_site.admin_view(self.resend_individual_email), name='attendee-resend-email'),
-
         ]
         return custom_urls + urls
 
