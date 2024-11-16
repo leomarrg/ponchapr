@@ -67,10 +67,6 @@ class Attendee(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    #confirming code field
-    code_confirmed = models.BooleanField(null=True, default=False, verbose_name="Email Confirmed")
-    code_confirmed_at = models.DateTimeField(null=True, blank=True, verbose_name="Confirmed At")
     
     class Meta:
         ordering = ['-created_at']

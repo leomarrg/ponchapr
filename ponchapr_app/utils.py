@@ -24,7 +24,7 @@ def send_registration_email(attendee, unique_id):
         to_email = attendee.email
         
         # Generate the email content with HTML
-        html_content = render_to_string('ponchapr_app/email/email_confirmed.html', {
+        html_content = render_to_string('ponchapr_app/email/registration_confirmation.html', {
             'attendee': attendee,
             'unique_id': unique_id
         })

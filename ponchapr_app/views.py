@@ -533,31 +533,3 @@ def generate_report(request):
         import traceback
         print(traceback.format_exc())
         return HttpResponse(f"An error occurred: {str(e)}", status=500)
-
-def confirm_email_receipt(request, unique_id):
-    """Handle email confirmation when user clicks the button in the email"""
-    try:
-        # Use select_related to fetch the related region in the same query
-        attendee = Attendee.objects.select_related('region').get(unique_id=unique_id)
-        
-        if not attendee.code_confirmed:
-            attendee.code_confirmed = True
-            attendee.code_confirmed_at = timezone.now()
-            attendee.save()
-            
-        success = True
-        
-    except Attendee.DoesNotExist:
-        success = False
-        attendee = None
-    except Exception as e:
-        # Handle any errors that might occur if migrations haven't run
-        print(f"Error in confirm_email_receipt: {str(e)}")
-        success = False
-        attendee = None
-    
-    # Return a confirmation page with all attendee details
-    return render(request, 'ponchapr_app/email/email_confirmed.html', {
-        'success': success,
-        'attendee': attendee
-    })
