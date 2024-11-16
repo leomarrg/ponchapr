@@ -126,7 +126,7 @@ class DuplicatePhoneFilter(admin.SimpleListFilter):
     
 
 class AttendeeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'created_at', 'unique_id', 'checkout_time', 'checked_out', 'resend_email_button')  # Use 'created_at' instead
+    list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'created_at', 'unique_id', 'checkout_time', 'checked_out')  # Use 'created_at' instead
     list_filter = ('pre_registered', 'registered_at_event', 'arrived', 'arrival_time', DuplicateNameFilter, DuplicatePhoneFilter)
     search_fields = ['name', 'last_name', 'email']
 
