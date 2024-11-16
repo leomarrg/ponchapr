@@ -70,9 +70,39 @@ class CustomAdminSite(admin.AdminSite):
     
 
 class AttendeeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'created_at', 'unique_id', 'checkout_time', 'checked_out')  # Use 'created_at' instead
+    list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'created_at', 'unique_id', 'checkout_time', 'checked_out', 'resend_email_button')  # Use 'created_at' instead
     list_filter = ('pre_registered', 'registered_at_event', 'arrived', 'arrival_time')
     search_fields = ['name', 'last_name', 'email']
+
+    actions = ['export_to_text', 'resend_email']  # Add to existing actions if any
+    
+    def resend_email(self, request, queryset):
+        success_count = 0
+        error_count = 0
+        
+        for attendee in queryset:
+            try:
+                # Resend email using your existing email function
+                send_registration_email_async(attendee, attendee.unique_id)
+                success_count += 1
+            except Exception as e:
+                self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
+                error_count += 1
+        
+        if success_count:
+            self.message_user(request, f"Successfully resent {success_count} email(s).", level='SUCCESS')
+        
+        if error_count:
+            self.message_user(request, f"Failed to send {error_count} email(s). Check logs for details.", level='WARNING')
+    
+    resend_email.short_description = "Resend confirmation email to selected attendees"
+
+    def resend_email_button(self, obj):
+        return format_html('<a class="button" href="{}">Resend Email</a>', 
+                         f'/admin/ponchapr_app/attendee/{obj.id}/resend_email/')
+    
+    resend_email_button.short_description = "Resend Email"
+    resend_email_button.allow_tags = True
 
     def changelist_view(self, request, extra_context=None):
         # Get arrival time statistics for the chart
