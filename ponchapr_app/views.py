@@ -397,4 +397,4 @@ def checkout_form(request):
     return render(request, 'ponchapr_app/checkout.html')
 
 def terms_view(request):
-    return render(request,'terms.html')
+    return render(request,'ponchapr_app/terms.html')
