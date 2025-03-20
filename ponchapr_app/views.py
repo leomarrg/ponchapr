@@ -395,3 +395,6 @@ def checkout_form(request):
             messages.error(request, "Por favor, ingrese un código de identificación.")
     
     return render(request, 'ponchapr_app/checkout.html')
+
+def terms_view(request):
+    return render(request,'terms.html')
