@@ -466,7 +466,7 @@ def generate_report(request):
         response['Content-Disposition'] = 'attachment; filename="PonchaPR_Event_Report.pdf"'
         
         # Render the template to a string
-        template = get_template('event_report.html')
+        template = get_template('ponchapr_app/event_report.html')
         html = template.render(context)
         
         # Create a file-like buffer to receive PDF data
