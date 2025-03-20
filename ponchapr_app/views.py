@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .forms import AttendeeForm
 from .models import Attendee
-from .utils import send_registration_email, send_registration_email_async
+from .utils import send_registration_email, send_registration_email_async, schedule_registration_email
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from django.contrib import messages
@@ -62,7 +62,7 @@ def front_desk_register(request):
                 attendee.save()
                 
                 # Schedule email in background
-                run_email_command(attendee, attendee.unique_id)
+                schedule_registration_email(attendee, attendee.unique_id)
                 
                 # Mostrar mensaje de éxito inmediatamente
                 messages.success(request, f"¡Registro exitoso! Se enviará un correo de confirmación con su número de identificación.")
