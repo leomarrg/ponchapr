@@ -61,14 +61,11 @@ def front_desk_register(request):
                 attendee.unique_id = temp_unique_id
                 attendee.save()
                 
+                # Schedule email in background
+                run_email_command(attendee, attendee.unique_id)
+                
                 # Mostrar mensaje de éxito inmediatamente
                 messages.success(request, f"¡Registro exitoso! Se enviará un correo de confirmación con su número de identificación.")
-                
-                # Enviar correo en segundo plano (después de retornar la respuesta)
-                # Esto no retrasa la respuesta al usuario
-                threading.Thread(
-                    target=lambda: send_registration_email(attendee, attendee.unique_id)
-                ).start()
                 
                 return redirect('register')
                 
