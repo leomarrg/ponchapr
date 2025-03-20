@@ -1,0 +1,184 @@
+{%load static%}
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if IE 9 ]><html class="no-js ie ie9" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+   <!--- Basic Page Needs
+   ================================================== -->
+   <meta charset="utf-8">
+	<title>Survey</title>
+	<meta name="description" content="">  
+	<meta name="author" content="">
+
+   <!-- Mobile Specific Metas
+   ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+    ================================================== -->
+   <link rel="stylesheet" href="{% static 'css/default.css' %}">
+	<link rel="stylesheet" href="{% static 'css/layout.css' %}">
+   <link rel="stylesheet" href="{% static 'css/media-queries.css' %}">
+   <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+   <link rel="stylesheet" href="{% static 'css/prettyPhoto.css' %}">
+
+   <!-- Script
+   ================================================== -->
+	<script src="{% static 'js/modernizr.js' %}"></script>
+
+   <!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="{% static 'favicon.png' %}" >
+
+</head>
+
+<body>
+
+   <div id="preloader">      
+      <div id="status">
+         <img src="{% static 'images/preloader.gif' %}" height="64" width="64" alt="">
+      </div>
+   </div>
+
+   <!-- Header
+   ================================================== -->
+   <header>
+
+      <div class="logo">
+         <a class="smoothscroll" href="{% url 'homepage' %}"><img alt="" src="{% static 'images/logo.png' %}"></a>
+      </div>
+
+      <nav id="nav-wrap">         
+         
+         <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show Menu</a>
+	      <a class="mobile-btn" href="#" title="Hide navigation">Hide Menu</a>         
+
+      </nav> <!-- end #nav-wrap -->
+
+   </header> <!-- Header End -->
+   <br><br>
+   <section>
+    <div class="container">
+      <h2 class="form-header">Questionario</h2>
+      <h5>Nombre del evento</h5>
+      <form action="#" method="post">  
+        <!-- Satisfaction Question -->
+        <div class="form-group">
+          <label for="satisfaction">¿Qué tan satisfecho está con el evento?</label>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" id="satisfaction-5" name="satisfaction" value="5">
+              <label for="satisfaction-5">Muy satisfecho</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="satisfaction-4" name="satisfaction" value="4">
+              <label for="satisfaction-4">Satisfecho</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="satisfaction-3" name="satisfaction" value="3">
+              <label for="satisfaction-3">Neutral</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="satisfaction-2" name="satisfaction" value="2">
+              <label for="satisfaction-2">Insatisfecho</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="satisfaction-1" name="satisfaction" value="1">
+              <label for="satisfaction-1">Muy insatisfecho</label>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Usefulness Question -->
+        <div class="form-group">
+          <label for="usefulness">¿Qué tan útil fue el contenido presentado?</label>
+          <div class="radio-group">
+            <div class="radio-item">
+              <input type="radio" id="usefulness-5" name="usefulness" value="5">
+              <label for="usefulness-5">Muy útil</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="usefulness-4" name="usefulness" value="4">
+              <label for="usefulness-4">Útil</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="usefulness-3" name="usefulness" value="3">
+              <label for="usefulness-3">Neutral</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="usefulness-2" name="usefulness" value="2">
+              <label for="usefulness-2">Poco útil</label>
+            </div>
+            <div class="radio-item">
+              <input type="radio" id="usefulness-1" name="usefulness" value="1">
+              <label for="usefulness-1">Nada útil</label>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Comments Field -->
+        <div class="form-group">
+          <label for="comments">Comentarios adicionales sobre el evento o talleres:</label>
+          <textarea id="comments" name="comments" rows="5" style="width: 100%; padding: 8px; margin-top: 8px; border: 1px solid #ddd; border-radius: 4px; resize: none;"></textarea>
+        </div>
+  
+        <!-- Submit Button -->
+        <button type="submit" style="padding: 10px 20px; background-color: #5cb85c; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px;">Someter</button>
+      </form>
+    </div>
+  </section>
+   <!-- Footer
+   ================================================== -->
+   <footer>
+      <div class="row">         
+         <div class="six columns info">
+            <div class="footer-logo">
+               <a href="#">
+                  <img src="{% static 'images/footer-logo.png' %}" alt="" />
+               </a>
+            </div>
+            <p>registratepr</p>
+         </div>
+               <div class="columns last">
+                  <h3 class="contact">Contáctanos</h3>
+                  <ul>
+                    <li><a href="tel:6473438234">939-257-0148</a></li>
+                   
+                    <li><a href="mailto:someone@woo.com">leomarrg@gmail.com</a></li>
+                  </ul>
+               </div>
+         <p class="copyright">&copy; 2024 registratepr | Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></p>
+
+<!--==================================================================-->
+         <!--commented button to go back to top-->
+         <!--<div id="go-top">
+            <a class="smoothscroll" title="Back to Top" href="#hero"><i class="icon-up-open"></i></a>
+         </div>-->
+
+      </div> <!-- Row End -->
+
+   </footer> <!-- Footer End--><section>
+  
+
+   <!-- Java Script
+   ================================================== -->
+   <script src="{% static 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' %}"></script>
+   <script>
+    window.jQuery || document.write('<script src="{% static "js/jquery-1.10.2.min.js" %}"><\/script>');
+</script>
+   <script type="text/javascript" src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
+
+   <script src="{% static 'js/jquery.flexslider.js' %}"></script>
+   <script src="{% static 'js/waypoints.js' %}"></script>
+   <script src="{% static 'js/jquery.fittext.js' %}"></script>
+   <script src="{% static 'js/jquery.fitvids.js' %}"></script>
+   <script src="{% static 'js/imagelightbox.js' %}"></script>
+   <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script>   
+   <script src="{% static 'js/main.js' %}"></script>
+
+</body>
+
+</html>

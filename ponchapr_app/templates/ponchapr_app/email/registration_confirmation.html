@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Confirmación de Registro</title>
+</head>
+<body>
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>¡Gracias por registrarte!</h2>
+        
+        <p>Hola {{ attendee.name }},</p>
+        
+        <p>Tu registro ha sido confirmado. Por favor guarda este código, lo necesitarás para validar tu salida al evento.</p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <div style="background-color: #f8f9fa; border: 2px solid #007bff; border-radius: 10px; padding: 20px; display: inline-block; min-width: 200px;">
+                <h2 style="margin: 0; color: #343a40; font-size: 24px;">Su Número Único</h2>
+                <p style="font-size: 42px; font-weight: bold; letter-spacing: 3px; margin: 15px 0; color: #007bff;">
+                    {{ unique_id }}
+                </p>
+                <p style="margin: 0; color: #6c757d; font-size: 14px;">Presente este número al salir del evento</p>
+            </div>
+        </div>
+        
+        <p>Detalles de tu registro:</p>
+        <ul>
+            <li>Nombre: {{ attendee.name }} {{ attendee.last_name }}</li>
+            <li>Email: {{ attendee.email }}</li>
+
+        </ul>
+        
+        <p>Por favor, muestra este código QR al llegar al evento.</p>
+    </div>
+</body>
+</html>

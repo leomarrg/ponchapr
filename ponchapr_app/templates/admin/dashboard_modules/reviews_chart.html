@@ -1,0 +1,40 @@
+{% load static %}
+<div class="grp-module">
+    <div class="grp-module-content">
+        <div class="chart-container">
+            <canvas id="reviewsChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{{ review_categories|json_script:"review-categories-data" }}
+{{ review_counts|json_script:"review-counts-data" }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+    const reviewCategories = JSON.parse(document.getElementById('review-categories-data').textContent);
+    const reviewCounts = JSON.parse(document.getElementById('review-counts-data').textContent);
+
+    const reviewsCtx = document.getElementById('reviewsChart').getContext('2d');
+    new Chart(reviewsCtx, {
+        type: 'bar',
+        data: {
+            labels: reviewCategories,
+            datasets: [{
+                label: 'Reviews by Category',
+                data: reviewCounts,
+                backgroundColor: '#309bbf'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Reviews by Category'
+                }
+            }
+        }
+    });
+</script>

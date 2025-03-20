@@ -1,0 +1,60 @@
+{% load static %}
+<div class="grp-module">
+    <div class="grp-module-content">
+        <div class="grp-row">
+            <div class="grp-cell">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3 class="grp-module-title">Total Attendees</h3>
+                        <p class="stat-number">{{ total_attendees }}</p>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <h3 class="grp-module-title">Arrived Attendees</h3>
+                        <p class="stat-number">{{ arrived_attendees }}</p>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <h3 class="grp-module-title">Total Reviews</h3>
+                        <p class="stat-number">{{ total_reviews }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 15px;
+}
+
+.stat-box {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #309bbf;
+    margin-top: 10px;
+}
+
+.chart-container {
+    background: white;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.grp-module-title {
+    margin: 0;
+    color: #333;
+}
+</style>

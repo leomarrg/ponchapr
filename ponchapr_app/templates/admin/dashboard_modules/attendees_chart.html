@@ -1,0 +1,140 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/admin_css.css' %}">
+
+{% load static %}
+<div class="grp-module">
+    <h3>Debug Information</h3>
+    <pre>
+    Module exists: {% if module %}Yes{% else %}No{% endif %}
+    Module ID: {{ module.id|default:"No ID" }}
+    Module title: {{ module.title|default:"No title" }}
+    Children count: {{ module.children|length }}
+    Raw children data: {{ module.children|pprint }}
+    </pre>
+    
+    <div class="grp-module-content">
+        <div class="grp-row">
+            <div class="grp-cell">
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="attendeesChart{{ module.id }}"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if module.children %}
+    <script id="chart-data-{{ module.id }}" type="application/json">
+    {
+        "times": [
+            {% for child in module.children %}
+                "{{ child.hour }}:{{ child.minute }}"{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        "counts": [
+            {% for child in module.children %}
+                {{ child.count }}{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    }
+    </script>
+{% else %}
+    <div class="no-data-message" style="padding: 20px; background: #f9f9f9; border: 1px solid #ddd; margin: 10px 0;">
+        <p><strong>No attendance data available.</strong></p>
+        <p>This could be because:</p>
+        <ul>
+            <li>No event has been created yet</li>
+            <li>No attendees have arrived at the current event</li>
+            <li>No arrival times have been recorded</li>
+        </ul>
+    </div>
+{% endif %}
+
+<!-- Load Scripts -->
+<script>
+    // Immediate debug check
+    document.getElementById('chart-container-debug').innerHTML = `
+        <div style="padding: 10px; background: #fff; border: 1px solid #ccc; margin-bottom: 10px;">
+            <p>Current time: ${new Date().toISOString()}</p>
+            <p>Chart.js loaded: ${typeof Chart !== 'undefined'}</p>
+            <p>jQuery loaded: ${typeof jQuery !== 'undefined'}</p>
+            <p>Canvas exists: ${!!document.querySelector('#attendeesChartattendee-chart')}</p>
+            <p>Data script exists: ${!!document.querySelector('#chart-data-attendee-chart')}</p>
+        </div>
+    `;
+</script>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Standalone chart initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing chart...');
+    
+    const canvas = document.querySelector('#attendeesChartattendee-chart');
+    const dataScript = document.querySelector('#chart-data-attendee-chart');
+    
+    if (!canvas) {
+        console.error('Canvas not found!');
+        return;
+    }
+    
+    if (!dataScript) {
+        console.error('Data script not found!');
+        return;
+    }
+    
+    try {
+        const chartData = JSON.parse(dataScript.textContent);
+        console.log('Chart data:', chartData);
+        
+        const ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.dates,
+                datasets: [
+                    {
+                        label: 'Pre-registered',
+                        data: chartData.preRegistered,
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Registered at Event',
+                        data: chartData.registeredAtEvent,
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        console.log('Chart created successfully');
+    } catch (error) {
+        console.error('Error creating chart:', error);
+        console.error('Raw data script content:', dataScript.textContent);
+    }
+});
+</script>

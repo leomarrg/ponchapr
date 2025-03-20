@@ -1,0 +1,243 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .qr-container {
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .qr-button {
+        background: var(--primary);
+        color: var(--primary-fg);
+        border-radius: 4px;
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        margin: 10px 0;
+    }
+    .qr-button:hover {
+        background: var(--primary-darker);
+    }
+    .qr-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+    .qr-modal-content {
+        background: var(--body-bg);
+        padding: 20px;
+        margin: 50px auto;
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .qr-alert {
+        padding: 12px;
+        border-radius: 4px;
+        margin: 10px 0;
+        display: none;
+    }
+    .qr-alert-success {
+        background: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+    }
+    .qr-alert-error {
+        background: #f2dede;
+        color: #a94442;
+        border: 1px solid #ebccd1;
+    }
+    .attendee-info {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        display: none;
+    }
+    #reader {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .qr-close {
+        position: absolute;
+        right: 20px;
+        top: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        color: var(--body-quiet-color);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="qr-container">
+    <div class="module">
+        <h2>Verificación de QR</h2>
+        
+        <!-- Scanner Button -->
+        <div>
+            <button onclick="startScanner()" class="qr-button">
+                <i class="fas fa-qrcode"></i> Iniciar Scanner QR
+            </button>
+        </div>
+
+        <!-- QR Scanner Modal -->
+        <div id="scannerModal" class="qr-modal">
+            <div class="qr-modal-content">
+                <span class="qr-close" onclick="closeScanner()">&times;</span>
+                <h2>Escanear Código QR</h2>
+                
+                <div id="reader"></div>
+                
+                <div id="result">
+                    <div id="success-alert" class="qr-alert qr-alert-success"></div>
+                    <div id="error-alert" class="qr-alert qr-alert-error"></div>
+                </div>
+
+                <div id="attendee-info" class="attendee-info">
+                    <h3>Información del Participante</h3>
+                    <p><strong>Nombre:</strong> <span id="attendee-name"></span></p>
+                    <p><strong>Email:</strong> <span id="attendee-email"></span></p>
+                    <p><strong>Hora de llegada:</strong> <span id="attendee-arrival"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    let html5QrcodeScanner = null;
+
+    function startScanner() {
+        requestCamera();
+    }
+
+    function requestCamera() {
+        navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: "environment" // Prefer rear camera on mobile devices
+            } 
+        })
+        .then(function(stream) {
+            stream.getTracks().forEach(track => track.stop());
+            showScannerModal();
+            initializeScanner();
+        })
+        .catch(function(err) {
+            showError('Error: Se requiere permiso de cámara para escanear');
+        });
+    }
+
+    function showScannerModal() {
+        const modal = document.getElementById('scannerModal');
+        modal.style.display = 'block';
+    }
+
+    function initializeScanner() {
+        const config = {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            showTorchButtonIfSupported: true,
+            aspectRatio: 1.0,
+            defaultZoom: 2
+        };
+
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", config);
+        html5QrcodeScanner.render(onScanSuccess);
+    }
+
+    function closeScanner() {
+        const modal = document.getElementById('scannerModal');
+        modal.style.display = 'none';
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+        }
+        hideAttendeeInfo();
+    }
+
+    function showError(message) {
+        const errorAlert = document.getElementById('error-alert');
+        const successAlert = document.getElementById('success-alert');
+        errorAlert.textContent = message;
+        errorAlert.style.display = 'block';
+        successAlert.style.display = 'none';
+        setTimeout(() => {
+            errorAlert.style.display = 'none';
+        }, 3000);
+    }
+
+    function showSuccess(message) {
+        const successAlert = document.getElementById('success-alert');
+        const errorAlert = document.getElementById('error-alert');
+        successAlert.textContent = message;
+        successAlert.style.display = 'block';
+        errorAlert.style.display = 'none';
+        setTimeout(() => {
+            successAlert.style.display = 'none';
+            closeScanner();
+        }, 3000);
+    }
+
+    function showAttendeeInfo(attendee) {
+        const info = document.getElementById('attendee-info');
+        document.getElementById('attendee-name').textContent = attendee.name;
+        document.getElementById('attendee-email').textContent = attendee.email;
+        document.getElementById('attendee-arrival').textContent = attendee.arrival_time;
+        info.style.display = 'block';
+    }
+
+    function hideAttendeeInfo() {
+        document.getElementById('attendee-info').style.display = 'none';
+    }
+
+    function processQRCode(qrCode) {
+        fetch('{% url "verify_qr_code" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: `qr_code_id=${encodeURIComponent(qrCode)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+                if (data.attendee) {
+                    showAttendeeInfo(data.attendee);
+                }
+            } else {
+                showError(data.message);
+                hideAttendeeInfo();
+            }
+        })
+        .catch(error => {
+            showError('Error al procesar el código QR');
+            hideAttendeeInfo();
+        });
+    }
+
+    function onScanSuccess(decodedText, decodedResult) {
+        processQRCode(decodedText);
+    }
+
+    // Handle ESC key to close modal
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeScanner();
+        }
+    });
+</script>
+{% endblock %}
