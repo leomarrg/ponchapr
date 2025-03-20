@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PonchaPR - Event Report</title>
+    <style>
+        @page { margin: 2cm; }
+        body { font-family: Arial; font-size: 12px; }
+        h1 { color: #4e73df; text-align: center; }
+        h2 { color: #4e73df; border-bottom: 1px solid #ddd; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        table, th, td { border: 1px solid #ddd; }
+        th { background-color: #f2f2f2; padding: 8px; text-align: left; }
+        td { padding: 8px; }
+        .page-break { page-break-before: always; }
+    </style>
+</head>
+<body>
+    <h1>PonchaPR Event Report</h1>
+    <p style="text-align: center">Generated on: {{ generated_at|date:"F d, Y g:i A" }}</p>
+    
+    <h2>Attendance Summary</h2>
+    <table>
+        <tr>
+            <th>Total Registered</th>
+            <td>{{ total_attendees }}</td>
+        </tr>
+        <tr>
+            <th>Checked In</th>
+            <td>{{ arrived_attendees }}</td>
+        </tr>
+        <tr>
+            <th>Checked Out</th>
+            <td>{{ checked_out_attendees }}</td>
+        </tr>
+        <tr>
+            <th>Check-in Rate</th>
+            <td>{{ arrival_percentage }}%</td>
+        </tr>
+    </table>
+    
+    <div class="page-break"></div>
+    <h2>Attendee List</h2>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Last Name</th>
+            <th>Status</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+        </tr>
+        {% for attendee in attendees %}
+            {% if forloop.counter0|divisibleby:40 and forloop.counter0 > 0 %}
+                </table><div class="page-break"></div><h2>Attendee List (continued)</h2><table>
+                <tr>
+                    <th>Name</th>
+                    <th>Last Name</th>
+                    <th>Status</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                </tr>
+            {% endif %}
+            <tr>
+                <td>{{ attendee.name }}</td>
+                <td>{{ attendee.last_name }}</td>
+                <td>
+                    {% if attendee.checked_out %}Checked Out
+                    {% elif attendee.arrived %}Checked In
+                    {% elif attendee.pre_registered %}Pre-Registered
+                    {% elif attendee.registered_at_event %}Front Desk
+                    {% else %}Registered{% endif %}
+                </td>
+                <td>{{ attendee.arrival_time|date:"M d, Y g:i A"|default:"-" }}</td>
+                <td>{{ attendee.checkout_time|date:"M d, Y g:i A"|default:"-" }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

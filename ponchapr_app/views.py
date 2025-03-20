@@ -1,15 +1,21 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from .forms import AttendeeForm
 from .models import Attendee
-from .utils import send_registration_email, send_registration_email_async, schedule_registration_email
+from .utils import send_registration_email_async, schedule_registration_email
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from django.contrib import messages
-from django.db.models import Count
+from django.db.models import Count, Avg, F, ExpressionWrapper
 from django.db.models.functions import TruncHour
+from django.template.loader import get_template
+from django.contrib.auth.decorators import login_required
 import json
-import threading
+from io import BytesIO
+import logging
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 def pre_register(request):
     if request.method == 'POST':
@@ -398,3 +404,95 @@ def checkout_form(request):
 
 def terms_view(request):
     return render(request,'ponchapr_app/terms.html')
+
+@login_required
+def generate_report(request):
+    """
+    Generate a PDF report of the current event statistics and attendee list
+    """
+    try:
+        # Get the dashboard context data
+        # Call the dashboard function directly with the return_context parameter
+        # and get the context from the response
+        context = dashboard(request)
+        
+        # Add the date and time the report was generated
+        context['generated_at'] = timezone.now()
+        
+        # Add any additional calculations or data needed for the report
+        if 'attendees' in context and context['attendees']:
+            # Calculate region distribution
+            region_distribution = {}
+            for attendee in context['attendees']:
+                region_name = attendee.region.name if attendee.region else 'No Region'
+                if region_name in region_distribution:
+                    region_distribution[region_name] += 1
+                else:
+                    region_distribution[region_name] = 1
+            
+            # Calculate percentages
+            total = len(context['attendees'])
+            for region in region_distribution:
+                region_distribution[region] = (region_distribution[region] / total) * 100
+                
+            context['region_distribution'] = region_distribution
+            
+            # Calculate average time spent at event (for checked-out attendees)
+            from django.db.models import F, ExpressionWrapper, DurationField, Avg
+            
+            # Query for average time spent - use your model directly
+            avg_time_result = Attendee.objects.filter(
+                arrival_time__isnull=False,
+                checkout_time__isnull=False
+            ).annotate(
+                time_spent=ExpressionWrapper(
+                    F('checkout_time') - F('arrival_time'), 
+                    output_field=DurationField()
+                )
+            ).aggregate(
+                avg_time=Avg('time_spent')
+            )
+            
+            if avg_time_result['avg_time']:
+                avg_seconds = avg_time_result['avg_time'].total_seconds()
+                avg_hours = int(avg_seconds // 3600)
+                avg_minutes = int((avg_seconds % 3600) // 60)
+                context['avg_time_spent'] = f"{avg_hours}h {avg_minutes}m"
+            else:
+                context['avg_time_spent'] = "N/A"
+        
+        # Create a response with the PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="PonchaPR_Event_Report.pdf"'
+        
+        # Render the template to a string
+        template = get_template('event_report.html')
+        html = template.render(context)
+        
+        # Create a file-like buffer to receive PDF data
+        buffer = BytesIO()
+        
+        # Convert HTML to PDF in the buffer
+        import xhtml2pdf.pisa as pisa
+        pisa_status = pisa.CreatePDF(
+            html,                   # HTML content
+            dest=buffer,            # Output destination
+            encoding='utf-8'
+        )
+        
+        if pisa_status.err:
+            return HttpResponse("Error generating PDF report. Please try again.", status=500)
+        
+        # Get the value of the buffer
+        pdf = buffer.getvalue()
+        buffer.close()
+        
+        # Write the PDF to the response
+        response.write(pdf)
+        
+        return response
+    
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return HttpResponse(f"An error occurred: {str(e)}", status=500)

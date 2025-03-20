@@ -13,6 +13,7 @@ urlpatterns = [
     path('check-in/<int:attendee_id>/', views.check_in_attendee, name='check_in_attendee'),
     path('checkout/', views.checkout_form, name='checkout_form'),
     path('terms/', views.terms_view, name='terms'),
+    path('generate-report/', views.generate_report, name='generate_report'),
     # Add these new authentication paths
     path('accounts/login/', auth_views.LoginView.as_view(template_name='admin/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
