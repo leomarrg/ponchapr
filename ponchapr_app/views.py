@@ -411,19 +411,39 @@ def generate_report(request):
     Generate a PDF report of the current event statistics and attendee list
     """
     try:
-        # Get the dashboard context data
-        # Call the dashboard function directly with the return_context parameter
-        # and get the context from the response
-        context = dashboard(request)
+        # Get data directly instead of calling dashboard view
+        # These should be the same queries used in your dashboard view
+        total_attendees = Attendee.objects.count()
+        arrived_attendees = Attendee.objects.filter(arrived=True).count()
+        checked_out_attendees = Attendee.objects.filter(checked_out=True).count()
         
-        # Add the date and time the report was generated
-        context['generated_at'] = timezone.now()
+        # Calculate attendance percentages
+        arrival_percentage = 0
+        if total_attendees > 0:
+            arrival_percentage = int((arrived_attendees / total_attendees) * 100)
+        
+        # Get registration type counts
+        pre_registered_count = Attendee.objects.filter(pre_registered=True).count()
+        
+        # Get all attendees
+        attendees = Attendee.objects.all().select_related('region').order_by('-created_at')
+        
+        # Build the context dictionary yourself
+        context = {
+            'total_attendees': total_attendees,
+            'arrived_attendees': arrived_attendees,
+            'checked_out_attendees': checked_out_attendees,
+            'arrival_percentage': arrival_percentage,
+            'pre_registered_count': pre_registered_count,
+            'attendees': attendees,
+            'generated_at': timezone.now()
+        }
         
         # Add any additional calculations or data needed for the report
-        if 'attendees' in context and context['attendees']:
+        if attendees:
             # Calculate region distribution
             region_distribution = {}
-            for attendee in context['attendees']:
+            for attendee in attendees:
                 region_name = attendee.region.name if attendee.region else 'No Region'
                 if region_name in region_distribution:
                     region_distribution[region_name] += 1
@@ -431,7 +451,7 @@ def generate_report(request):
                     region_distribution[region_name] = 1
             
             # Calculate percentages
-            total = len(context['attendees'])
+            total = len(attendees)
             for region in region_distribution:
                 region_distribution[region] = (region_distribution[region] / total) * 100
                 
@@ -440,7 +460,7 @@ def generate_report(request):
             # Calculate average time spent at event (for checked-out attendees)
             from django.db.models import F, ExpressionWrapper, DurationField, Avg
             
-            # Query for average time spent - use your model directly
+            # Query for average time spent
             avg_time_result = Attendee.objects.filter(
                 arrival_time__isnull=False,
                 checkout_time__isnull=False
