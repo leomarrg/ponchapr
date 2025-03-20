@@ -9,111 +9,33 @@
    <!--- Basic Page Needs
    ================================================== -->
    <meta charset="utf-8">
-	<title>Register</title>
-	<meta name="description" content="">  
-	<meta name="author" content="">
+   <title>Check-Out</title>
+   <meta name="description" content="">  
+   <meta name="author" content="">
    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
    <meta http-equiv="Pragma" content="no-cache">
    <meta http-equiv="Expires" content="0">
 
    <!-- Mobile Specific Metas
    ================================================== -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-	<!-- CSS
+   <!-- CSS
     ================================================== -->
    <link rel="stylesheet" href="{% static 'css/default.css' %}">
-	<link rel="stylesheet" href="{% static 'css/layout.css' %}">
+   <link rel="stylesheet" href="{% static 'css/layout.css' %}">
    <link rel="stylesheet" href="{% static 'css/media-queries.css' %}">
    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
    <link rel="stylesheet" href="{% static 'css/prettyPhoto.css' %}">
 
    <!-- Script
    ================================================== -->
-	<script src="{% static 'js/modernizr.js' %}"></script>
+   <script src="{% static 'js/modernizr.js' %}"></script>
    <script src="{% static 'js/main.js' %}"></script>
 
    <!-- Favicons
-	================================================== -->
-	<link rel="shortcut icon" href="{% static 'favicon.png' %}" >
-
-   <style>
-      html {
-         height: 100%;
-      }
-
-      body {
-         min-height: 100%;
-         display: flex;
-         flex-direction: column;
-         margin: 0;
-      }
-
-      main {
-         flex: 1 0 auto;
-         display: flex;
-         flex-direction: column;
-      }
-
-      section {
-         flex: 1;
-         display: flex;
-         align-items: center;
-         justify-content: center;
-      }
-
-      footer {
-         flex-shrink: 0;
-         width: 100%;
-         background-color: inherit;
-         position: relative;
-      }
-
-      @media screen and (min-height: 100vh) {
-         footer {
-            margin-top: auto;
-         }
-      }
-      
-      /* Center the form both horizontally and vertically */
-      .container {
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-         justify-content: center;
-         width: 30%;
-         max-width: 100%;
-         padding: 20px 15px;
-         box-sizing: border-box;
-      }
-      
-      #checkoutForm {
-         width: 100%;
-         max-width: 500px;
-         margin: 0 auto;
-      }
-      
-      .form-header {
-         text-align: center;
-         width: 100%;
-      }
-      
-      .form-group {
-         margin-bottom: 20px;
-      }
-      
-      .submit-btn {
-         display: block;
-         margin: 20px auto 0;
-      }
-      
-      /* Make sure messages are also centered */
-      .messages {
-         width: 100%;
-         max-width: 500px;
-         margin: 0 auto 20px;
-      }
-   </style>
+   ================================================== -->
+   <link rel="shortcut icon" href="{% static 'favicon.png' %}" >
 
 </head>
 
@@ -128,12 +50,12 @@
    <!-- Header
    ================================================== -->
    <header>
-
       <div class="logo">
          <a class="smoothscroll" href="#hero"><img alt="" src="{% static 'images/logo.png' %}"></a>
       </div>
-
    </header> <!-- Header End -->
+   
+   <br><br>
    
    <main>
       <section>
@@ -159,9 +81,11 @@
                   <div id="uniqueIdError" class="error-message"></div>
                </div>
                
-               <button type="submit" class="submit-btn">
-                  Completar Check-Out
-               </button>
+               <div class="button-wrapper">
+                  <button type="submit" class="submit-btn">
+                     Completar Check-Out
+                  </button>
+               </div>
             </form>
          </div>
       </section>
@@ -181,28 +105,18 @@
                </a>
             </div>
 
-            <p>REGISTRATEPR  es una plataforma digital diseñada para simplificar el proceso de registro en cualquier tipo de evento.</p>
-
+            <p>REGISTRATEPR es una plataforma digital diseñada para simplificar el proceso de registro en cualquier tipo de evento.</p>
 
          </div>
 
-
-
-               <div class="columns last">
-                  <h3 class="contact">Contáctanos</h3>
-                  <ul>                   
-                    <li><a href="mailto:someone@woo.com">registratepr.info@gmail.com</a></li>
-                  </ul>
-               </div>
-
+         <div class="columns last">
+            <h3 class="contact">Contáctanos</h3>
+            <ul>                   
+               <li><a href="mailto:registratepr.info@gmail.com">registratepr.info@gmail.com</a></li>
+            </ul>
+         </div>
 
          <p class="copyright">&copy; 2024 registratepr | Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></p>
-
-<!--==================================================================-->
-         <!--commented button to go back to top-->
-         <!--<div id="go-top">
-            <a class="smoothscroll" title="Back to Top" href="#hero"><i class="icon-up-open"></i></a>
-         </div>-->
 
       </div> <!-- Row End -->
 
@@ -213,8 +127,8 @@
    ================================================== -->
    <script src="{% static 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' %}"></script>
    <script>
-    window.jQuery || document.write('<script src="{% static "js/jquery-1.10.2.min.js" %}"><\/script>');
-</script>
+      window.jQuery || document.write('<script src="{% static "js/jquery-1.10.2.min.js" %}"><\/script>');
+   </script>
    <script type="text/javascript" src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
    <script src="{% static 'js/jquery.flexslider.js' %}"></script>
    <script src="{% static 'js/waypoints.js' %}"></script>
@@ -224,60 +138,55 @@
    <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script>   
    <script src="{% static 'js/main.js' %}"></script>
    <script>
-        const form = document.querySelector('form');
-        let isSubmitting = false;
+      const form = document.querySelector('form');
+      let isSubmitting = false;
 
-        form.addEventListener('submit', function(e) {
-            if (isSubmitting) {
+      form.addEventListener('submit', function(e) {
+         if (isSubmitting) {
             e.preventDefault();
             return;
-            }
+         }
 
-            isSubmitting = true;
-            const submitButton = this.querySelector('button[type="submit"]');
-            if (submitButton) {
+         isSubmitting = true;
+         const submitButton = this.querySelector('button[type="submit"]');
+         if (submitButton) {
             submitButton.disabled = true;
             submitButton.innerHTML = 'Procesando...';
-            }
-        });
+         }
+      });
 
-        // Reset submission status when leaving the page
-        window.addEventListener('beforeunload', function() {
-            isSubmitting = false;
-        });
+      // Reset submission status when leaving the page
+      window.addEventListener('beforeunload', function() {
+         isSubmitting = false;
+      });
 
-        // Prevent form resubmission on page refresh
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.href);
-        }
+      // Prevent form resubmission on page refresh
+      if (window.history.replaceState) {
+         window.history.replaceState(null, null, window.location.href);
+      }
 
-        // Reset the form and date picker after successful submission
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const messages = document.querySelector('.messages');
-            
-            // Reset form on any server response (success or error)
-            if (messages && (messages.querySelector('.alert-success') || messages.querySelector('.alert'))) {
+      // Reset the form after successful submission
+      document.addEventListener('DOMContentLoaded', function() {
+         const form = document.querySelector('form');
+         const messages = document.querySelector('.messages');
+         
+         // Reset form on any server response (success or error)
+         if (messages && (messages.querySelector('.alert-success') || messages.querySelector('.alert'))) {
             form.reset();  // Reset all form fields
-            const datePicker = document.getElementById('date-of-birth');
-            if (datePicker) {
-                    datePicker.value = '';  // Explicitly clear the date picker
-            }
             
             // Clear any error messages that might be displayed
             const errorMessages = document.querySelectorAll('.error-message');
             errorMessages.forEach(error => error.textContent = '');
-            }
-            
-            // Clear all inputs on page load
-            const clearInputs = () => {
-            const inputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="date"]');
+         }
+         
+         // Clear all inputs on page load
+         const clearInputs = () => {
+            const inputs = document.querySelectorAll('input[type="text"]');
             inputs.forEach(input => input.value = '');
-            };
-            clearInputs();
-        });    
+         };
+         clearInputs();
+      });    
    </script>
 
 </body>
-
 </html>
