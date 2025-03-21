@@ -79,7 +79,7 @@ class AttendeeForm(forms.ModelForm):
         
         # Check if the email domain is valid
         if email:
-            valid_domains = ['.gov', 'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
+            valid_domains = ['pr.gov', 'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
             domain = email.split('@')[-1]
             
             if not any(domain.endswith(valid_domain) for valid_domain in valid_domains):
