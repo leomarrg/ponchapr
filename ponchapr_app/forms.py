@@ -72,8 +72,19 @@ class AttendeeForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
+        
+        # Check if email already exists
         if Attendee.objects.filter(email=email).exists():
             raise forms.ValidationError("Este correo electrónico ya está registrado.")
+        
+        # Check if the email domain is valid
+        if email:
+            valid_domains = ['.gov', 'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
+            domain = email.split('@')[-1]
+            
+            if not any(domain.endswith(valid_domain) for valid_domain in valid_domains):
+                raise forms.ValidationError(f"Por favor utilice un correo electrónico con un dominio válido como: {', '.join(valid_domains)}")
+        
         return email
     
     def clean_region(self):
