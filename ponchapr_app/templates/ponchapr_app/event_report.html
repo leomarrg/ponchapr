@@ -5,8 +5,16 @@
     <meta charset="utf-8">
     <title>PonchaPR - Event Report</title>
     <style>
-        @page { margin: 2cm; }
-        body { font-family: Arial; font-size: 12px; }
+        @page { 
+            margin: 2cm; 
+            @bottom-right {
+                content: element(footer);
+            }
+        }
+        body { 
+            font-family: Arial; 
+            font-size: 12px; 
+        }
         h1 { color: #4e73df; text-align: center; }
         h2 { color: #4e73df; border-bottom: 1px solid #ddd; }
         h3 { color: #4e73df; margin-top: 15px; }
@@ -17,6 +25,7 @@
         .page-break { page-break-before: always; }
         .region-header { background-color: #e8eaf6; font-weight: bold; padding: 8px; margin-top: 15px; }
         .region-section { margin-top: 20px; border: 1px solid #ddd; padding: 10px; }
+        
         /* Footer with logo */
         #footer {
             position: running(footer);
@@ -40,9 +49,14 @@
     </style>
 </head>
 <body>
-     <!-- Fixed logo that appears on every page -->
-     <div class="fixed-logo">
+    <!-- Fixed logo that appears on every page -->
+    <div class="fixed-logo">
         <img src="{{ logo_url|default:'/static/images/adfan_logo.jpg' }}" alt="ADFAN Logo">
+    </div>
+    
+    <!-- Alternative method using page templates -->
+    <div id="footer">
+        <img id="page-logo" src="{{ logo_url|default:'/static/images/adfan_logo.jpg' }}" alt="ADFAN Logo">
     </div>
     <h1>PonchaPR Event Report</h1>
     <p style="text-align: center">Generated on: {{ generated_at|date:"F d, Y g:i A" }}</p>
