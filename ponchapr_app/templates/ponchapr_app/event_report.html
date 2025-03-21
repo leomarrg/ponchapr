@@ -6,14 +6,7 @@
     <title>PonchaPR - Event Report</title>
     <style>
         @page { margin: 2cm; }
-        body { 
-            font-family: Arial; 
-            font-size: 12px; 
-            background-image: url('{% static "images/adfan_logo.jpg" %}');
-            background-position: bottom right;
-            background-repeat: no-repeat;
-            background-size: 100px auto;
-        }
+        body { font-family: Arial; font-size: 12px; }
         h1 { color: #4e73df; text-align: center; }
         h2 { color: #4e73df; border-bottom: 1px solid #ddd; }
         h3 { color: #4e73df; margin-top: 15px; }
@@ -24,6 +17,9 @@
         .page-break { page-break-before: always; }
         .region-header { background-color: #e8eaf6; font-weight: bold; padding: 8px; margin-top: 15px; }
         .region-section { margin-top: 20px; border: 1px solid #ddd; padding: 10px; }
+        
+        /* Simple footer with logo */
+        .footer { text-align: right; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -74,6 +70,11 @@
     </table>
     {% endif %}
     
+    <!-- Logo at the bottom of first page -->
+    <div class="footer">
+        <img src="/ponchapr_app/static/images/adfan_logo.jpg" width="100">
+    </div>
+    
     <div class="page-break"></div>
     <h2>Attendees by Region</h2>
     <p>Each region is displayed on a separate page with its own table.</p>
@@ -97,6 +98,12 @@
             {% for attendee in region_group.list %}
                 {% if forloop.counter0|divisibleby:30 and forloop.counter0 > 0 %}
                     </table>
+                    
+                    <!-- Logo at the bottom of continuation page -->
+                    <div class="footer">
+                        <img src="/ponchapr_app/static/images/adfan_logo.jpg" width="100">
+                    </div>
+                    
                     <div class="page-break"></div>
                     <h3>Region: {{ region_group.grouper|default:"No Region" }} (continued)</h3>
                     <table>
@@ -123,6 +130,11 @@
                 </tr>
             {% endfor %}
         </table>
+        
+        <!-- Logo at the bottom of each region page -->
+        <div class="footer">
+            <img src="/ponchapr_app/static/images/adfan_logo.jpg" width="100">
+        </div>
     {% endfor %}
 </body>
 </html>
