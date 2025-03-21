@@ -425,8 +425,8 @@ def generate_report(request):
         # Get registration type counts
         pre_registered_count = Attendee.objects.filter(pre_registered=True).count()
         
-        # Get all attendees
-        attendees = Attendee.objects.all().select_related('region').order_by('-created_at')
+        # Get all attendees - order by region name and then by created_at
+        attendees = Attendee.objects.all().select_related('region').order_by('region__name', '-created_at')
         
         # Build the context dictionary yourself
         context = {
@@ -443,12 +443,15 @@ def generate_report(request):
         if attendees:
             # Calculate region distribution
             region_distribution = {}
+            region_counts = {}
             for attendee in attendees:
                 region_name = attendee.region.name if attendee.region else 'No Region'
                 if region_name in region_distribution:
                     region_distribution[region_name] += 1
+                    region_counts[region_name] += 1
                 else:
                     region_distribution[region_name] = 1
+                    region_counts[region_name] = 1
             
             # Calculate percentages
             total = len(attendees)
@@ -456,6 +459,7 @@ def generate_report(request):
                 region_distribution[region] = (region_distribution[region] / total) * 100
                 
             context['region_distribution'] = region_distribution
+            context['region_counts'] = region_counts
             
             # Calculate average time spent at event (for checked-out attendees)
             from django.db.models import F, ExpressionWrapper, DurationField, Avg
@@ -484,6 +488,13 @@ def generate_report(request):
         # Create a response with the PDF
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="PonchaPR_Event_Report.pdf"'
+        
+        # Add a custom filter to access dictionary items by key in templates
+        from django.template.defaulttags import register
+        
+        @register.filter
+        def get_item(dictionary, key):
+            return dictionary.get(key)
         
         # Render the template to a string
         template = get_template('ponchapr_app/event_report.html')

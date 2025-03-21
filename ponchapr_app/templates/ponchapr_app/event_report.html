@@ -9,11 +9,14 @@
         body { font-family: Arial; font-size: 12px; }
         h1 { color: #4e73df; text-align: center; }
         h2 { color: #4e73df; border-bottom: 1px solid #ddd; }
+        h3 { color: #4e73df; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         table, th, td { border: 1px solid #ddd; }
         th { background-color: #f2f2f2; padding: 8px; text-align: left; }
         td { padding: 8px; }
         .page-break { page-break-before: always; }
+        .region-header { background-color: #e8eaf6; font-weight: bold; padding: 8px; margin-top: 15px; }
+        .region-section { margin-top: 20px; border: 1px solid #ddd; padding: 10px; }
     </style>
 </head>
 <body>
@@ -38,43 +41,81 @@
             <th>Check-in Rate</th>
             <td>{{ arrival_percentage }}%</td>
         </tr>
+        {% if avg_time_spent %}
+        <tr>
+            <th>Average Time Spent</th>
+            <td>{{ avg_time_spent }}</td>
+        </tr>
+        {% endif %}
     </table>
     
-    <div class="page-break"></div>
-    <h2>Attendee List</h2>
+    {% if region_distribution %}
+    <h2>Regional Distribution</h2>
     <table>
         <tr>
-            <th>Name</th>
-            <th>Last Name</th>
-            <th>Status</th>
-            <th>Check-in</th>
-            <th>Check-out</th>
+            <th>Region</th>
+            <th>Attendee Count</th>
+            <th>Percentage</th>
         </tr>
-        {% for attendee in attendees %}
-            {% if forloop.counter0|divisibleby:40 and forloop.counter0 > 0 %}
-                </table><div class="page-break"></div><h2>Attendee List (continued)</h2><table>
-                <tr>
-                    <th>Name</th>
-                    <th>Last Name</th>
-                    <th>Status</th>
-                    <th>Check-in</th>
-                    <th>Check-out</th>
-                </tr>
-            {% endif %}
-            <tr>
-                <td>{{ attendee.name }}</td>
-                <td>{{ attendee.last_name }}</td>
-                <td>
-                    {% if attendee.checked_out %}Checked Out
-                    {% elif attendee.arrived %}Checked In
-                    {% elif attendee.pre_registered %}Pre-Registered
-                    {% elif attendee.registered_at_event %}Front Desk
-                    {% else %}Registered{% endif %}
-                </td>
-                <td>{{ attendee.arrival_time|date:"M d, Y g:i A"|default:"-" }}</td>
-                <td>{{ attendee.checkout_time|date:"M d, Y g:i A"|default:"-" }}</td>
-            </tr>
+        {% for region, percentage in region_distribution.items %}
+        <tr>
+            <td>{{ region }}</td>
+            <td>{{ region_counts|get_item:region }}</td>
+            <td>{{ percentage|floatformat:1 }}%</td>
+        </tr>
         {% endfor %}
     </table>
+    {% endif %}
+    
+    <div class="page-break"></div>
+    <h2>Attendees by Region</h2>
+    <p>Each region is displayed on a separate page with its own table.</p>
+    
+    {% regroup attendees by region.name as region_list %}
+    
+    {% for region_group in region_list %}
+        <div class="page-break"></div>
+        <h2>Region: {{ region_group.grouper|default:"No Region" }}</h2>
+        
+        <p>Total attendees in this region: {{ region_counts|get_item:region_group.grouper|default:"0" }}</p>
+        
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Last Name</th>
+                <th>Status</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+            </tr>
+            {% for attendee in region_group.list %}
+                {% if forloop.counter0|divisibleby:30 and forloop.counter0 > 0 %}
+                    </table>
+                    <div class="page-break"></div>
+                    <h3>Region: {{ region_group.grouper|default:"No Region" }} (continued)</h3>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Last Name</th>
+                            <th>Status</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                        </tr>
+                {% endif %}
+                <tr>
+                    <td>{{ attendee.name }}</td>
+                    <td>{{ attendee.last_name }}</td>
+                    <td>
+                        {% if attendee.checked_out %}Checked Out
+                        {% elif attendee.arrived %}Checked In
+                        {% elif attendee.pre_registered %}Pre-Registered
+                        {% elif attendee.registered_at_event %}Front Desk
+                        {% else %}Registered{% endif %}
+                    </td>
+                    <td>{{ attendee.arrival_time|date:"M d, Y g:i A"|default:"-" }}</td>
+                    <td>{{ attendee.checkout_time|date:"M d, Y g:i A"|default:"-" }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
 </body>
 </html>
