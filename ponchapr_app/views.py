@@ -428,6 +428,11 @@ def generate_report(request):
         # Get all attendees - order by region name and then by created_at
         attendees = Attendee.objects.all().select_related('region').order_by('region__name', '-created_at')
 
+        # Get absolute path to the logo
+        import os
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        logo_path = os.path.join(base_dir, 'ponchapr_app', 'static', 'images', 'adfan_logo.jpg')
+
         # Build the context dictionary yourself
         context = {
             'total_attendees': total_attendees,
@@ -437,7 +442,7 @@ def generate_report(request):
             'pre_registered_count': pre_registered_count,
             'attendees': attendees,
             'generated_at': timezone.now(),
-            'logo_url': 'ponchapr_app/static/images/adfan_logo.jpg'
+            'logo_path': 'logo_path'
         }
         
         # Add any additional calculations or data needed for the report
