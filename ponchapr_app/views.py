@@ -427,7 +427,7 @@ def generate_report(request):
         
         # Get all attendees - order by region name and then by created_at
         attendees = Attendee.objects.all().select_related('region').order_by('region__name', '-created_at')
-        
+
         # Build the context dictionary yourself
         context = {
             'total_attendees': total_attendees,
@@ -436,7 +436,8 @@ def generate_report(request):
             'arrival_percentage': arrival_percentage,
             'pre_registered_count': pre_registered_count,
             'attendees': attendees,
-            'generated_at': timezone.now()
+            'generated_at': timezone.now(),
+            'logo_url': 'ponchapr_app/static/images/adfan_logo.jpg'
         }
         
         # Add any additional calculations or data needed for the report

@@ -17,9 +17,33 @@
         .page-break { page-break-before: always; }
         .region-header { background-color: #e8eaf6; font-weight: bold; padding: 8px; margin-top: 15px; }
         .region-section { margin-top: 20px; border: 1px solid #ddd; padding: 10px; }
+        /* Footer with logo */
+        #footer {
+            position: running(footer);
+            text-align: right;
+        }
+        #page-logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        
+        /* Alternative method - fixed positioned logo */
+        .fixed-logo {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: auto;
+            z-index: -1; /* Ensures it stays behind content */
+        }
     </style>
 </head>
 <body>
+     <!-- Fixed logo that appears on every page -->
+     <div class="fixed-logo">
+        <img src="{{ logo_url|default:'/static/images/adfan_logo.jpg' }}" alt="ADFAN Logo">
+    </div>
     <h1>PonchaPR Event Report</h1>
     <p style="text-align: center">Generated on: {{ generated_at|date:"F d, Y g:i A" }}</p>
     
