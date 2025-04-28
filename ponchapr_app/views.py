@@ -591,3 +591,7 @@ def generate_report(request):
         import traceback
         print(traceback.format_exc())
         return HttpResponse(f"An error occurred: {str(e)}", status=500)
+
+def landing_page(request):
+    """Muestra la página principal con instrucciones y botón para registro"""
+    return render(request, 'ponchapr_app/instrucciones.html')

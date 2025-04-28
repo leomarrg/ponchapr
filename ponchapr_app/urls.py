@@ -3,7 +3,8 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path('', views.pre_register, name='pre_register'),
+    path('', views.landing_page, name='landing_page'),  # Nueva página principal
+    path('pre-register/', views.pre_register, name='pre_register'),
     path('register/', views.front_desk_register, name='register'),
     path('api/checkin/', views.verify_checkin_qr_code, name='verify_checkin_qr_code'),
     path('api/checkout/', views.verify_checkout_qr_code, name='verify_checkout_qr_code'),
