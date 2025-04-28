@@ -299,6 +299,37 @@
                         </div>
                     </div>
 
+                    <div class="row mb-4">
+                        <div class="col-xl-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Seleccionar Evento</h6>
+                                </div>
+                                <div class="card-body">
+                                    <form method="get" action="{% url 'dashboard' %}" class="mb-0">
+                                        <div class="form-group mb-0">
+                                            <div class="input-group">
+                                                <select name="event_id" class="form-control">
+                                                    {% for event in all_events %}
+                                                        <option value="{{ event.id }}" {% if selected_event and event.id == selected_event.id %}selected{% endif %}>
+                                                            {{ event.name }} ({{ event.date|date:"d/m/Y" }})
+                                                            {% if event.is_active %} - Activo{% endif %}
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="submit">
+                                                        <i class="fas fa-filter fa-sm"></i> Filtrar
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+
                     <!-- Attendance Overview Table -->
                     <div class="row">
                         <div class="col-xl-9 col-lg-9">

@@ -6,6 +6,25 @@ from django.utils import timezone
 # Create your models here.
 # registry_app/models.py
 
+class Event(models.Model):
+    name = models.CharField(max_length=200)
+    date = models.DateField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"{self.name} ({self.date})"
+    
+    class Meta:
+        ordering = ['-date']
+    
+    def save(self, *args, **kwargs):
+        # Si este evento se está marcando como activo, desactivar los demás
+        if self.is_active:
+            Event.objects.filter(is_active=True).update(is_active=False)
+        super().save(*args, **kwargs)
+
 class Table(models.Model):
     table_number = models.PositiveIntegerField(unique=True)
     max_seats = models.PositiveIntegerField(default=5)  # Add max_seats field with a default value
@@ -42,9 +61,10 @@ class Region(models.Model):
 class Attendee(models.Model):
     name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
+    email = models.EmailField()
     phone_number = models.CharField(max_length=20)
     date_of_birth = models.DateField(null=True, blank=True)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
     
     # New unique identifier field (6-digit number)
     unique_id = models.CharField(max_length=6, unique=True, blank=True)
@@ -70,6 +90,7 @@ class Attendee(models.Model):
     
     class Meta:
         ordering = ['-created_at']
+        unique_together = [['email', 'event']]
     
     def __str__(self):
         return f"{self.name} {self.last_name}"

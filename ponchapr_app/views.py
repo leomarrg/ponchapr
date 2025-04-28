@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from .forms import AttendeeForm
-from .models import Attendee
+from .models import Attendee, Event
 from .utils import send_registration_email_async, schedule_registration_email
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
@@ -45,6 +45,14 @@ def pre_register(request):
 
 def front_desk_register(request):
     """Handle registrations that happen at the event (same day registrations)"""
+    
+    active_event = Event.objects.filter(is_active=True).first()
+
+    if not active_event:
+        messages.error(request, "No hay un evento activo configurado. Por favor, contacte al administrador.")
+        # Redireccionar a una página adecuada o mostrar un formulario vacío
+        return render(request, 'ponchapr_app/register.html', {'form': AttendeeForm()})
+    
     if request.method == 'POST':
         form = AttendeeForm(request.POST)
         if form.is_valid():
@@ -54,6 +62,7 @@ def front_desk_register(request):
                 attendee.registered_at_event = True
                 attendee.arrived = True
                 attendee.arrival_time = timezone.now()
+                attendee.event = active_event
                 
                 # Generar ID único
                 import random
@@ -87,7 +96,8 @@ def front_desk_register(request):
         form = AttendeeForm()
     
     return render(request, 'ponchapr_app/register.html', {
-        'form': form
+        'form': form,
+        'active_event': active_event
     })
 
 @staff_member_required
@@ -330,6 +340,17 @@ def checkout_qr_code_verify(request):
 
 @staff_member_required
 def dashboard_view(request):
+
+    event_id = request.GET.get('event_id')
+    
+    if event_id:
+        selected_event = get_object_or_404(Event, id=event_id)
+    else:
+        selected_event = Event.objects.filter(is_active=True).first()
+    
+    # Obtener todos los eventos para el selector
+    all_events = Event.objects.all().order_by('-date')
+
     # Basic statistics
     total_attendees = Attendee.objects.count()
     arrived_attendees = Attendee.objects.filter(arrived=True).count()
@@ -350,7 +371,7 @@ def dashboard_view(request):
     front_desk_count = Attendee.objects.filter(registered_at_event=True).count()
     
     # Get all attendees for the data table with related regions
-    attendees = Attendee.objects.all().select_related('region').order_by('-created_at')
+    attendees = Attendee.objects.filter(event=selected_event).select_related('region').order_by('-created_at') if selected_event else []
     
     context = {
         'total_attendees': total_attendees,
@@ -361,19 +382,31 @@ def dashboard_view(request):
         'front_desk_count': front_desk_count,
         'checkout_percentage': checkout_percentage,
         'expected_attendees': expected_attendees,
+        'selected_event': selected_event,
+        'all_events': all_events,
         'attendees': attendees,
     }
     
     return render(request, "ponchapr_app/index.html", context)
 
 def checkout_form(request):
+
+    active_event = Event.objects.filter(is_active=True).first()
+    
+    if not active_event:
+        messages.error(request, "No hay un evento activo configurado. Por favor, contacte al administrador.")
+        return render(request, 'ponchapr_app/checkout.html')
+
     if request.method == 'POST':
         unique_id = request.POST.get('unique_id')
         if unique_id:
             try:
                 # Buscar el asistente por unique_id
-                attendee = Attendee.objects.filter(unique_id=unique_id).first()
-                
+                attendee = Attendee.objects.filter(
+                    unique_id=unique_id,
+                    event=active_event
+                ).first()                
+
                 if not attendee:
                     messages.error(request, "No se encontró ningún asistente con ese código de identificación.")
                     return render(request, 'ponchapr_app/checkout.html')

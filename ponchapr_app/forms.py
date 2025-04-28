@@ -1,5 +1,5 @@
 from django import forms
-from .models import Attendee, Review, Region
+from .models import Attendee, Review, Region, Event
 from datetime import date
 
 
@@ -72,11 +72,15 @@ class AttendeeForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
+
+        active_event = Event.objects.filter(is_active=True).first()
         
         # Check if email already exists
-        if Attendee.objects.filter(email=email).exists():
-            raise forms.ValidationError("Este correo electrónico ya está registrado.")
-        
+        if email and active_event:
+            existing_attendee = Attendee.objects.filter(email=email, event=active_event).exists()
+            if existing_attendee:
+                raise forms.ValidationError("Este correo electrónico ya está registrado para este evento.")
+
         # Check if the email domain is valid
         if email:
             valid_domains = ['pr.gov', 'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']

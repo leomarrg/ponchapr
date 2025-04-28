@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Count, F, Q
 from django.utils.html import format_html
 from django.urls import path
-from .models import Attendee, Table, Review, Region
+from .models import Event, Attendee, Table, Review, Region
 from django.http import HttpResponse
 from django.utils import timezone
 from django.db.models.functions import ExtractHour
@@ -126,7 +126,7 @@ class DuplicatePhoneFilter(admin.SimpleListFilter):
     
 
 class AttendeeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'arrival_time', 'unique_id', 'checkout_time', 'checked_out')  # Use 'created_at' instead
+    list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'arrival_time', 'unique_id', 'checkout_time', 'checked_out', 'event')  # Use 'created_at' instead
     list_filter = ('pre_registered', 'registered_at_event', 'arrived', 'arrival_time', DuplicateNameFilter, DuplicatePhoneFilter)
     search_fields = ['name', 'last_name', 'email']
 
@@ -305,6 +305,25 @@ class AttendeeAdmin(admin.ModelAdmin):
     def qr_code_verify(request):
         return render(request, 'admin/ponchapr_app/qr_code_verify.html')
 
+class EventAdmin(admin.ModelAdmin):
+    list_display = ('name', 'date', 'start_time', 'end_time', 'is_active')
+    list_filter = ('is_active', 'date')
+    search_fields = ('name',)
+    actions = ['make_active']
+    
+    def make_active(self, request, queryset):
+        # Solo activar el primer evento seleccionado
+        if queryset.count() > 0:
+            first_event = queryset.first()
+            # Desactivar todos los eventos
+            Event.objects.all().update(is_active=False)
+            # Activar el seleccionado
+            first_event.is_active = True
+            first_event.save()
+            self.message_user(request, f"Evento '{first_event}' marcado como activo")
+    
+    make_active.short_description = "Marcar evento seleccionado como activo"
+
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('satisfaction', 'usefulness', 'category', 'comments', 'review_date')
@@ -350,4 +369,5 @@ admin.site.register(Region, RegionAdmin)
 
 admin.site.register(Attendee, AttendeeAdmin)
 admin.site.register(Review, ReviewAdmin)
+admin.site.register(Event, EventAdmin)
 

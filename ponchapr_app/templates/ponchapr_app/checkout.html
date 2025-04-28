@@ -71,6 +71,9 @@
             {% endif %}
 
             <h2 class="form-header">Check-Out</h2>
+               {% if active_event %}
+               <p class="event-info text-center">Evento actual: {{ active_event.name }}</p>
+               {% endif %}
             
             <form id="checkoutForm" method="post" action="">
                {% csrf_token %}
