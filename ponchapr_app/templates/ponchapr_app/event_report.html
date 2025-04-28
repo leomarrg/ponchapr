@@ -20,11 +20,36 @@
         
         /* Simple footer with logo */
         .footer { text-align: right; margin-top: 20px; }
+        
+        /* Event info section */
+        .event-info { 
+            background-color: #f9f9f9; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-bottom: 20px;
+            border-left: 4px solid #4e73df;
+        }
+        .event-info h3 {
+            margin-top: 0;
+            color: #4e73df;
+        }
+        .event-info p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <h1>PonchaPR Event Report</h1>
     <p style="text-align: center">Generated on: {{ generated_at|date:"F d, Y g:i A" }}</p>
+    
+    <!-- New Event Information Section -->
+    <div class="event-info">
+        <h3>Event Information</h3>
+        <p><strong>Name:</strong> {{ event.name }}</p>
+        <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
+        <p><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</p>
+        <p><strong>Expected Attendance:</strong> {{ event.expected_attendance }}</p>
+    </div>
     
     <h2>Attendance Summary</h2>
     <table>

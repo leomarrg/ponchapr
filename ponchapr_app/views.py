@@ -451,33 +451,47 @@ def terms_view(request):
 @login_required
 def generate_report(request):
     """
-    Generate a PDF report of the current event statistics and attendee list
+    Generate a PDF report of the specified event statistics and attendee list
     """
     try:
-        # Get data directly instead of calling dashboard view
-        # These should be the same queries used in your dashboard view
-        total_attendees = Attendee.objects.count()
-        arrived_attendees = Attendee.objects.filter(arrived=True).count()
-        checked_out_attendees = Attendee.objects.filter(checked_out=True).count()
+        # Get the event ID from query parameters
+        event_id = request.GET.get('event_id')
+        
+        # If an event ID is provided, get that specific event
+        if event_id:
+            event = get_object_or_404(Event, id=event_id)
+        else:
+            # Otherwise, default to the active event
+            event = Event.objects.filter(is_active=True).first()
+            
+        if not event:
+            messages.error(request, "No se encontró un evento para generar el reporte. Seleccione un evento o active uno.")
+            return redirect('dashboard')
+        
+        # Get statistics filtered by the selected event
+        total_attendees = Attendee.objects.filter(event=event).count()
+        arrived_attendees = Attendee.objects.filter(event=event, arrived=True).count()
+        checked_out_attendees = Attendee.objects.filter(event=event, checked_out=True).count()
         
         # Calculate attendance percentages
         arrival_percentage = 0
         if total_attendees > 0:
             arrival_percentage = int((arrived_attendees / total_attendees) * 100)
         
-        # Get registration type counts
-        pre_registered_count = Attendee.objects.filter(pre_registered=True).count()
+        # Get registration type counts for the selected event
+        pre_registered_count = Attendee.objects.filter(event=event, pre_registered=True).count()
         
-        # Get all attendees - order by region name and then by created_at
-        attendees = Attendee.objects.all().select_related('region').order_by('region__name', '-created_at')
+        # Get all attendees for this event - order by region name and then by created_at
+        attendees = Attendee.objects.filter(event=event).select_related('region').order_by('region__name', '-created_at')
 
         # Get absolute path to the logo
         import os
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        logo_path = os.path.join(base_dir, 'ponchapr_app', 'static', 'images', 'adfan_logo.jpg')
+        logo_path = os.path.join(base_dir, 'ponchapr_app', 'static', 'images', 'logo.png')
 
-        # Build the context dictionary yourself
+        # Build the context dictionary
         context = {
+            'event': event,
             'total_attendees': total_attendees,
             'arrived_attendees': arrived_attendees,
             'checked_out_attendees': checked_out_attendees,
@@ -485,7 +499,7 @@ def generate_report(request):
             'pre_registered_count': pre_registered_count,
             'attendees': attendees,
             'generated_at': timezone.now(),
-            'logo_path': 'logo_path'
+            'logo_path': logo_path
         }
         
         # Add any additional calculations or data needed for the report
@@ -515,6 +529,7 @@ def generate_report(request):
             
             # Query for average time spent
             avg_time_result = Attendee.objects.filter(
+                event=event,
                 arrival_time__isnull=False,
                 checkout_time__isnull=False
             ).annotate(
@@ -536,7 +551,7 @@ def generate_report(request):
         
         # Create a response with the PDF
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="PonchaPR_Event_Report.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="PonchaPR_Event_Report_{event.name}_{event.date}.pdf"'
         
         # Add a custom filter to access dictionary items by key in templates
         from django.template.defaulttags import register
