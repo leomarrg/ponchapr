@@ -4,38 +4,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instrucciones - ADSEF</title>
+    <title>Instrucciones - Registro de Evento ADSEF</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles-compromiso.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            background-color: #164b68;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{% static "css/img/Web-Photo@2x.png" %}');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .content-inner {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+        
+        .compromiso-img {
+            margin-top: 40px;
+            margin-bottom: 10px;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .registro-banner-container {
+            width: 100%;
+            position: relative;
+            margin: 5px 0;
+            padding: 10px 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Esto crea un fondo verde semi-transparente */
+        .registro-banner-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #74b95c;
+            opacity: 0.7; /* Ajusta este valor para la opacidad deseada */
+            z-index: -1;
+        }
+        
+        .registro-banner {
+            text-transform: uppercase;
+            font-size: 28px;
+            font-weight: bold;
+            max-width: 600px;
+            margin: 0 auto;
+            /* El texto permanece 100% opaco */
+            opacity: 1;
+        }
+        
+        .instrucciones-btn {
+            background-color: #00b3d3;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 50px;
+            font-size: 28px;
+            font-weight: 900;
+            cursor: pointer;
+            margin: 10px 0;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .descripcion {
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 18px;
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .registrate-btn {
+            background-color: #a4cc47;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 20px 0;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .footer img {
+            max-width: 250px;
+            height: auto;
+        }
+        
+        .escudo-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            opacity: 0.4;
+            z-index: 0;
+            max-width: 80%;
+            height: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .registro-banner {
+                font-size: 22px;
+            }
+            
+            .descripcion {
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <div class="main-card">
-            <div class="header">
-                <h1 class="title">COMPROMISO EN <span class="accent">acción</span></h1>
+        <div class="background"></div>
+        
+        <!-- Escudo de fondo semi-transparente -->
+        <img src="{% static 'css/img/Escudo@2x.png' %}" alt="" class="escudo-overlay">
+        
+        <div class="content">
+            <div class="content-inner">
+                <!-- Imagen de "Compromiso en acción" -->
+                <img src="{% static 'css/img/compromiso_en_accion@2x.png' %}" alt="COMPROMISO EN acción" class="compromiso-img">
             </div>
             
-            <div class="registro-section">
-                <h2>REGISTRO</h2>
+            <!-- Franja verde semi-transparente a todo el ancho -->
+            <div class="registro-banner-container">
+                <div class="registro-banner">
+                    REGISTRO
+                </div>
             </div>
             
-            <div class="content">
-                <button class="btn-instrucciones">Instrucciones</button>
+            <div class="content-inner">
+                <a href="#info" class="instrucciones-btn">Instrucciones</a>
                 
-                <div class="instructions-text">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+                <div id="info" class="descripcion">
+                    <p>El registro para el evento es simple y rápido. Siga estos pasos:</p>
+                    <br>
+                    <ol style="padding-left: 20px;">
+                        <li>Complete todos los campos del formulario con la información requerida.</li>
+                        <li>Al enviar el formulario, recibirá un código único.</li>
+                        <li>Guarde o tome captura de pantalla del código.</li>
+                        <li>Al finalizar el evento, utilice el mismo código para registrar su salida.</li>
+                    </ol>
+                    <br>
+                    <p>Si tiene alguna pregunta, comuníquese con nosotros al correo: <a href="mailto:registratepr.info@gmail.com" style="color: #a4cc47;">registratepr.info@gmail.com</a></p>
                 </div>
                 
-                <a href="{% url 'register' %}" class="btn-registrate">Registrate</a>
+                <a href="{% url 'register' %}" class="registrate-btn">Regístrate</a>
             </div>
-            
-            <div class="footer">
-                <p class="admin-text">ADMINISTRACIÓN DE DESARROLLO SOCIOECONÓMICO DE LA FAMILIA</p>
-                <div class="logo-container">
-                    <img src="{% static 'images/adsef_logo.png' %}" alt="ADSEF Logo" class="adsef-logo">
-                </div>
-                <p class="gobierno-text">GOBIERNO DE PUERTO RICO</p>
-            </div>
+        </div>
+        
+        <div class="footer">
+            <img src="{% static 'css/img/adsef@2x.png' %}" alt="ADSEF - Gobierno de Puerto Rico">
         </div>
     </div>
 </body>

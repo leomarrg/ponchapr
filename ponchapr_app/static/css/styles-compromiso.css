@@ -19,6 +19,8 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    background-image: url(img/Web\ Photo@2x.png);
+    background-position: 0 80% 50% 0;
 }
 
 .container {
