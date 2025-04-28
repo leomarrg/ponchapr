@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -25,13 +26,13 @@
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
                 </div>
                 
-                <button class="btn-registrate">Registrate</button>
+                <a href="{% url 'register' %}" class="btn-registrate">Registrate</a>
             </div>
             
             <div class="footer">
                 <p class="admin-text">ADMINISTRACIÓN DE DESARROLLO SOCIOECONÓMICO DE LA FAMILIA</p>
                 <div class="logo-container">
-                    <img src="adsef_logo.png" alt="ADSEF Logo" class="adsef-logo">
+                    <img src="{% static 'images/adsef_logo.png' %}" alt="ADSEF Logo" class="adsef-logo">
                 </div>
                 <p class="gobierno-text">GOBIERNO DE PUERTO RICO</p>
             </div>
