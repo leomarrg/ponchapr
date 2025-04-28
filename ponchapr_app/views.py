@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from .forms import AttendeeForm
 from .models import Attendee, Event
@@ -340,7 +340,6 @@ def checkout_qr_code_verify(request):
 
 @staff_member_required
 def dashboard_view(request):
-
     event_id = request.GET.get('event_id')
     
     if event_id:
@@ -348,27 +347,37 @@ def dashboard_view(request):
     else:
         selected_event = Event.objects.filter(is_active=True).first()
     
-    # Obtener todos los eventos para el selector
+    # Get all events for the selector
     all_events = Event.objects.all().order_by('-date')
 
-    # Basic statistics
-    total_attendees = Attendee.objects.count()
-    arrived_attendees = Attendee.objects.filter(arrived=True).count()
-    checked_out_attendees = Attendee.objects.filter(checked_out=True).count()
-
+    # Basic statistics - filter by selected event
+    if selected_event:
+        total_attendees = Attendee.objects.filter(event=selected_event).count()
+        arrived_attendees = Attendee.objects.filter(event=selected_event, arrived=True).count()
+        checked_out_attendees = Attendee.objects.filter(event=selected_event, checked_out=True).count()
+        pre_registered_count = Attendee.objects.filter(event=selected_event, pre_registered=True).count()
+        front_desk_count = Attendee.objects.filter(event=selected_event, registered_at_event=True).count()
+    else:
+        total_attendees = Attendee.objects.count()
+        arrived_attendees = Attendee.objects.filter(arrived=True).count()
+        checked_out_attendees = Attendee.objects.filter(checked_out=True).count()
+        pre_registered_count = Attendee.objects.filter(pre_registered=True).count()
+        front_desk_count = Attendee.objects.filter(registered_at_event=True).count()
     
     # Calculate attendance percentages
     expected_attendees = 200
     arrival_percentage = round((arrived_attendees / expected_attendees) * 100, 1) if expected_attendees > 0 else 0
     checkout_percentage = round((checked_out_attendees / expected_attendees) * 100, 1) if expected_attendees > 0 else 0
 
-    arrival_percentage = 0
     if total_attendees > 0:
         arrival_percentage = int((arrived_attendees / total_attendees) * 100)
+    else:
+        arrival_percentage = 0
     
-    # Get registration type counts for pie chart
-    pre_registered_count = Attendee.objects.filter(pre_registered=True).count()
-    front_desk_count = Attendee.objects.filter(registered_at_event=True).count()
+    # Pre-registered percentage
+    pre_registered_percentage = 0
+    if total_attendees > 0:
+        pre_registered_percentage = int((pre_registered_count / total_attendees) * 100)
     
     # Get all attendees for the data table with related regions
     attendees = Attendee.objects.filter(event=selected_event).select_related('region').order_by('-created_at') if selected_event else []
@@ -379,6 +388,7 @@ def dashboard_view(request):
         'checked_out_attendees': checked_out_attendees,
         'arrival_percentage': arrival_percentage,
         'pre_registered_count': pre_registered_count,
+        'pre_registered_percentage': pre_registered_percentage,
         'front_desk_count': front_desk_count,
         'checkout_percentage': checkout_percentage,
         'expected_attendees': expected_attendees,
