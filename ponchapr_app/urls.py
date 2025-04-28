@@ -18,4 +18,6 @@ urlpatterns = [
     # Add these new authentication paths
     path('accounts/login/', auth_views.LoginView.as_view(template_name='admin/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+
+    path('get-offices/', views.get_offices, name='get_offices'),
 ]

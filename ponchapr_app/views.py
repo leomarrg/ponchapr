@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from .forms import AttendeeForm
-from .models import Attendee, Event
+from .models import Attendee, Event, Region, LocalOffice
 from .utils import send_registration_email_async, schedule_registration_email
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
@@ -63,6 +63,12 @@ def front_desk_register(request):
                 attendee.arrived = True
                 attendee.arrival_time = timezone.now()
                 attendee.event = active_event
+                
+                # Asignar la oficina seleccionada
+                office_id = form.cleaned_data.get('office').id if form.cleaned_data.get('office') else None
+                if office_id:
+                    office = LocalOffice.objects.get(id=office_id)
+                    attendee.office = office
                 
                 # Generar ID único
                 import random
@@ -595,3 +601,24 @@ def generate_report(request):
 def landing_page(request):
     """Muestra la página principal con instrucciones y botón para registro"""
     return render(request, 'ponchapr_app/instrucciones.html')
+
+
+# Añadir esta nueva función a views.py
+
+def get_offices(request):
+    """
+    Vista AJAX para obtener las oficinas de una región específica
+    """
+    region_id = request.GET.get('region_id')
+    if region_id:
+        try:
+            # Obtener todas las oficinas de la región seleccionada
+            offices = LocalOffice.objects.filter(region_id=region_id).order_by('office_name')
+            
+            # Formatear las oficinas para devolverlas como JSON
+            offices_data = [{'id': office.id, 'name': office.office_name} for office in offices]
+            
+            return JsonResponse({'offices': offices_data})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'No se proporcionó un ID de región'}, status=400)

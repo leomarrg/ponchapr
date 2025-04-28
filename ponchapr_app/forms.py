@@ -1,12 +1,21 @@
 from django import forms
-from .models import Attendee, Review, Region, Event
+from .models import LocalOffice, Attendee, Review, Region, Event
 from datetime import date
 
 
 class AttendeeForm(forms.ModelForm):
+    office = forms.ModelChoiceField(
+        queryset=LocalOffice.objects.none(),
+        required=True,
+        widget=forms.Select(attrs={
+            'id': 'office',
+            'required': True,
+        }),
+        label='Oficina'
+    )
     class Meta:
         model = Attendee
-        fields = ['name', 'last_name', 'phone_number', 'email', 'region']
+        fields = ['name', 'last_name', 'phone_number', 'email', 'region', 'office']
         widgets = {
             'name': forms.TextInput(attrs={
                 'id': 'name',
@@ -52,6 +61,17 @@ class AttendeeForm(forms.ModelForm):
         # self.fields['date_of_birth'].widget.attrs['type'] = 'date'
         self.fields['region'].queryset = Region.objects.filter(active=True)
         self.fields['region'].empty_label = "Seleccione una región"
+        self.fields['office'].empty_label = "Seleccione una oficina"
+
+        if self.instance.pk and self.instance.region:
+            self.fields['office'].queryset = LocalOffice.objects.filter(region=self.instance.region)
+    
+        if 'region' in self.data:
+            try:
+                region_id = int(self.data.get('region'))
+                self.fields['office'].queryset = LocalOffice.objects.filter(region_id=region_id)
+            except (ValueError, TypeError):
+                pass
 
     def clean_phone_number(self):
         phone = self.cleaned_data.get('phone_number')

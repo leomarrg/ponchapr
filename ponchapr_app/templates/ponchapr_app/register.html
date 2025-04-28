@@ -264,6 +264,23 @@
                 font-size: 18px;
             }
         }
+
+        /* Spinner para cargar oficinas */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
     
     <script src="{% static 'js/modernizr.js' %}"></script>
@@ -308,31 +325,49 @@
                         <div class="form-group">
                             <label for="name">Nombre:</label>
                             {{ form.name }}
-                            <div id="nameError" class="error-message"></div>
+                            <div id="nameError" class="error-message">
+                                {% if form.name.errors %}{{ form.name.errors }}{% endif %}
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="last-name">Apellidos:</label>
                             {{ form.last_name }}
-                            <div id="lastNameError" class="error-message"></div>
+                            <div id="lastNameError" class="error-message">
+                                {% if form.last_name.errors %}{{ form.last_name.errors }}{% endif %}
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="email">Correo electrónico:</label>
                             {{ form.email }}
-                            <div id="emailError" class="error-message"></div>
+                            <div id="emailError" class="error-message">
+                                {% if form.email.errors %}{{ form.email.errors }}{% endif %}
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="phone">Número de teléfono:</label>
                             {{ form.phone_number }}
-                            <div id="phoneError" class="error-message"></div>
+                            <div id="phoneError" class="error-message">
+                                {% if form.phone_number.errors %}{{ form.phone_number.errors }}{% endif %}
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label for="region">Región:</label>
                             {{ form.region }}
-                            <div id="regionError" class="error-message"></div>
+                            <div id="regionError" class="error-message">
+                                {% if form.region.errors %}{{ form.region.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="office">Oficina Local: <span id="officeLoading" class="spinner" style="display: none;"></span></label>
+                            {{ form.office }}
+                            <div id="officeError" class="error-message">
+                                {% if form.office.errors %}{{ form.office.errors }}{% endif %}
+                            </div>
                         </div>
                         
                         <button type="submit" class="submit-btn">
@@ -347,16 +382,82 @@
             <div class="footer-logo">
                 <img src="{% static 'css/img/adsef@2x.png' %}" alt="ADSEF - Gobierno de Puerto Rico">
             </div>
-            <p class="copyright">&copy; 2025 - Powered By Dominio</p>        </div>
+            <p class="copyright">&copy; 2025 - Powered By Dominio</p>        
+        </div>
     </div>
     
     <!-- Script para el manejo del formulario -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Manejo del formulario
+            // Referencias a elementos del DOM
             const form = document.getElementById('registrationForm');
+            const regionSelect = document.getElementById('region');
+            const officeSelect = document.getElementById('office');
+            const officeLoadingSpinner = document.getElementById('officeLoading');
+            
             let isSubmitting = false;
 
+            // Función para obtener token CSRF
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            
+            // Actualizar las oficinas cuando cambia la región
+            regionSelect.addEventListener('change', function() {
+                const regionId = this.value;
+                officeSelect.innerHTML = '<option value="">Cargando oficinas...</option>';
+                officeSelect.disabled = true;
+                officeLoadingSpinner.style.display = 'inline-block';
+                
+                if (regionId) {
+                    // Realizar solicitud AJAX para obtener las oficinas
+                    fetch(`/get-offices/?region_id=${regionId}`, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        officeSelect.innerHTML = '<option value="">Seleccione una oficina</option>';
+                        
+                        // Agregar las opciones de oficinas
+                        data.offices.forEach(office => {
+                            const option = document.createElement('option');
+                            option.value = office.id;
+                            option.textContent = office.name;
+                            officeSelect.appendChild(option);
+                        });
+                        
+                        officeSelect.disabled = false;
+                        officeLoadingSpinner.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error cargando oficinas:', error);
+                        officeSelect.innerHTML = '<option value="">Error al cargar oficinas</option>';
+                        officeSelect.disabled = false;
+                        officeLoadingSpinner.style.display = 'none';
+                    });
+                } else {
+                    // Si no hay región seleccionada, vaciar el select de oficinas
+                    officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
+                    officeSelect.disabled = true;
+                    officeLoadingSpinner.style.display = 'none';
+                }
+            });
+
+            // Manejo del formulario
             form.addEventListener('submit', function(e) {
                 if (isSubmitting) {
                     e.preventDefault();
@@ -387,6 +488,10 @@
                 form.reset();
                 const errorMessages = form.querySelectorAll('.error-message');
                 errorMessages.forEach(error => error.textContent = '');
+                
+                // Restablecer los dropdowns
+                officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
+                officeSelect.disabled = true;
             }
         });
     </script>

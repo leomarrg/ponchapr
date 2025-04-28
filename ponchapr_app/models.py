@@ -47,6 +47,7 @@ class FileDownload(models.Model):
     def __str__(self):
         return str(self.display_name) if self.display_name else str(self.file)
 
+
 class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
     active = models.BooleanField(default=True)
@@ -57,6 +58,16 @@ class Region(models.Model):
     class Meta:
         ordering = ['name']
 
+class LocalOffice(models.Model):
+    rmo = models.CharField(max_length=10)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='offices')
+    office_name = models.CharField(max_length=100)
+    
+    class Meta:
+        ordering = ['office_name']
+    
+    def __str__(self):
+        return self.office_name
 
 class Attendee(models.Model):
     name = models.CharField(max_length=100)
@@ -65,7 +76,8 @@ class Attendee(models.Model):
     phone_number = models.CharField(max_length=20)
     date_of_birth = models.DateField(null=True, blank=True)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
-    
+    office = models.ForeignKey(LocalOffice, on_delete=models.SET_NULL, null=True, blank=True)
+
     # New unique identifier field (6-digit number)
     unique_id = models.CharField(max_length=6, unique=True, blank=True)
     
