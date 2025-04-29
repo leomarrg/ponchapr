@@ -321,6 +321,7 @@
                 <div class="form-container">
                     <form id="registrationForm" method="post" action="">
                         {% csrf_token %}
+                        <input type="hidden" id="is_office_update" name="is_office_update" value="false">
                         
                         <div class="form-group">
                             <label for="name">Nombre:</label>
@@ -362,7 +363,7 @@
                             </div>
                         </div>
                         
-                        <div class="form-group">
+                        <div class="form-group" id="officeGroup">
                             <label for="office">Oficina Local: <span id="officeLoading" class="spinner" style="display: none;"></span></label>
                             {{ form.office }}
                             <div id="officeError" class="error-message">
@@ -400,20 +401,95 @@
    <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script> 
    <script src="{% static 'js/main.js' %}"></script>
    <script>
-        const form = document.querySelector('form');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Referencias a elementos del DOM
+        const form = document.getElementById('registrationForm');
+        const regionSelect = document.getElementById('region');
+        const officeSelect = document.getElementById('office');
+        const officeLoadingSpinner = document.getElementById('officeLoading');
+        const officeGroup = document.getElementById('officeGroup');
+        const isOfficeUpdate = document.getElementById('is_office_update');
+        const messages = document.querySelector('.messages');
+        const submitButton = form.querySelector('button[type="submit"]');
+        
         let isSubmitting = false;
 
+        // Función para obtener token CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Actualizar las oficinas cuando cambia la región
+        regionSelect.addEventListener('change', function() {
+            const regionId = this.value;
+            officeSelect.innerHTML = '<option value="">Cargando oficinas...</option>';
+            officeSelect.disabled = true;
+            officeLoadingSpinner.style.display = 'inline-block';
+            
+            if (regionId) {
+                // Realizar solicitud AJAX para obtener las oficinas
+                fetch(`/get-offices/?region_id=${regionId}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    officeSelect.innerHTML = '<option value="">Seleccione una oficina</option>';
+                    
+                    // Agregar las opciones de oficinas
+                    data.offices.forEach(office => {
+                        const option = document.createElement('option');
+                        option.value = office.id;
+                        option.textContent = office.name;
+                        officeSelect.appendChild(option);
+                    });
+                    
+                    officeSelect.disabled = false;
+                    officeLoadingSpinner.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error cargando oficinas:', error);
+                    officeSelect.innerHTML = '<option value="">Error al cargar oficinas</option>';
+                    officeSelect.disabled = false;
+                    officeLoadingSpinner.style.display = 'none';
+                });
+            } else {
+                // Si no hay región seleccionada, vaciar el select de oficinas
+                officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
+                officeSelect.disabled = true;
+                officeLoadingSpinner.style.display = 'none';
+            }
+        });
+
+        // Manejo del formulario
         form.addEventListener('submit', function(e) {
+            // Si es una actualización de oficinas, no marcar como enviando
+            if (isOfficeUpdate.value === "true") {
+                return;
+            }
+            
             if (isSubmitting) {
-            e.preventDefault();
-            return;
+                e.preventDefault();
+                return;
             }
 
             isSubmitting = true;
-            const submitButton = this.querySelector('button[type="submit"]');
             if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.innerHTML = 'Procesando...';
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Procesando...';
             }
         });
 
@@ -427,168 +503,29 @@
             window.history.replaceState(null, null, window.location.href);
         }
 
-        // Reset the form and date picker after successful submission
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.querySelector('form');
-            const messages = document.querySelector('.messages');
+        // SOLO limpiar el formulario cuando hay un mensaje de ÉXITO
+        if (messages && messages.querySelector('.alert-success')) {
+            // Hay un mensaje de éxito, limpiar el formulario
+            form.reset();
             
-            // Reset form on any server response (success or error)
-            if (messages && (messages.querySelector('.alert-success') || messages.querySelector('.alert'))) {
-            form.reset();  // Reset all form fields
-            const datePicker = document.getElementById('date-of-birth');
-            if (datePicker) {
-                    datePicker.value = '';  // Explicitly clear the date picker
-            }
-            
-            // Clear any error messages that might be displayed
-            const errorMessages = document.querySelectorAll('.error-message');
+            // Limpiar mensajes de error
+            const errorMessages = form.querySelectorAll('.error-message');
             errorMessages.forEach(error => error.textContent = '');
-            }
             
-            // Clear all inputs on page load
-            const clearInputs = () => {
-            const inputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="date"]');
-            inputs.forEach(input => input.value = '');
-            };
-            clearInputs();
-        }); 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Referencias a elementos del DOM
-            const form = document.getElementById('registrationForm');
-            const regionSelect = document.getElementById('region');
-            const officeSelect = document.getElementById('office');
-            const officeLoadingSpinner = document.getElementById('officeLoading');
-            const messages = document.querySelector('.messages');
-            
-            let isSubmitting = false;
-
-            // Función para obtener token CSRF
-            function getCookie(name) {
-               let cookieValue = null;
-               if (document.cookie && document.cookie !== '') {
-                     const cookies = document.cookie.split(';');
-                     for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                           cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                           break;
-                        }
-                     }
-               }
-               return cookieValue;
-            }
-            
-            // Actualizar las oficinas cuando cambia la región
-            regionSelect.addEventListener('change', function() {
-               const regionId = this.value;
-               officeSelect.innerHTML = '<option value="">Cargando oficinas...</option>';
-               officeSelect.disabled = true;
-               officeLoadingSpinner.style.display = 'inline-block';
-               
-               if (regionId) {
-                     // Realizar solicitud AJAX para obtener las oficinas
-                     fetch(`/get-offices/?region_id=${regionId}`, {
-                        headers: {
-                           'X-Requested-With': 'XMLHttpRequest',
-                           'X-CSRFToken': getCookie('csrftoken')
-                        }
-                     })
-                     .then(response => response.json())
-                     .then(data => {
-                        officeSelect.innerHTML = '<option value="">Seleccione una oficina</option>';
-                        
-                        // Agregar las opciones de oficinas
-                        data.offices.forEach(office => {
-                           const option = document.createElement('option');
-                           option.value = office.id;
-                           option.textContent = office.name;
-                           officeSelect.appendChild(option);
-                        });
-                        
-                        officeSelect.disabled = false;
-                        officeLoadingSpinner.style.display = 'none';
-                     })
-                     .catch(error => {
-                        console.error('Error cargando oficinas:', error);
-                        officeSelect.innerHTML = '<option value="">Error al cargar oficinas</option>';
-                        officeSelect.disabled = false;
-                        officeLoadingSpinner.style.display = 'none';
-                     });
-               } else {
-                     // Si no hay región seleccionada, vaciar el select de oficinas
-                     officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
-                     officeSelect.disabled = true;
-                     officeLoadingSpinner.style.display = 'none';
-               }
-            });
-
-            // Manejo del formulario
-            form.addEventListener('submit', function(e) {
-               if (isSubmitting) {
-                     e.preventDefault();
-                     return;
-               }
-
-               isSubmitting = true;
-               const submitButton = this.querySelector('button[type="submit"]');
-               if (submitButton) {
-                     submitButton.disabled = true;
-                     submitButton.innerHTML = 'Procesando...';
-               }
-            });
-
-            // Reset submission status when leaving the page
-            window.addEventListener('beforeunload', function() {
-               isSubmitting = false;
-            });
-
-            // Prevent form resubmission on page refresh
-            if (window.history.replaceState) {
-               window.history.replaceState(null, null, window.location.href);
-            }
-
-            // CLAVE: Solo limpiar el formulario cuando hay un mensaje de éxito, no cuando hay errores
-            if (messages && messages.querySelector('.alert-success')) {
-               // Hay un mensaje de éxito, limpiar el formulario
-               form.reset();
-               const errorMessages = form.querySelectorAll('.error-message');
-               errorMessages.forEach(error => error.textContent = '');
-               
-               // Restablecer los dropdowns
-               officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
-               officeSelect.disabled = true;
-               
-               // Limpiar todos los inputs en caso de éxito
-               const inputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="date"]');
-               inputs.forEach(input => input.value = '');
-            }
-            // NO limpiar los campos si hay errores de validación
-         });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('registrationForm');
-            const regionSelect = document.getElementById('region');
-            const officeGroup = document.getElementById('officeGroup');
-            const officeSelect = document.getElementById('office');
-            const isOfficeUpdate = document.getElementById('is_office_update');
-            
-            // Si la región cambia, enviar el formulario para actualizar oficinas
-            regionSelect.addEventListener('change', function() {
-                isOfficeUpdate.value = "true"; // Marca que esto es una actualización de oficinas
-                form.submit();
-            });
-            
-            // Mostrar grupo de oficinas solo si hay opciones disponibles
-            if (officeSelect && officeSelect.options.length > 1) {
-                officeGroup.style.display = 'block';
-            }
-            
-            // Prevenir reenvío del formulario en recarga
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-        });
-    </script>
+            // Restablecer los dropdowns
+            officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
+            officeSelect.disabled = true;
+        }
+        
+        // Mostrar grupo de oficinas solo si hay opciones disponibles
+        if (officeSelect && officeSelect.options.length > 1) {
+            officeGroup.style.display = 'block';
+        }
+        
+        // Reiniciar el valor de is_office_update
+        isOfficeUpdate.value = "false";
+    });
+   </script>
     
     <!-- JavaScript adicional -->
     <script src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
