@@ -400,6 +400,8 @@
    <script src="{% static 'js/imagelightbox.js' %}"></script>
    <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script> 
    <script src="{% static 'js/main.js' %}"></script>
+   
+   <!-- SCRIPT ÚNICO PARA GESTIONAR EL FORMULARIO -->
    <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Referencias a elementos del DOM
@@ -474,13 +476,14 @@
             }
         });
 
-        // Manejo del formulario
+        // Manejo del formulario - solo para cuando es un envío real, no actualización de oficinas
         form.addEventListener('submit', function(e) {
-            // Si es una actualización de oficinas, no marcar como enviando
-            if (isOfficeUpdate.value === "true") {
-                return;
+            // Verificar si es solo actualización de oficinas
+            if (isOfficeUpdate && isOfficeUpdate.value === "true") {
+                return; // No hacer nada adicional si es actualización de oficinas
             }
             
+            // Prevenir múltiples envíos
             if (isSubmitting) {
                 e.preventDefault();
                 return;
@@ -504,6 +507,7 @@
         }
 
         // SOLO limpiar el formulario cuando hay un mensaje de ÉXITO
+        // NO HACER NADA SI HAY MENSAJES DE ERROR para mantener los datos ingresados
         if (messages && messages.querySelector('.alert-success')) {
             // Hay un mensaje de éxito, limpiar el formulario
             form.reset();
@@ -523,12 +527,10 @@
         }
         
         // Reiniciar el valor de is_office_update
-        isOfficeUpdate.value = "false";
+        if (isOfficeUpdate) {
+            isOfficeUpdate.value = "false";
+        }
     });
    </script>
-    
-    <!-- JavaScript adicional -->
-    <script src="{% static 'js/jquery-1.10.2.min.js' %}"></script>
-    <script src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
 </body>
 </html>
