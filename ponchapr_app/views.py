@@ -56,54 +56,55 @@ def front_desk_register(request):
     if request.method == 'POST':
         form = AttendeeForm(request.POST)
         
-        # Verificar si es una actualización de oficinas
+        # Verificar si es solo una actualización de oficinas
         is_office_update = request.POST.get('is_office_update') == 'true'
         
-        # Si hay errores en el formulario, asegurarse de que las oficinas se carguen
-        if form.data.get('region'):
-            try:
-                region_id = int(form.data.get('region'))
-                form.fields['office'].queryset = LocalOffice.objects.filter(region_id=region_id).order_by('office_name')
-            except (ValueError, TypeError):
-                pass
-        
-        # Si es solo una actualización de oficinas o hay errores, mostrar el formulario sin procesar
-        if is_office_update or not form.is_valid():
+        # Si es una actualización de oficinas, solo actualizar el formulario sin validar
+        if is_office_update:
             return render(request, 'ponchapr_app/register.html', {
                 'form': form,
                 'active_event': active_event
             })
         
-        # Si el formulario es válido, procesar el registro
-        try:
-            # Crear y guardar el asistente
-            attendee = form.save(commit=False)
-            attendee.registered_at_event = True
-            attendee.arrived = True
-            attendee.arrival_time = timezone.now()
-            attendee.event = active_event
-            
-            # Generar ID único
-            import random
-            import string
-            temp_unique_id = ''.join(random.choices(string.digits, k=6))
-            
-            # Verificar que sea único
-            while Attendee.objects.filter(unique_id=temp_unique_id).exists():
+        # Si es un envío completo del formulario, validar
+        if form.is_valid():
+            try:
+                # Crear y guardar el asistente
+                attendee = form.save(commit=False)
+                attendee.registered_at_event = True
+                attendee.arrived = True
+                attendee.arrival_time = timezone.now()
+                attendee.event = active_event
+                
+                # Generar ID único
+                import random
+                import string
                 temp_unique_id = ''.join(random.choices(string.digits, k=6))
-            
-            attendee.unique_id = temp_unique_id
-            attendee.save()
-            
-            # Enviar email
-            schedule_registration_email(attendee, attendee.unique_id)
-            
-            messages.success(request, f"¡Registro exitoso! Se enviará un correo de confirmación con su número de identificación.")
-            return redirect('register')
-            
-        except Exception as e:
-            print(f"Error en el registro: {str(e)}")
-            messages.error(request, "Hubo un problema con el registro. Por favor intente nuevamente.")
+                
+                # Verificar que sea único
+                while Attendee.objects.filter(unique_id=temp_unique_id).exists():
+                    temp_unique_id = ''.join(random.choices(string.digits, k=6))
+                
+                attendee.unique_id = temp_unique_id
+                attendee.save()
+                
+                # Enviar email
+                schedule_registration_email(attendee, attendee.unique_id)
+                
+                messages.success(request, f"¡Registro exitoso! Se enviará un correo de confirmación con su número de identificación.")
+                return redirect('register')
+                
+            except Exception as e:
+                print(f"Error en el registro: {str(e)}")
+                messages.error(request, "Hubo un problema con el registro. Por favor intente nuevamente.")
+        else:
+            # Asegurarse de que las oficinas estén cargadas incluso con errores de validación
+            if form.data.get('region'):
+                try:
+                    region_id = int(form.data.get('region'))
+                    form.fields['office'].queryset = LocalOffice.objects.filter(region_id=region_id).order_by('office_name')
+                except (ValueError, TypeError):
+                    pass
     else:
         form = AttendeeForm()
     
