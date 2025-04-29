@@ -558,30 +558,6 @@
                 officeSelect.disabled = true;
             }
         });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('registrationForm');
-            const regionSelect = document.getElementById('region');
-            const officeGroup = document.getElementById('officeGroup');
-            const officeSelect = document.getElementById('office');
-            const isOfficeUpdate = document.getElementById('is_office_update');
-            
-            // Si la región cambia, enviar el formulario para actualizar oficinas
-            regionSelect.addEventListener('change', function() {
-                isOfficeUpdate.value = "true"; // Marca que esto es una actualización de oficinas
-                form.submit();
-            });
-            
-            // Mostrar grupo de oficinas solo si hay opciones disponibles
-            if (officeSelect && officeSelect.options.length > 1) {
-                officeGroup.style.display = 'block';
-            }
-            
-            // Prevenir reenvío del formulario en recarga
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
-        });
     </script>
     
     <!-- JavaScript adicional -->
