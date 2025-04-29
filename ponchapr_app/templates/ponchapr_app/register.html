@@ -386,8 +386,72 @@
         </div>
     </div>
     
-    <!-- Script para el manejo del formulario -->
-    <script>
+   <!-- Script para el manejo del formulario -->
+   <script src="{% static 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' %}"></script>
+   <script>
+    window.jQuery || document.write('<script src="{% static "js/jquery-1.10.2.min.js" %}"><\/script>');
+   </script>
+   <script type="text/javascript" src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
+   <script src="{% static 'js/jquery.flexslider.js' %}"></script>
+   <script src="{% static 'js/waypoints.js' %}"></script>
+   <script src="{% static 'js/jquery.fittext.js' %}"></script>
+   <script src="{% static 'js/jquery.fitvids.js' %}"></script>
+   <script src="{% static 'js/imagelightbox.js' %}"></script>
+   <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script> 
+   <script src="{% static 'js/main.js' %}"></script>
+   <script>
+        const form = document.querySelector('form');
+        let isSubmitting = false;
+
+        form.addEventListener('submit', function(e) {
+            if (isSubmitting) {
+            e.preventDefault();
+            return;
+            }
+
+            isSubmitting = true;
+            const submitButton = this.querySelector('button[type="submit"]');
+            if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Procesando...';
+            }
+        });
+
+        // Reset submission status when leaving the page
+        window.addEventListener('beforeunload', function() {
+            isSubmitting = false;
+        });
+
+        // Prevent form resubmission on page refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+
+        // Reset the form and date picker after successful submission
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const messages = document.querySelector('.messages');
+            
+            // Reset form on any server response (success or error)
+            if (messages && (messages.querySelector('.alert-success') || messages.querySelector('.alert'))) {
+            form.reset();  // Reset all form fields
+            const datePicker = document.getElementById('date-of-birth');
+            if (datePicker) {
+                    datePicker.value = '';  // Explicitly clear the date picker
+            }
+            
+            // Clear any error messages that might be displayed
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(error => error.textContent = '');
+            }
+            
+            // Clear all inputs on page load
+            const clearInputs = () => {
+            const inputs = document.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="number"], input[type="date"]');
+            inputs.forEach(input => input.value = '');
+            };
+            clearInputs();
+        }); 
         document.addEventListener('DOMContentLoaded', function() {
             // Referencias a elementos del DOM
             const form = document.getElementById('registrationForm');

@@ -1,202 +1,429 @@
 {% load static %}
 <!DOCTYPE html>
-<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
-<!--[if IE 9 ]><html class="no-js ie ie9" lang="en"> <![endif]-->
-<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-Out - RegistratePR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos basados en register.html */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            background-color: #164b68;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-   <!--- Basic Page Needs
-   ================================================== -->
-   <meta charset="utf-8">
-   <title>Check-Out</title>
-   <meta name="description" content="">  
-   <meta name="author" content="">
-   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-   <meta http-equiv="Pragma" content="no-cache">
-   <meta http-equiv="Expires" content="0">
-
-   <!-- Mobile Specific Metas
-   ================================================== -->
-   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-   <!-- CSS
-    ================================================== -->
-   <link rel="stylesheet" href="{% static 'css/default.css' %}">
-   <link rel="stylesheet" href="{% static 'css/layout.css' %}">
-   <link rel="stylesheet" href="{% static 'css/media-queries.css' %}">
-   <link rel="stylesheet" href="{% static 'css/animate.css' %}">
-   <link rel="stylesheet" href="{% static 'css/prettyPhoto.css' %}">
-
-   <!-- Script
-   ================================================== -->
-   <script src="{% static 'js/modernizr.js' %}"></script>
-   <script src="{% static 'js/main.js' %}"></script>
-
-   <!-- Favicons
-   ================================================== -->
-   <link rel="shortcut icon" href="{% static 'favicon.png' %}" >
-
-</head>
-
-<body>
-
-   <div id="preloader">      
-      <div id="status">
-         <img src="{% static 'images/preloader.gif' %}" height="64" width="64" alt="">
-      </div>
-   </div>
-
-   <!-- Header
-   ================================================== -->
-   <header>
-      <div class="logo">
-         <a class="smoothscroll" href="#hero"><img alt="" src="{% static 'images/logo.png' %}"></a>
-      </div>
-   </header> <!-- Header End -->
-   
-   <br><br>
-   
-   <main>
-      <section>
-         <div class="container">
-            {% if messages %}
-            <div class="messages">
-               {% for message in messages %}
-               <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-                  {{ message }}
-               </div>
-               {% endfor %}
-            </div>
-            {% endif %}
-
-            <h2 class="form-header">Check-Out</h2>
-               {% if active_event %}
-               <p class="event-info text-center">Evento actual: {{ active_event.name }}</p>
-               {% endif %}
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{% static "css/img/Web-Photo@2x.png" %}');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .content-inner {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+        
+        .logo-img {
+            margin-top: 40px;
+            margin-bottom: 10px;
+            max-width: 250px;
+            height: auto;
+        }
+        
+        .checkout-banner-container {
+            width: 100%;
+            position: relative;
+            margin: 5px 0;
+            padding: 10px 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Franja verde con opacidad */
+        .checkout-banner-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #8dc63f;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .checkout-banner {
+            text-transform: uppercase;
+            font-size: 28px;
+            font-weight: bold;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 1;
+        }
+        
+        /* Estilos para el formulario */
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #00b3d3;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 179, 211, 0.25);
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .submit-btn {
+            background-color: #a4cc47;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 45px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background-color: #92b730;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            background-color: #6a8c23;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .footer-logo img {
+            max-width: 250px;
+            height: auto;
+        }
+        
+        .event-info {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        /* Mensajes de alerta */
+        .messages {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-left: 4px solid transparent;
+        }
+        
+        .alert-success {
+            background-color: rgba(58, 184, 125, 0.2);
+            border-left-color: #3ab87d;
+        }
+        
+        .alert-error, .alert-danger {
+            background-color: rgba(255, 107, 107, 0.2);
+            border-left-color: #ff6b6b;
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 203, 107, 0.2);
+            border-left-color: #ffcb6b;
+        }
+        
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            .checkout-banner {
+                font-size: 22px;
+            }
             
-            <form id="checkoutForm" method="post" action="">
-               {% csrf_token %}
-               
-               <div class="form-group">
-                  <label for="unique_id">Número de Identificación:</label>
-                  <input type="text" id="unique_id" name="unique_id" class="form-control" maxlength="6" required>
-                  <div id="uniqueIdError" class="error-message"></div>
-               </div>
-               
-               <div class="button-wrapper">
-                  <button type="submit" class="submit-btn">
-                     Completar Check-Out
-                  </button>
-               </div>
-            </form>
-         </div>
-      </section>
-   </main>
-
-   <!-- Footer
-   ================================================== -->
-   <footer>
-
-      <div class="row">         
-
-         <div class="six columns info">
-
-            <div class="footer-logo">
-               <a href="#">
-                  <img src="{% static 'images/footer-logo.png' %}" alt="" />
-               </a>
+            .form-container {
+                padding: 15px;
+            }
+            
+            .submit-btn {
+                padding: 12px 30px;
+                font-size: 18px;
+            }
+        }
+        
+        .footer-li {
+            margin-top: 10px;
+        }
+        
+        .footer-li ul {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            list-style: none;
+        }
+        
+        .footer-li ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-li ul li a:hover {
+            color: #a4cc47;
+        }
+        
+        .contact {
+            color: white;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .contact + ul {
+            list-style: none;
+            margin-bottom: 15px;
+        }
+        
+        .contact + ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .contact + ul li a:hover {
+            color: #a4cc47;
+        }
+        
+        .copyright {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        
+        .copyright a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .copyright a:hover {
+            color: #a4cc47;
+        }
+        
+        /* Overlay para precargador */
+        #preloader {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="background"></div>
+        
+        <div class="content">
+            <div class="content-inner">
+                <!-- Logo -->
+                <img src="{% static 'css/img/compromiso_en_accion@2x.png' %}" alt="RegistratePR" class="logo-img">
             </div>
-
-            <p>REGISTRATEPR es una plataforma digital diseñada para simplificar el proceso de registro en cualquier tipo de evento.</p>
-
-         </div>
-
-         <div class="columns last">
-            <h3 class="contact">Contáctanos</h3>
-            <ul>                   
-               <li><a href="mailto:registratepr.info@gmail.com">registratepr.info@gmail.com</a></li>
-            </ul>
+            
+            <!-- Franja verde semi-transparente a todo el ancho -->
+            <div class="checkout-banner-container">
+                <div class="checkout-banner">
+                    CHECK-OUT
+                </div>
+            </div>
+            
+            <div class="content-inner">
+                <!-- Mensajes -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Información del evento activo -->
+                {% if active_event %}
+                <p class="event-info">Evento actual: {{ active_event.name }}</p>
+                {% endif %}
+                
+                <!-- Formulario de checkout -->
+                <div class="form-container">
+                    <form id="checkoutForm" method="post" action="">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="unique_id">Número de Identificación:</label>
+                            <input type="text" id="unique_id" name="unique_id" maxlength="6" required>
+                            <div id="uniqueIdError" class="error-message"></div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            Completar Check-Out
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-logo">
+                <img src="{% static 'css/img/adsef@2x.png' %}" alt="RegistratePR">
+            </div>            
             <div class="footer-li">
                 <ul>
-                   <li><a href="{% url 'terms' %}">Términos de Uso</a></li>
-                   <li><a href="{% url 'terms' %}">Licencia de Uso</a></li>
+                    <li><a href="{% url 'terms' %}">Términos de Uso</a></li>
+                    <li><a href="{% url 'terms' %}">Licencia de Uso</a></li>
                 </ul>
-             </div>
-          </div>
-         </div>
-
-         <p class="copyright">&copy; 2024 registratepr | Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a> | Powered By <a href="#">Dominio</a></p>
-
-      </div> <!-- Row End -->
-
-   </footer> <!-- Footer End-->
-
-
-   <!-- Java Script
-   ================================================== -->
-   <script src="{% static 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' %}"></script>
-   <script>
-      window.jQuery || document.write('<script src="{% static "js/jquery-1.10.2.min.js" %}"><\/script>');
-   </script>
-   <script type="text/javascript" src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
-   <script src="{% static 'js/jquery.flexslider.js' %}"></script>
-   <script src="{% static 'js/waypoints.js' %}"></script>
-   <script src="{% static 'js/jquery.fittext.js' %}"></script>
-   <script src="{% static 'js/jquery.fitvids.js' %}"></script>
-   <script src="{% static 'js/imagelightbox.js' %}"></script>
-   <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script>   
-   <script src="{% static 'js/main.js' %}"></script>
-   <script>
-      const form = document.querySelector('form');
-      let isSubmitting = false;
-
-      form.addEventListener('submit', function(e) {
-         if (isSubmitting) {
-            e.preventDefault();
-            return;
-         }
-
-         isSubmitting = true;
-         const submitButton = this.querySelector('button[type="submit"]');
-         if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.innerHTML = 'Procesando...';
-         }
-      });
-
-      // Reset submission status when leaving the page
-      window.addEventListener('beforeunload', function() {
-         isSubmitting = false;
-      });
-
-      // Prevent form resubmission on page refresh
-      if (window.history.replaceState) {
-         window.history.replaceState(null, null, window.location.href);
-      }
-
-      // Reset the form after successful submission
-      document.addEventListener('DOMContentLoaded', function() {
-         const form = document.querySelector('form');
-         const messages = document.querySelector('.messages');
-         
-         // Reset form on any server response (success or error)
-         if (messages && (messages.querySelector('.alert-success') || messages.querySelector('.alert'))) {
-            form.reset();  // Reset all form fields
+            </div>
             
-            // Clear any error messages that might be displayed
-            const errorMessages = document.querySelectorAll('.error-message');
-            errorMessages.forEach(error => error.textContent = '');
-         }
-         
-         // Clear all inputs on page load
-         const clearInputs = () => {
+            <p class="copyright">&copy; 2025 Powered by Dominio </p>
+        </div>
+    </div>
+    
+    <!-- Script para el manejo del formulario -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('checkoutForm');
+            let isSubmitting = false;
+
+            // Manejo del formulario
+            form.addEventListener('submit', function(e) {
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return;
+                }
+
+                isSubmitting = true;
+                const submitButton = this.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = 'Procesando...';
+                }
+            });
+
+            // Reset submission status when leaving the page
+            window.addEventListener('beforeunload', function() {
+                isSubmitting = false;
+            });
+
+            // Prevent form resubmission on page refresh
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+
+            // Reset the form after successful submission
+            const messages = document.querySelector('.messages');
+            if (messages && (messages.querySelector('.alert-success') || messages.querySelector('.alert'))) {
+                form.reset();
+                const errorMessages = form.querySelectorAll('.error-message');
+                errorMessages.forEach(error => error.textContent = '');
+            }
+            
+            // Clear all inputs on page load
             const inputs = document.querySelectorAll('input[type="text"]');
             inputs.forEach(input => input.value = '');
-         };
-         clearInputs();
-      });    
-   </script>
-
+        });
+    </script>
 </body>
 </html>
