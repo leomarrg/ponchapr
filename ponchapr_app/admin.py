@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Count, F, Q
 from django.utils.html import format_html
 from django.urls import path
-from .models import Event, Attendee, Table, Review, Region
+from .models import LocalOffice, Event, Attendee, Table, Review, Region
 from django.http import HttpResponse
 from django.utils import timezone
 from django.db.models.functions import ExtractHour
@@ -324,6 +324,21 @@ class EventAdmin(admin.ModelAdmin):
     
     make_active.short_description = "Marcar evento seleccionado como activo"
 
+class LocalOfficeAdmin(admin.ModelAdmin):
+    list_display = ('office_name', 'region', 'rmo')
+    list_filter = ('region',)
+    search_fields = ('office_name', 'rmo')
+    ordering = ('region', 'office_name')
+
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'active', 'offices_count')
+    search_fields = ('name',)
+    list_filter = ('active',)
+    
+    def offices_count(self, obj):
+        return obj.offices.count()
+    
+    offices_count.short_description = 'Número de Oficinas'
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('satisfaction', 'usefulness', 'category', 'comments', 'review_date')
@@ -370,4 +385,5 @@ admin.site.register(Region, RegionAdmin)
 admin.site.register(Attendee, AttendeeAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Event, EventAdmin)
+admin.site.register(LocalOffice, LocalOfficeAdmin)
 
