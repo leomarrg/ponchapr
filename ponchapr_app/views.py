@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from .forms import AttendeeForm
 from .models import Attendee, Event, Region, LocalOffice
-from .utils import send_registration_email_async, schedule_registration_email
+from .utils import send_welcome_email_async, send_welcome_email, send_pre_registration_email
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
 from django.contrib import messages
@@ -13,30 +13,43 @@ from django.contrib.auth.decorators import login_required
 import json
 from io import BytesIO
 import logging
+from django.db.models import Q, Count
+from collections import defaultdict
 
-# Setup logging
-logger = logging.getLogger(__name__)
 
 def pre_register(request):
     if request.method == 'POST':
         form = AttendeeForm(request.POST)
         if form.is_valid():
-            attendee = form.save(commit=False)
-            attendee.pre_registered = True
-            attendee.save()  # Save to generate unique_id
-            
-            # Add debugging
-            print("Sending email with unique ID...")
             try:
-                # Send the unique_id in the email
-                send_registration_email_async(attendee, attendee.unique_id)
-                print("Email sending initiated")
+                attendee = form.save(commit=False)
+                attendee.pre_registered = True
+                # Para pre-registro, NO marcar como llegado
+                attendee.arrived = False
+                attendee.save()
+                
+                # Enviar correo específico de pre-registro (no fallar si hay error)
+                try:
+                    from .utils import send_pre_registration_email  # Import específico
+                    send_pre_registration_email(attendee)
+                    email_status = "El correo de confirmación de pre-registro será enviado en breve."
+                except Exception as email_error:
+                    print(f"Error enviando correo: {email_error}")
+                    email_status = "El pre-registro fue exitoso, pero hubo un problema enviando el correo."
+                
+                messages.success(request, f"¡Pre-registro exitoso! {email_status}")
+                return render(request, 'ponchapr_app/pre_register.html', {'form': AttendeeForm()})
+                
             except Exception as e:
-                print(f"Error sending email: {e}")
-                messages.error(request, f"Error sending email: {e}")
-            
-            messages.success(request, "Registro exitoso! El correo de confirmación será enviado en breve.")
-            return render(request, 'ponchapr_app/pre_register.html', {'form': AttendeeForm()})
+                print(f"Error en el pre-registro: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                messages.error(request, f"Hubo un problema con el pre-registro: {str(e)}")
+        else:
+            # Procesar errores del formulario
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Error en {field}: {error}")
     else:
         form = AttendeeForm()
     
@@ -50,49 +63,38 @@ def front_desk_register(request):
 
     if not active_event:
         messages.error(request, "No hay un evento activo configurado. Por favor, contacte al administrador.")
-        # Redireccionar a una página adecuada o mostrar un formulario vacío
         return render(request, 'ponchapr_app/register.html', {'form': AttendeeForm()})
     
     if request.method == 'POST':
         form = AttendeeForm(request.POST)
         if form.is_valid():
             try:
-                # Crear y guardar el asistente rápidamente
+                # Crear y guardar el asistente
                 attendee = form.save(commit=False)
                 attendee.registered_at_event = True
                 attendee.arrived = True
                 attendee.arrival_time = timezone.now()
                 attendee.event = active_event
-                
-                # Asignar la oficina seleccionada
-                office_id = form.cleaned_data.get('office').id if form.cleaned_data.get('office') else None
-                if office_id:
-                    office = LocalOffice.objects.get(id=office_id)
-                    attendee.office = office
-                
-                # Generar ID único
-                import random
-                import string
-                temp_unique_id = ''.join(random.choices(string.digits, k=6))
-                
-                # Verificar que sea único (una verificación rápida)
-                while Attendee.objects.filter(unique_id=temp_unique_id).exists():
-                    temp_unique_id = ''.join(random.choices(string.digits, k=6))
-                
-                attendee.unique_id = temp_unique_id
                 attendee.save()
                 
-                # Schedule email in background
-                schedule_registration_email(attendee, attendee.unique_id)
+                # Enviar correo de bienvenida (no fallar si hay error)
+                try:
+                    send_welcome_email(attendee)
+                    email_status = "Se enviará un correo de bienvenida."
+                except Exception as email_error:
+                    print(f"Error enviando correo: {email_error}")
+                    email_status = "El registro fue exitoso, pero hubo un problema enviando el correo."
                 
-                # Mostrar mensaje de éxito inmediatamente
-                messages.success(request, f"¡Registro exitoso! Se enviará un correo de confirmación con su número de identificación.")
+                # Mostrar mensaje de éxito
+                messages.success(request, f"¡Registro exitoso! {attendee.name} {attendee.last_name} ha sido registrado y marcado como presente. {email_status}")
                 
                 return redirect('register')
                 
             except Exception as e:
                 print(f"Error en el registro: {str(e)}")
-                messages.error(request, "Hubo un problema con el registro. Por favor intente nuevamente.")
+                import traceback
+                traceback.print_exc()
+                messages.error(request, f"Hubo un problema con el registro: {str(e)}")
         else:
             # Procesar errores del formulario
             for field, errors in form.errors.items():
@@ -385,8 +387,44 @@ def dashboard_view(request):
     if total_attendees > 0:
         pre_registered_percentage = int((pre_registered_count / total_attendees) * 100)
     
-    # Get all attendees for the data table with related regions
-    attendees = Attendee.objects.filter(event=selected_event).select_related('region').order_by('-created_at') if selected_event else []
+    # Get all attendees for the data table - ordered by creation date (most recent first)
+    attendees = Attendee.objects.filter(event=selected_event).order_by('-created_at') if selected_event else []
+    
+    # Get organization statistics for the dashboard
+    organization_stats = {}
+    if selected_event:
+        org_data = (
+            Attendee.objects.filter(event=selected_event)
+            .exclude(organization__isnull=True)
+            .exclude(organization='')
+            .values('organization')
+            .annotate(
+                total=Count('id'),
+                arrived=Count('id', filter=Q(arrived=True)),
+                checked_out=Count('id', filter=Q(checked_out=True))
+            )
+            .order_by('-total')[:10]  # Top 10 organizations
+        )
+        organization_stats = list(org_data)
+    
+    # Get registration timeline (last 7 days)
+    from datetime import timedelta
+    end_date = timezone.now()
+    start_date = end_date - timedelta(days=7)
+    
+    daily_registrations = []
+    if selected_event:
+        daily_data = (
+            Attendee.objects.filter(
+                event=selected_event,
+                created_at__range=(start_date, end_date)
+            )
+            .extra(select={'day': 'date(created_at)'})
+            .values('day')
+            .annotate(count=Count('id'))
+            .order_by('day')
+        )
+        daily_registrations = list(daily_data)
     
     context = {
         'total_attendees': total_attendees,
@@ -401,6 +439,8 @@ def dashboard_view(request):
         'selected_event': selected_event,
         'all_events': all_events,
         'attendees': attendees,
+        'organization_stats': organization_stats,
+        'daily_registrations': daily_registrations,
     }
     
     return render(request, "ponchapr_app/index.html", context)
@@ -486,9 +526,10 @@ def generate_report(request):
         
         # Get registration type counts for the selected event
         pre_registered_count = Attendee.objects.filter(event=event, pre_registered=True).count()
+        front_desk_count = Attendee.objects.filter(event=event, registered_at_event=True).count()
         
-        # Get all attendees for this event - order by region name and then by created_at
-        attendees = Attendee.objects.filter(event=event).select_related('region').order_by('region__name', '-created_at')
+        # Get all attendees for this event - order by organization and then by created_at
+        attendees = Attendee.objects.filter(event=event).order_by('organization', '-created_at')
 
         # Get absolute path to the logo
         import os
@@ -503,6 +544,7 @@ def generate_report(request):
             'checked_out_attendees': checked_out_attendees,
             'arrival_percentage': arrival_percentage,
             'pre_registered_count': pre_registered_count,
+            'front_desk_count': front_desk_count,
             'attendees': attendees,
             'generated_at': timezone.now(),
             'logo_path': logo_path
@@ -510,25 +552,34 @@ def generate_report(request):
         
         # Add any additional calculations or data needed for the report
         if attendees:
-            # Calculate region distribution
-            region_distribution = {}
-            region_counts = {}
+            # Calculate organization distribution (replacing region distribution)
+            organization_distribution = {}
+            organization_counts = {}
             for attendee in attendees:
-                region_name = attendee.region.name if attendee.region else 'No Region'
-                if region_name in region_distribution:
-                    region_distribution[region_name] += 1
-                    region_counts[region_name] += 1
+                org_name = attendee.organization if attendee.organization else 'Sin Organización'
+                if org_name in organization_distribution:
+                    organization_distribution[org_name] += 1
+                    organization_counts[org_name] += 1
                 else:
-                    region_distribution[region_name] = 1
-                    region_counts[region_name] = 1
+                    organization_distribution[org_name] = 1
+                    organization_counts[org_name] = 1
             
             # Calculate percentages
             total = len(attendees)
-            for region in region_distribution:
-                region_distribution[region] = (region_distribution[region] / total) * 100
+            for org in organization_distribution:
+                organization_distribution[org] = (organization_distribution[org] / total) * 100
                 
-            context['region_distribution'] = region_distribution
-            context['region_counts'] = region_counts
+            context['organization_distribution'] = organization_distribution
+            context['organization_counts'] = organization_counts
+            
+            # Calculate registration distribution by date
+            from collections import defaultdict
+            registration_by_date = defaultdict(int)
+            for attendee in attendees:
+                date_key = attendee.created_at.date()
+                registration_by_date[date_key] += 1
+            
+            context['registration_by_date'] = dict(registration_by_date)
             
             # Calculate average time spent at event (for checked-out attendees)
             from django.db.models import F, ExpressionWrapper, DurationField, Avg
@@ -554,10 +605,21 @@ def generate_report(request):
                 context['avg_time_spent'] = f"{avg_hours}h {avg_minutes}m"
             else:
                 context['avg_time_spent'] = "N/A"
+                
+            # Get top organizations by participation
+            top_organizations = (
+                Attendee.objects.filter(event=event)
+                .exclude(organization__isnull=True)
+                .exclude(organization='')
+                .values('organization')
+                .annotate(count=Count('id'))
+                .order_by('-count')[:10]
+            )
+            context['top_organizations'] = top_organizations
         
         # Create a response with the PDF
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = f'attachment; filename="PonchaPR_Event_Report_{event.name}_{event.date}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="ADSEF_Event_Report_{event.name}_{event.date}.pdf"'
         
         # Add a custom filter to access dictionary items by key in templates
         from django.template.defaulttags import register
@@ -582,7 +644,7 @@ def generate_report(request):
         )
         
         if pisa_status.err:
-            return HttpResponse("Error generating PDF report. Please try again.", status=500)
+            return HttpResponse("Error generando el reporte PDF. Por favor intente nuevamente.", status=500)
         
         # Get the value of the buffer
         pdf = buffer.getvalue()
@@ -596,7 +658,7 @@ def generate_report(request):
     except Exception as e:
         import traceback
         print(traceback.format_exc())
-        return HttpResponse(f"An error occurred: {str(e)}", status=500)
+        return HttpResponse(f"Ocurrió un error: {str(e)}", status=500)
 
 def landing_page(request):
     """Muestra la página principal con instrucciones y botón para registro"""

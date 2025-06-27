@@ -69,16 +69,29 @@ class LocalOffice(models.Model):
     def __str__(self):
         return self.office_name
 
-class Attendee(models.Model):
-    name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    email = models.EmailField()
-    phone_number = models.CharField(max_length=20)
-    date_of_birth = models.DateField(null=True, blank=True)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
-    office = models.ForeignKey(LocalOffice, on_delete=models.SET_NULL, null=True, blank=True)
+from django.db import models
+import uuid
+from django.utils import timezone
 
-    # New unique identifier field (6-digit number)
+# Los otros modelos se mantienen igual (Event, Table, FileDownload, Region, LocalOffice)...
+
+class Attendee(models.Model):
+    # Campos requeridos para el nuevo formulario
+    name = models.CharField(max_length=100, verbose_name="Nombre")
+    last_name = models.CharField(max_length=100, verbose_name="Apellidos")
+    organization = models.CharField(max_length=200, verbose_name="Organización/Agencia")  # Nuevo campo
+    phone_number = models.CharField(max_length=20, verbose_name="Teléfono")
+    email = models.EmailField(verbose_name="Correo electrónico")
+    
+    # Campos que se mantienen para funcionalidad del sistema
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
+    
+    # Campos comentados/opcionales - se mantienen para compatibilidad con la BD
+    # date_of_birth = models.DateField(null=True, blank=True)
+    # office = models.ForeignKey(LocalOffice, on_delete=models.SET_NULL, null=True, blank=True)
+    # region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
+
+    # New unique identifier field (6-digit number) - se mantiene para check-in/out
     unique_id = models.CharField(max_length=6, unique=True, blank=True)
     
     # QR code (legacy field can be reused or kept for compatibility)
@@ -94,9 +107,6 @@ class Attendee(models.Model):
     checked_out = models.BooleanField(default=False)
     checkout_time = models.DateTimeField(null=True, blank=True)
     
-    # Added region field
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, null=True)
-    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -105,7 +115,7 @@ class Attendee(models.Model):
         unique_together = [['email', 'event']]
     
     def __str__(self):
-        return f"{self.name} {self.last_name}"
+        return f"{self.name} {self.last_name} - {self.organization}"
     
     def generate_unique_id(self):
         """Generate a 6-digit unique identifier"""
@@ -148,11 +158,7 @@ class Attendee(models.Model):
         img.save(buffer, format='PNG')
         return str(self.unique_id)
 
-    def __str__(self):
-        return f"{self.name} {self.last_name}"
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+# El modelo Review se mantiene igual...
 
     # def assign_table_and_seat(self):
     #     # Get all tables sorted by the number of attendees assigned

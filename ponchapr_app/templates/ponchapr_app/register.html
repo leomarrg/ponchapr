@@ -124,8 +124,7 @@
             color: white;
         }
         
-        .form-group input, 
-        .form-group select {
+        .form-group input {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -137,24 +136,15 @@
             transition: all 0.3s ease;
         }
         
-        .form-group input:focus,
-        .form-group select:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #00b3d3;
             background-color: rgba(255, 255, 255, 0.2);
             box-shadow: 0 0 0 3px rgba(0, 179, 211, 0.25);
         }
         
-        .form-group select {
-            appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-        }
-        
-        .form-group select option {
-            background-color: #164b68;
-            color: white;
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
         }
         
         .error-message {
@@ -263,23 +253,6 @@
                 font-size: 18px;
             }
         }
-
-        /* Spinner para cargar oficinas */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
     </style>
     
     <script src="{% static 'js/modernizr.js' %}"></script>
@@ -320,7 +293,6 @@
                 <div class="form-container">
                     <form id="registrationForm" method="post" action="">
                         {% csrf_token %}
-                        <input type="hidden" id="is_office_update" name="is_office_update" value="false">
                         
                         <div class="form-group">
                             <label for="name">Nombre:</label>
@@ -331,10 +303,26 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="last-name">Apellidos:</label>
+                            <label for="last_name">Apellidos:</label>
                             {{ form.last_name }}
                             <div id="lastNameError" class="error-message">
                                 {% if form.last_name.errors %}{{ form.last_name.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="organization">Organización/Agencia:</label>
+                            {{ form.organization }}
+                            <div id="organizationError" class="error-message">
+                                {% if form.organization.errors %}{{ form.organization.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone_number">Teléfono:</label>
+                            {{ form.phone_number }}
+                            <div id="phoneError" class="error-message">
+                                {% if form.phone_number.errors %}{{ form.phone_number.errors }}{% endif %}
                             </div>
                         </div>
                         
@@ -343,30 +331,6 @@
                             {{ form.email }}
                             <div id="emailError" class="error-message">
                                 {% if form.email.errors %}{{ form.email.errors }}{% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phone">Número de teléfono:</label>
-                            {{ form.phone_number }}
-                            <div id="phoneError" class="error-message">
-                                {% if form.phone_number.errors %}{{ form.phone_number.errors }}{% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="region">Región:</label>
-                            {{ form.region }}
-                            <div id="regionError" class="error-message">
-                                {% if form.region.errors %}{{ form.region.errors }}{% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="form-group" id="officeGroup">
-                            <label for="office">Oficina Local: <span id="officeLoading" class="spinner"></span></label>
-                            {{ form.office }}
-                            <div id="officeError" class="error-message">
-                                {% if form.office.errors %}{{ form.office.errors }}{% endif %}
                             </div>
                         </div>
                         
@@ -380,7 +344,6 @@
         
         <div class="footer">
             <div class="footer-logo">
-                <img src="{% static 'css/img/DEPTO_FAMILIA@4x.png' %}" alt="ADSEF - Gobierno de Puerto Rico">
                 <img src="{% static 'css/img/DEPTO_FAMILIA@4x.png' %}" alt="ADSEF - Gobierno de Puerto Rico">
             </div>
             <p class="copyright">&copy; 2025 - Powered By Dominio</p>        
@@ -401,88 +364,18 @@
    <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script> 
    <script src="{% static 'js/main.js' %}"></script>
    
-   <!-- SCRIPT ÚNICO PARA GESTIONAR EL FORMULARIO -->
+   <!-- SCRIPT SIMPLIFICADO PARA EL NUEVO FORMULARIO -->
    <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Referencias a elementos del DOM
         const form = document.getElementById('registrationForm');
-        const regionSelect = document.getElementById('region');
-        const officeSelect = document.getElementById('office');
-        const officeLoadingSpinner = document.getElementById('officeLoading');
-        const officeGroup = document.getElementById('officeGroup');
-        const isOfficeUpdate = document.getElementById('is_office_update');
         const messages = document.querySelector('.messages');
         const submitButton = form.querySelector('button[type="submit"]');
         
         let isSubmitting = false;
 
-        // Función para obtener token CSRF
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
-        // Actualizar las oficinas cuando cambia la región
-        regionSelect.addEventListener('change', function() {
-            const regionId = this.value;
-            officeSelect.innerHTML = '<option value="">Cargando oficinas...</option>';
-            officeSelect.disabled = true;
-            officeLoadingSpinner.style.display = 'inline-block';
-            
-            if (regionId) {
-                // Realizar solicitud AJAX para obtener las oficinas
-                fetch(`/get-offices/?region_id=${regionId}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    officeSelect.innerHTML = '<option value="">Seleccione una oficina</option>';
-                    
-                    // Agregar las opciones de oficinas
-                    data.offices.forEach(office => {
-                        const option = document.createElement('option');
-                        option.value = office.id;
-                        option.textContent = office.name;
-                        officeSelect.appendChild(option);
-                    });
-                    
-                    officeSelect.disabled = false;
-                    officeLoadingSpinner.style.display = 'none';
-                })
-                .catch(error => {
-                    console.error('Error cargando oficinas:', error);
-                    officeSelect.innerHTML = '<option value="">Error al cargar oficinas</option>';
-                    officeSelect.disabled = false;
-                    officeLoadingSpinner.style.display = 'none';
-                });
-            } else {
-                // Si no hay región seleccionada, vaciar el select de oficinas
-                officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
-                officeSelect.disabled = true;
-                officeLoadingSpinner.style.display = 'none';
-            }
-        });
-
-        // Manejo del formulario - solo para cuando es un envío real, no actualización de oficinas
+        // Manejo del formulario
         form.addEventListener('submit', function(e) {
-            // Verificar si es solo actualización de oficinas
-            if (isOfficeUpdate && isOfficeUpdate.value === "true") {
-                return; // No hacer nada adicional si es actualización de oficinas
-            }
-            
             // Prevenir múltiples envíos
             if (isSubmitting) {
                 e.preventDefault();
@@ -506,8 +399,7 @@
             window.history.replaceState(null, null, window.location.href);
         }
 
-        // SOLO limpiar el formulario cuando hay un mensaje de ÉXITO
-        // NO HACER NADA SI HAY MENSAJES DE ERROR para mantener los datos ingresados
+        // Limpiar el formulario cuando hay un mensaje de ÉXITO
         if (messages && messages.querySelector('.alert-success')) {
             // Hay un mensaje de éxito, limpiar el formulario
             form.reset();
@@ -515,20 +407,35 @@
             // Limpiar mensajes de error
             const errorMessages = form.querySelectorAll('.error-message');
             errorMessages.forEach(error => error.textContent = '');
-            
-            // Restablecer los dropdowns
-            officeSelect.innerHTML = '<option value="">Seleccione primero una región</option>';
-            officeSelect.disabled = true;
         }
-        
-        // Mostrar grupo de oficinas solo si hay opciones disponibles
-        if (officeSelect && officeSelect.options.length > 1) {
-            officeGroup.style.display = 'block';
+
+        // Validación básica de email (solo quitar espacios y convertir a minúsculas)
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+            emailInput.addEventListener('blur', function() {
+                const email = this.value.trim().toLowerCase();
+                this.value = email;
+            });
         }
-        
-        // Reiniciar el valor de is_office_update
-        if (isOfficeUpdate) {
-            isOfficeUpdate.value = "false";
+
+        // Formateo automático del teléfono
+        const phoneInput = document.getElementById('phone_number');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, ''); // Solo números
+                
+                // Formatear como (XXX) XXX-XXXX para números de 10 dígitos
+                if (value.length >= 10) {
+                    value = value.substring(0, 10);
+                    value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`;
+                } else if (value.length >= 6) {
+                    value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`;
+                } else if (value.length >= 3) {
+                    value = `(${value.substring(0, 3)}) ${value.substring(3)}`;
+                }
+                
+                this.value = value;
+            });
         }
     });
    </script>

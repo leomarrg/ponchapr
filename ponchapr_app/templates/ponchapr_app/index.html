@@ -335,18 +335,18 @@
                         <div class="col-xl-9 col-lg-9">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Attendance Overview</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Listado de Participantes</h6>
                                 </div>
                                 <div class="card-body">
                                     <!-- Tabs -->
                                     <ul class="nav nav-tabs" id="attendanceTab" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" id="attendees-tab" data-toggle="tab" href="#attendees" role="tab"
-                                                aria-controls="attendees" aria-selected="true">Attendee List</a>
+                                                aria-controls="attendees" aria-selected="true">Lista de Asistentes</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="stats-tab" data-toggle="tab" href="#stats" role="tab"
-                                                aria-controls="stats" aria-selected="false">Statistics</a>
+                                                aria-controls="stats" aria-selected="false">Estadísticas</a>
                                         </li>
                                     </ul>
                                     <div class="tab-content mt-3" id="attendanceTabContent">
@@ -355,41 +355,41 @@
                                                 <table class="table table-bordered" id="attendeeDataTable" width="100%" cellspacing="0">
                                                     <thead>
                                                         <tr>
-                                                            <th>Region</th>
-                                                            <th>Name</th>
-                                                            <th>Last Name</th>
-                                                            <th>Email</th>
-                                                            <th>Check-in Time</th>
-                                                            <th>Check-out Time</th>
-                                                            <th>Status</th>
+                                                            <th>Nombre</th>
+                                                            <th>Apellidos</th>
+                                                            <th>Organización</th>
+                                                            <th>Teléfono</th>
+                                                            <th>Correo</th>
+                                                            <th>Fecha de Registro</th>
+                                                            <th>Estado</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {% for attendee in attendees %}
                                                         <tr>
-                                                            <td>{{ attendee.region.name|default:"-" }}</td>
                                                             <td>{{ attendee.name }}</td>
                                                             <td>{{ attendee.last_name }}</td>
+                                                            <td>{{ attendee.organization|default:"-" }}</td>
+                                                            <td>{{ attendee.phone_number|default:"-" }}</td>
                                                             <td>{{ attendee.email }}</td>
-                                                            <td>{{ attendee.arrival_time|date:"M d, Y g:i A"|default:"-" }}</td>
-                                                            <td>{{ attendee.checkout_time|date:"M d, Y g:i A"|default:"-" }}</td>
+                                                            <td>{{ attendee.created_at|date:"d/m/Y g:i A" }}</td>
                                                             <td>
                                                                 {% if attendee.checked_out %}
                                                                     <span class="badge badge-info">Checked Out</span>
                                                                 {% elif attendee.arrived %}
                                                                     <span class="badge badge-success">Checked In</span>
                                                                 {% elif attendee.pre_registered %}
-                                                                    <span class="badge badge-warning">Pre-Registered</span>
+                                                                    <span class="badge badge-warning">Pre-Registrado</span>
                                                                 {% elif attendee.registered_at_event %}
-                                                                    <span class="badge badge-primary">Front Desk</span>
+                                                                    <span class="badge badge-primary">Registro en Sitio</span>
                                                                 {% else %}
-                                                                    <span class="badge badge-secondary">Registered</span>
+                                                                    <span class="badge badge-secondary">Registrado</span>
                                                                 {% endif %}
                                                             </td>
                                                         </tr>
                                                         {% empty %}
                                                         <tr>
-                                                            <td colspan="9" class="text-center">No attendees found</td>
+                                                            <td colspan="7" class="text-center">No se encontraron participantes</td>
                                                         </tr>
                                                         {% endfor %}
                                                     </tbody>
@@ -403,12 +403,12 @@
                                                 <div class="col-md-6">
                                                     <div class="card border-left-primary shadow h-100 py-2">
                                                         <div class="card-body">
-                                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Registration Efficiency</div>
+                                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Eficiencia de Pre-Registro</div>
                                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                                                 {% if total_attendees > 0 %}
-                                                                    {{ pre_registered_count|default:0 }} of {{ total_attendees }} ({{ pre_registered_percentage|default:0 }}%)
+                                                                    {{ pre_registered_count|default:0 }} de {{ total_attendees }} ({{ pre_registered_percentage|default:0 }}%)
                                                                 {% else %}
-                                                                    No registrations yet
+                                                                    No hay registros aún
                                                                 {% endif %}
                                                             </div>
                                                         </div>
@@ -417,13 +417,50 @@
                                                 <div class="col-md-6">
                                                     <div class="card border-left-success shadow h-100 py-2">
                                                         <div class="card-body">
-                                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Check-in Rate</div>
+                                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Tasa de Check-in</div>
                                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                                                 {% if total_attendees > 0 %}
                                                                     {{ arrival_percentage }}%
                                                                 {% else %}
-                                                                    No registrations yet
+                                                                    No hay registros aún
                                                                 {% endif %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Resumen por Organizaciones -->
+                                            <div class="row mt-4">
+                                                <div class="col-12">
+                                                    <div class="card border-left-info shadow h-100 py-2">
+                                                        <div class="card-body">
+                                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-3">Participación por Organización</div>
+                                                            <div class="table-responsive">
+                                                                <table class="table table-sm">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Organización/Agencia</th>
+                                                                            <th>Registrados</th>
+                                                                            <th>Check-in</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {% regroup attendees by organization as organization_list %}
+                                                                        {% for organization in organization_list %}
+                                                                        <tr>
+                                                                            <td>{{ organization.grouper|default:"Sin especificar" }}</td>
+                                                                            <td>{{ organization.list|length }}</td>
+                                                                            <td>
+                                                                                {% for attendee in organization.list %}
+                                                                                    {% if attendee.arrived %}1{% else %}0{% endif %}
+                                                                                    {% if not forloop.last %}+{% endif %}
+                                                                                {% endfor %}
+                                                                            </td>
+                                                                        </tr>
+                                                                        {% endfor %}
+                                                                    </tbody>
+                                                                </table>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -439,7 +476,7 @@
                         <div class="col-xl-3 col-lg-3">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Attendance Statistics</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Estadísticas de Asistencia</h6>
                                 </div>
                                 <div class="card-body">
                                     <div style="position: relative; height: 250px; width: 100%;">
@@ -449,9 +486,9 @@
                                         </canvas>
                                     </div>
                                     <div class="text-center mt-3">
-                                        <div class="small text-muted">Expected attendance: 200</div>
+                                        <div class="small text-muted">Asistencia esperada: 200</div>
                                         <div class="font-weight-bold">
-                                            Current attendance rate: <span id="checkedInCount">{{ arrived_attendees|default:0 }}</span> / 200 (<span id="computedPercentage"></span>%)
+                                            Tasa actual de asistencia: <span id="checkedInCount">{{ arrived_attendees|default:0 }}</span> / 200 (<span id="computedPercentage"></span>%)
                                         </div>
                                     </div>
                                 </div>
@@ -464,10 +501,10 @@
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Attendance Progress</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Progreso de Asistencia</h6>
                                 </div>
                                 <div class="card-body">
-                                    <h4 class="small font-weight-bold">Check-in Rate <span class="float-right" id="progressPercentage"></span></h4>
+                                    <h4 class="small font-weight-bold">Tasa de Check-in <span class="float-right" id="progressPercentage"></span></h4>
                                     <div class="progress mb-4">
                                         <!-- Progress bar will be updated by JS -->
                                         <div class="progress-bar bg-info" role="progressbar" id="progressBar" style="width: 0%"
@@ -480,12 +517,11 @@
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">About the Event</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Acerca del Evento</h6>
                                 </div>
                                 <div class="card-body">
-                                    <p>Welcome to the PonchaPR event management dashboard. From here you can track registration
-                                        statistics, manage check-ins, and generate reports.</p>
-                                    <p class="mb-0">Use the sidebar navigation to access different features of the system.</p>
+                                    <p>Bienvenido al dashboard de gestión de eventos de ADSEF. Desde aquí puedes monitorear las estadísticas de registro, gestionar check-ins y generar reportes.</p>
+                                    <p class="mb-0">Utiliza la navegación lateral para acceder a las diferentes funciones del sistema.</p>
                                 </div>
                             </div>
                         </div>
@@ -501,7 +537,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; PonchaPR 2025</span>
+                        <span>Copyright &copy; ADSEF 2025</span>
                     </div>
                 </div>
             </footer>
@@ -522,15 +558,15 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">¿Listo para salir?</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-body">Selecciona "Cerrar Sesión" si estás listo para terminar tu sesión actual.</div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="{% url 'admin:logout' %}">Logout</a>
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-primary" href="{% url 'admin:logout' %}">Cerrar Sesión</a>
                 </div>
             </div>
         </div>
@@ -549,9 +585,23 @@
             // Initialize DataTables if available
             if (typeof $.fn.DataTable !== 'undefined') {
                 $('#attendeeDataTable').DataTable({
-                    "pageLength": 8,
-                    "lengthMenu": [[8, 16, 32, -1], [8, 16, 32, "All"]],
-                    "order": [[5, "desc"]]
+                    "pageLength": 10,
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                    "order": [[5, "desc"]], // Ordenar por fecha de registro (descendente)
+                    "language": {
+                        "lengthMenu": "Mostrar _MENU_ registros por página",
+                        "zeroRecords": "No se encontraron registros",
+                        "info": "Mostrando página _PAGE_ de _PAGES_",
+                        "infoEmpty": "No hay registros disponibles",
+                        "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                        "search": "Buscar:",
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        }
+                    }
                 });
             }
 
@@ -590,23 +640,36 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Checked In', 'Checked Out'],
+                    labels: ['Check-in', 'Check-out'],
                     datasets: [{
-                        label: 'Attendees Count',
+                        label: 'Cantidad de Asistentes',
                         data: [arrived, checkedOut],
                         backgroundColor: [
-                            'rgba(75, 192, 192, 0.5)',
-                            'rgba(255, 99, 132, 0.5)'
-                        ]
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(54, 162, 235, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: expectedAttendance
+                            max: Math.max(expectedAttendance, arrived + 10),
+                            ticks: {
+                                stepSize: 10
+                            }
                         }
                     }
                 }

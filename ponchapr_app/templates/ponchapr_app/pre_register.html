@@ -1,232 +1,443 @@
 {% load static %}
 <!DOCTYPE html>
-<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
-<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
-<!--[if IE 9 ]><html class="no-js ie ie9" lang="en"> <![endif]-->
-<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Registro </title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos basados en register.html */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            background-color: #1c2854;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-   <!--- Basic Page Needs
-   ================================================== -->
-   <meta charset="utf-8">
-   <title>Pre-Register</title>
-   <meta name="description" content="">  
-   <meta name="author" content="">
-   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-   <meta http-equiv="Pragma" content="no-cache">
-   <meta http-equiv="Expires" content="0">
-
-   <!-- Mobile Specific Metas
-   ================================================== -->
-   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-   <!-- CSS
-    ================================================== -->
-   <link rel="stylesheet" href="{% static 'css/default.css' %}">
-   <link rel="stylesheet" href="{% static 'css/layout.css' %}">
-   <link rel="stylesheet" href="{% static 'css/media-queries.css' %}">
-   <link rel="stylesheet" href="{% static 'css/animate.css' %}">
-   <link rel="stylesheet" href="{% static 'css/prettyPhoto.css' %}">
-
-   <!-- Script
-   ================================================== -->
-   <script src="{% static 'js/modernizr.js' %}"></script>
-
-   <!-- Favicons
-   ================================================== -->
-   <link rel="shortcut icon" href="{% static 'favicon.png' %}" >
-
-   <style>
-      .error-message {
-          color: #dc3545;
-          font-size: 0.9em;
-          margin-top: 5px;
-          margin-bottom: 10px;
-      }
-      
-      .input-error {
-          border: 1px solid #dc3545 !important;
-          background-color: rgba(220, 53, 69, 0.05) !important;
-      }
-      
-      .input-success {
-          border: 1px solid #28a745 !important;
-      }
-      
-   </style>
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .content-inner {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+        
+        .compromiso-img {
+            margin-top: 40px;
+            margin-bottom: -70px;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .registro-banner-container {
+            width: 100%;
+            position: relative;
+            margin: 5px 0;
+            padding: 10px 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Franja verde con opacidad */
+        .registro-banner-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #8acff3;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .registro-banner {
+            text-transform: uppercase;
+            font-size: 28px;
+            font-weight: bold;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 1;
+        }
+        
+        /* Estilos para el formulario */
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #00b3d3;
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 0 3px rgba(0, 179, 211, 0.25);
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .error-message {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .submit-btn {
+            background-color: #e5bc44;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 45px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background-color: #92b730;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            background-color: #6a8c23;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .footer {
+            margin-top: auto;
+            width: 100%;
+            padding: 20px;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .footer-logo img {
+            max-width: 250px;
+            height: auto;
+        }
+        
+        .escudo-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            opacity: 0.3;
+            z-index: 0;
+            max-width: 80%;
+            height: auto;
+        }
+        
+        /* Mensajes de alerta */
+        .messages {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-left: 4px solid transparent;
+        }
+        
+        .alert-success {
+            background-color: rgba(58, 184, 125, 0.2);
+            border-left-color: #3ab87d;
+        }
+        
+        .alert-error, .alert-danger {
+            background-color: rgba(255, 107, 107, 0.2);
+            border-left-color: #ff6b6b;
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 203, 107, 0.2);
+            border-left-color: #ffcb6b;
+        }
+        
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            .registro-banner {
+                font-size: 22px;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+            
+            .submit-btn {
+                padding: 12px 30px;
+                font-size: 18px;
+            }
+        }
+    </style>
+    
+    <script src="{% static 'js/modernizr.js' %}"></script>
 </head>
-
 <body>
-   <div id="preloader">      
-      <div id="status">
-         <img src="{% static 'images/preloader.gif' %}" height="64" width="64" alt="">
-      </div>
-   </div>
-
-   <!-- Header
-   ================================================== -->
-   <header>
-      <div class="logo">
-         <a class="smoothscroll" href="#hero"><img alt="" src="{% static 'images/logo.png' %}"></a>
-      </div>
-   </header>
-
-   <br><br>
-   <section>
-      <div class="container">
-         {% if messages %}
-         <div class="messages">
-            {% for message in messages %}
-            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-               {{ message }}
-            </div>
-            {% endfor %}
-         </div>
-         {% endif %}
-         <h2 class="form-header">Pre-Registro</h2>
-         <form method="post" action="" id="registrationForm">
-            {% csrf_token %}
-            <label for="name">Nombre:</label>
-            {{ form.name }}
-            <div id="nameError" class="error-message">
-                {% if form.name.errors %}{{ form.name.errors }}{% endif %}
+    <div class="container">
+        <div class="background"></div>
+        
+        <!-- Escudo de fondo semi-transparente -->
+        <img src="{% static 'css/img/Escudo@2x.png' %}" alt="" class="escudo-overlay">
+        
+        <div class="content">
+            <div class="content-inner">
+                <!-- Imagen de "Compromiso en acción" -->
+                <img src="{% static 'css/img/logo_conversatorio_4x.png' %}" alt="COMPROMISO EN acción" class="compromiso-img">
             </div>
             
-            <label for="last-name">Apellidos:</label>
-            {{ form.last_name }}
-            <div id="last-nameError" class="error-message">
-                {% if form.last_name.errors %}{{ form.last_name.errors }}{% endif %}
+            <!-- Franja verde semi-transparente a todo el ancho -->
+            <div class="registro-banner-container">
+                <div class="registro-banner">
+                    PRE-REGISTRO
+                </div>
             </div>
             
-            <label for="date">Fecha de nacimiento</label>
-            {{ form.date_of_birth }}
-            <div id="date-of-birthError" class="error-message">
-                {% if form.date_of_birth.errors %}{{ form.date_of_birth.errors }}{% endif %}
+            <div class="content-inner">
+                <!-- Mensajes -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Formulario de pre-registro -->
+                <div class="form-container">
+                    <form id="registrationForm" method="post" action="">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="name">Nombre:</label>
+                            {{ form.name }}
+                            <div id="nameError" class="error-message">
+                                {% if form.name.errors %}{{ form.name.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="last_name">Apellidos:</label>
+                            {{ form.last_name }}
+                            <div id="lastNameError" class="error-message">
+                                {% if form.last_name.errors %}{{ form.last_name.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="organization">Organización/Agencia:</label>
+                            {{ form.organization }}
+                            <div id="organizationError" class="error-message">
+                                {% if form.organization.errors %}{{ form.organization.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone_number">Teléfono:</label>
+                            {{ form.phone_number }}
+                            <div id="phoneError" class="error-message">
+                                {% if form.phone_number.errors %}{{ form.phone_number.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Correo electrónico:</label>
+                            {{ form.email }}
+                            <div id="emailError" class="error-message">
+                                {% if form.email.errors %}{{ form.email.errors }}{% endif %}
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            Pre-Registrarse
+                        </button>
+                    </form>
+                </div>
             </div>
-            
-            <label for="email">Correo electrónico:</label>
-            {{ form.email }}
-            <div id="emailError" class="error-message">
-                {% if form.email.errors %}{{ form.email.errors }}{% endif %}
-            </div>
-
-            <label for="region">Región:</label>
-            {{ form.region }}
-            <div id="regionError" class="error-message">
-                {% if form.region.errors %}{{ form.region.errors }}{% endif %}
-            </div>
-
-            <label for="phone">Número de teléfono:</label>
-            {{ form.phone_number }}
-            <div id="phoneError" class="error-message">
-                {% if form.phone_number.errors %}{{ form.phone_number.errors }}{% endif %}
-            </div>
-            
-            <button type="submit" class="submit-btn">
-               Pre-Registrarse
-            </button>
-         </form>
-      </div>
-   </section>
-
-   <!-- Footer
-   ================================================== -->
-   <footer>
-      <div class="row">         
-         <div class="six columns info">
+        </div>
+        
+        <div class="footer">
             <div class="footer-logo">
-               <a href="#">
-                  <img src="{% static 'images/footer-logo.png' %}" alt="" />
-               </a>
+                <img src="{% static 'css/img/DEPTO_FAMILIA@4x.png' %}" alt="ADSEF - Gobierno de Puerto Rico">
             </div>
-            <p>REGISTRATEPR es una plataforma digital diseñada para simplificar el proceso de registro en cualquier tipo de evento.</p>
-         </div>
-         <div class="columns last">
-            <h3 class="contact">Contáctanos</h3>
-            <ul>
-               <li><a href="mailto:someone@woo.com">registratepr.info@gmail.com</a></li>
-            </ul>
-         </div>
-
-         <p class="copyright">&copy; 2024 registratepr | Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></p>
-      </div>
-   </footer>
-
-   <!-- Java Script
-   ================================================== -->
-   <script src="{% static 'http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' %}"></script>
-   <script>window.jQuery || document.write('<script src="{% static "js/jquery-1.10.2.min.js" %}"><\/script>');</script>
+            <p class="copyright">&copy; 2025 - Powered By Dominio</p>        
+        </div>
+    </div>
+    
+   <!-- Script para el manejo del formulario -->
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>
+    window.jQuery || document.write('<script src="{% static "js/jquery-1.10.2.min.js" %}"><\/script>');
+   </script>
    <script type="text/javascript" src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
    <script src="{% static 'js/jquery.flexslider.js' %}"></script>
    <script src="{% static 'js/waypoints.js' %}"></script>
    <script src="{% static 'js/jquery.fittext.js' %}"></script>
    <script src="{% static 'js/jquery.fitvids.js' %}"></script>
    <script src="{% static 'js/imagelightbox.js' %}"></script>
-   <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script>   
+   <script src="{% static 'js/jquery.prettyPhoto.js' %}"></script> 
    <script src="{% static 'js/main.js' %}"></script>
-
+   
+   <!-- SCRIPT SIMPLIFICADO PARA EL NUEVO FORMULARIO -->
    <script>
-     const form = document.querySelector('form');
-     let isSubmitting = false;
-
-     form.addEventListener('submit', function(e) {
-        if (isSubmitting) {
-           e.preventDefault();
-           return;
-        }
-
-        isSubmitting = true;
-        const submitButton = this.querySelector('button[type="submit"]');
-        if (submitButton) {
-           submitButton.disabled = true;
-           submitButton.innerHTML = 'Procesando...';
-        }
-     });
-
-     // Reset submission status when leaving the page
-     window.addEventListener('beforeunload', function() {
-        isSubmitting = false;
-     });
-
-     // Prevent form resubmission on page refresh
-     if (window.history.replaceState) {
-        window.history.replaceState(null, null, window.location.href);
-     }
-
-     // Solo resetear el formulario después de un envío exitoso
-     document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Referencias a elementos del DOM
+        const form = document.getElementById('registrationForm');
         const messages = document.querySelector('.messages');
+        const submitButton = form.querySelector('button[type="submit"]');
         
-        // Solo resetear si hay un mensaje de éxito
+        let isSubmitting = false;
+
+        // Manejo del formulario
+        form.addEventListener('submit', function(e) {
+            // Prevenir múltiples envíos
+            if (isSubmitting) {
+                e.preventDefault();
+                return;
+            }
+
+            isSubmitting = true;
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Procesando...';
+            }
+        });
+
+        // Reset submission status when leaving the page
+        window.addEventListener('beforeunload', function() {
+            isSubmitting = false;
+        });
+
+        // Prevent form resubmission on page refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+
+        // Limpiar el formulario cuando hay un mensaje de ÉXITO
         if (messages && messages.querySelector('.alert-success')) {
-           const form = document.querySelector('form');
-           form.reset();  // Reset all form fields
-           const datePicker = document.getElementById('date-of-birth');
-           if (datePicker) {
-              datePicker.value = '';  // Explicitly clear the date picker
-           }
-           
-           // Clear any error messages
-           const errorMessages = document.querySelectorAll('.error-message');
-           errorMessages.forEach(error => error.textContent = '');
+            // Hay un mensaje de éxito, limpiar el formulario
+            form.reset();
+            
+            // Limpiar mensajes de error
+            const errorMessages = form.querySelectorAll('.error-message');
+            errorMessages.forEach(error => error.textContent = '');
         }
-        
-        // Validación mejorada del campo fecha
-        const dateOfBirth = document.getElementById('date-of-birth');
-        if (dateOfBirth) {
-           // Set max date to today (no future dates)
-           const today = new Date();
-           const yyyy = today.getFullYear();
-           const mm = String(today.getMonth() + 1).padStart(2, '0');
-           const dd = String(today.getDate()).padStart(2, '0');
-           const formattedToday = `${yyyy}-${mm}-${dd}`;
-           dateOfBirth.setAttribute('max', formattedToday);
-           
-           // Set min date to reasonable age (e.g., 100 years ago)
-           const minYear = yyyy - 100;
-           dateOfBirth.setAttribute('min', `${minYear}-${mm}-${dd}`);
+
+        // Validación básica de email (solo quitar espacios y convertir a minúsculas)
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+            emailInput.addEventListener('blur', function() {
+                const email = this.value.trim().toLowerCase();
+                this.value = email;
+            });
         }
-     });
+
+        // Formateo automático del teléfono
+        const phoneInput = document.getElementById('phone_number');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, ''); // Solo números
+
+                // Formatear como (XXX) XXX-XXXX para números de 10 dígitos
+                if (value.length >= 10) {
+                    value = value.substring(0, 10);
+                    value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`;
+                } else if (value.length >= 6) {
+                    value = `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`;
+                } else if (value.length >= 3) {
+                    value = `(${value.substring(0, 3)}) ${value.substring(3)}`;
+                }
+                
+                this.value = value;
+            });
+        }
+    });
    </script>
 </body>
 </html>

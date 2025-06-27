@@ -10,27 +10,26 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
-from .utils import send_registration_email_async
+from .utils import send_welcome_email_async
+from datetime import timedelta
 
-
-
-admin.site.site_header = "Panel de Administración RegistratePR"
-admin.site.site_title = "Administración de RegistratePR"
+admin.site.site_header = "Panel de Administración ADSEF"
+admin.site.site_title = "Administración de ADSEF"
 admin.site.index_title = "Bienvenido al Panel de Administración"
 
 def export_to_text(modeladmin, request, queryset):
     # Set up the HTTP response with a plain text content type
     response = HttpResponse(content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename="attendees_list.txt"'
+    response['Content-Disposition'] = 'attachment; filename="participantes_lista.txt"'
 
     # Loop through each attendee in the queryset and write their info to the response
     for attendee in queryset:
-        response.write(f"{attendee.name} {attendee.last_name}\n")  # Customize the fields as needed
+        response.write(f"{attendee.name} {attendee.last_name} - {attendee.organization} - {attendee.email} - {attendee.phone_number}\n")
 
     return response
 
 # Add the custom action to your Admin class
-export_to_text.short_description = "Export selected attendees to text file"
+export_to_text.short_description = "Exportar participantes seleccionados a archivo de texto"
 
 class CustomAdminSite(admin.AdminSite):
     def get_urls(self):
@@ -47,10 +46,10 @@ class CustomAdminSite(admin.AdminSite):
         
         # Attendee statistics
         daily_attendees = Attendee.objects.filter(
-            registered_at_event__range=(start_date, end_date)
-        ).values('registered_at_event__date').annotate(
+            created_at__range=(start_date, end_date)
+        ).values('created_at__date').annotate(
             count=Count('id')
-        ).order_by('registered_at_event__date')
+        ).order_by('created_at__date')
 
         # Review statistics
         review_stats = Review.objects.values('category').annotate(
@@ -62,7 +61,7 @@ class CustomAdminSite(admin.AdminSite):
             'arrived_attendees': Attendee.objects.filter(arrived=True).count(),
             'total_reviews': Review.objects.count(),
             'attendee_data': list(daily_attendees.values_list('count', flat=True)),
-            'dates': list(daily_attendees.values_list('registered_at_event__date', flat=True)),
+            'dates': list(daily_attendees.values_list('created_at__date', flat=True)),
             'review_categories': list(review_stats.values_list('category', flat=True)),
             'review_counts': list(review_stats.values_list('count', flat=True)),
         })
@@ -70,12 +69,12 @@ class CustomAdminSite(admin.AdminSite):
         return super().index(request, extra_context)
 
 class DuplicateNameFilter(admin.SimpleListFilter):
-    title = "Duplicate Names"
+    title = "Nombres Duplicados"
     parameter_name = "duplicate_name"
     
     def lookups(self, request, model_admin):
         return (
-            ('yes', 'Show duplicates only'),
+            ('yes', 'Mostrar solo duplicados'),
         )
     
     def queryset(self, request, queryset):
@@ -97,14 +96,39 @@ class DuplicateNameFilter(admin.SimpleListFilter):
             return queryset.none()
         return queryset
 
+class DuplicateEmailFilter(admin.SimpleListFilter):
+    title = "Correos Duplicados"
+    parameter_name = "duplicate_email"
+    
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Mostrar solo duplicados'),
+        )
+    
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            # Find emails that appear more than once
+            duplicate_emails = Attendee.objects.exclude(email='').\
+                values('email').\
+                annotate(email_count=Count('id')).\
+                filter(email_count__gt=1)
+            
+            # Get the emails that are duplicated
+            duplicate_email_values = [item['email'] for item in duplicate_emails]
+            
+            # Filter original queryset to only include these duplicates
+            if duplicate_email_values:
+                return queryset.filter(email__in=duplicate_email_values)
+            return queryset.none()
+        return queryset
 
 class DuplicatePhoneFilter(admin.SimpleListFilter):
-    title = "Duplicate Phone Numbers"
+    title = "Teléfonos Duplicados"
     parameter_name = "duplicate_phone"
     
     def lookups(self, request, model_admin):
         return (
-            ('yes', 'Show duplicates only'),
+            ('yes', 'Mostrar solo duplicados'),
         )
     
     def queryset(self, request, queryset):
@@ -123,14 +147,73 @@ class DuplicatePhoneFilter(admin.SimpleListFilter):
                 return queryset.filter(phone_number__in=duplicate_phone_values)
             return queryset.none()
         return queryset
+
+class OrganizationFilter(admin.SimpleListFilter):
+    title = "Organización/Agencia"
+    parameter_name = "organization"
     
+    def lookups(self, request, model_admin):
+        organizations = Attendee.objects.exclude(organization='').values_list('organization', flat=True).distinct()
+        return [(org, org) for org in organizations if org]
+    
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(organization=self.value())
+        return queryset
 
 class AttendeeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'last_name', 'email', 'phone_number', 'arrived', 'arrival_time', 'unique_id', 'checkout_time', 'checked_out', 'event')  # Use 'created_at' instead
-    list_filter = ('pre_registered', 'registered_at_event', 'arrived', 'arrival_time', DuplicateNameFilter, DuplicatePhoneFilter)
-    search_fields = ['name', 'last_name', 'email']
+    list_display = (
+        'name', 
+        'last_name', 
+        'organization', 
+        'email', 
+        'phone_number', 
+        'arrived', 
+        'arrival_time', 
+        'unique_id', 
+        'checkout_time', 
+        'checked_out', 
+        'event',
+        'created_at'
+    )
+    
+    list_filter = (
+        'pre_registered', 
+        'registered_at_event', 
+        'arrived', 
+        'checked_out',
+        'created_at',
+        OrganizationFilter,
+        DuplicateNameFilter, 
+        DuplicateEmailFilter,
+        DuplicatePhoneFilter,
+        'event'
+    )
+    
+    search_fields = ['name', 'last_name', 'email', 'organization', 'phone_number']
+    
+    readonly_fields = ('unique_id', 'qr_code_id', 'created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Información Personal', {
+            'fields': ('name', 'last_name', 'organization', 'email', 'phone_number')
+        }),
+        ('Información del Evento', {
+            'fields': ('event', 'unique_id', 'qr_code_id')
+        }),
+        ('Estado de Registro', {
+            'fields': ('pre_registered', 'registered_at_event')
+        }),
+        ('Estado de Asistencia', {
+            'fields': ('arrived', 'arrival_time', 'checked_out', 'checkout_time')
+        }),
+        ('Fechas del Sistema', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        })
+    )
 
-    actions = ['export_to_text', 'resend_email']  # Add to existing actions if any
+    actions = ['export_to_text', 'resend_email', 'mark_as_arrived', 'mark_as_not_arrived']
     
     def resend_email(self, request, queryset):
         success_count = 0
@@ -139,25 +222,51 @@ class AttendeeAdmin(admin.ModelAdmin):
         for attendee in queryset:
             try:
                 # Resend email using your existing email function
-                send_registration_email_async(attendee, attendee.unique_id)
+                send_welcome_email_async(attendee)
                 success_count += 1
             except Exception as e:
-                self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
+                self.message_user(request, f"Error enviando correo a {attendee.email}: {str(e)}", level='ERROR')
                 error_count += 1
         
         if success_count:
-            self.message_user(request, f"Successfully resent {success_count} email(s).", level='SUCCESS')
+            self.message_user(request, f"Se reenviaron exitosamente {success_count} correo(s).", level='SUCCESS')
         
         if error_count:
-            self.message_user(request, f"Failed to send {error_count} email(s). Check logs for details.", level='WARNING')
+            self.message_user(request, f"Falló el envío de {error_count} correo(s). Revise los logs para más detalles.", level='WARNING')
     
-    resend_email.short_description = "Resend confirmation email to selected attendees"
+    resend_email.short_description = "Reenviar correo de bienvenida a participantes seleccionados"
+    
+    def mark_as_arrived(self, request, queryset):
+        updated = 0
+        for attendee in queryset:
+            if not attendee.arrived:
+                attendee.arrived = True
+                attendee.arrival_time = timezone.now()
+                attendee.save()
+                updated += 1
+        
+        self.message_user(request, f"Se marcaron como llegados {updated} participante(s).", level='SUCCESS')
+    
+    mark_as_arrived.short_description = "Marcar como llegados"
+    
+    def mark_as_not_arrived(self, request, queryset):
+        updated = 0
+        for attendee in queryset:
+            if attendee.arrived:
+                attendee.arrived = False
+                attendee.arrival_time = None
+                attendee.save()
+                updated += 1
+        
+        self.message_user(request, f"Se desmarcaron como llegados {updated} participante(s).", level='SUCCESS')
+    
+    mark_as_not_arrived.short_description = "Desmarcar como llegados"
 
     def resend_email_button(self, obj):
-        return format_html('<a class="button" href="{}">Resend Email</a>', 
+        return format_html('<a class="button" href="{}">Reenviar Correo</a>', 
                          f'/admin/ponchapr_app/attendee/{obj.id}/resend_email/')
     
-    resend_email_button.short_description = "Resend Email"
+    resend_email_button.short_description = "Reenviar Correo"
     resend_email_button.allow_tags = True
 
     def changelist_view(self, request, extra_context=None):
@@ -175,21 +284,32 @@ class AttendeeAdmin(admin.ModelAdmin):
         hours = range(24)
         chart_data = {hour: 0 for hour in hours}
         for stat in arrival_stats:
-            chart_data[int(stat['hour'])] = stat['count']
+            if stat['hour'] is not None:
+                chart_data[int(stat['hour'])] = stat['count']
+
+        # Get organization statistics
+        org_stats = (
+            Attendee.objects
+            .exclude(organization='')
+            .values('organization')
+            .annotate(count=Count('id'))
+            .order_by('-count')[:10]  # Top 10 organizations
+        )
 
         extra_context = extra_context or {}
-        extra_context['arrival_data'] = list(chart_data.values())
-        extra_context['hours'] = list(hours)
+        extra_context.update({
+            'arrival_data': list(chart_data.values()),
+            'hours': list(hours),
+            'org_stats': list(org_stats),
+            'show_scan_buttons': True
+        })
 
         return super().changelist_view(request, extra_context=extra_context)
 
     class Media:
         js = ('admin/js/chart.min.js',)  # Make sure to include Chart.js
 
-    # class Media:
-    #     js = ('js/dynamic_search.js',)  # Add the JavaScript for dynamic search
-
-    # Add the autocomplete URL
+    # Add the custom URLs
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -205,10 +325,10 @@ class AttendeeAdmin(admin.ModelAdmin):
         attendee = self.get_object(request, object_id)
         if attendee:
             try:
-                send_registration_email_async(attendee, attendee.unique_id)
-                self.message_user(request, f"Email resent successfully to {attendee.email}", level='SUCCESS')
+                send_welcome_email_async(attendee)
+                self.message_user(request, f"Correo reenviado exitosamente a {attendee.email}", level='SUCCESS')
             except Exception as e:
-                self.message_user(request, f"Error sending email to {attendee.email}: {str(e)}", level='ERROR')
+                self.message_user(request, f"Error enviando correo a {attendee.email}: {str(e)}", level='ERROR')
         return redirect('admin:ponchapr_app_attendee_changelist')
     
     def checkin_qr_code_verify(self, request):
@@ -217,72 +337,51 @@ class AttendeeAdmin(admin.ModelAdmin):
     def checkout_qr_code_verify(self, request):
         return render(request, 'admin/ponchapr_app/checkout_qr_code_verify.html')
     
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['show_scan_buttons'] = True
-        return super().changelist_view(request, extra_context=extra_context)
-    
     def mark_checkout(self, request, object_id):
         attendee = self.get_object(request, object_id)
         if attendee:
             attendee.checked_out = True
-            attendee.checkout_time = timezone.now()  # Make sure this line is present!
+            attendee.checkout_time = timezone.now()
             attendee.save()
+            self.message_user(request, f"{attendee.name} {attendee.last_name} marcado como checkout exitosamente.", level='SUCCESS')
         return redirect('admin:ponchapr_app_attendee_changelist')
-    
-
-    # def autocomplete_view(self, request):
-    #     if 'term' in request.GET:
-    #         term = request.GET.get('term')
-    #         # Use 'istartswith' for prefix-based matching
-    #         qs = Attendee.objects.filter(name__istartswith=term) | Attendee.objects.filter(last_name__istartswith=term)
-    #         attendees = list(qs.values('id', 'name'))
-    #         return JsonResponse(attendees, safe=False)
-
-    #     return JsonResponse([], safe=False)
 
     def registration_type(self, obj):
         if obj.pre_registered:
-            return "Pre-Registered"
+            return "Pre-Registrado"
         elif obj.registered_at_event:
-            return "Same-Day Registered"
-        return "Unknown"
+            return "Registro en Sitio"
+        return "Desconocido"
 
-    registration_type.short_description = "Registration Type"
+    registration_type.short_description = "Tipo de Registro"
 
     # Custom buttons to mark/unmark attendees as arrived
     def mark_as_arrived_button(self, obj):
         if not obj.arrived:
-            return format_html('<a class="button" href="{}">Mark as Arrived</a>', 
+            return format_html('<a class="button" href="{}">Marcar como Llegado</a>', 
                              f'/admin/ponchapr_app/attendee/{obj.id}/mark_arrived/')
         else:
-            return format_html('<a class="button" href="{}">Unmark as Arrived</a>', 
+            return format_html('<a class="button" href="{}">Desmarcar como Llegado</a>', 
                              f'/admin/ponchapr_app/attendee/{obj.id}/unmark_arrived/')
-    mark_as_arrived_button.short_description = "Mark/Unmark as Arrived"
+    mark_as_arrived_button.short_description = "Marcar/Desmarcar Llegada"
     mark_as_arrived_button.allow_tags = True
-
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('<path:object_id>/mark_arrived/', self.admin_site.admin_view(self.mark_arrived), name='attendee-mark-arrived'),
-            path('<path:object_id>/unmark_arrived/', self.admin_site.admin_view(self.unmark_arrived), name='attendee-unmark-arrived'),
-        ]
-        return custom_urls + urls
 
     def mark_arrived(self, request, object_id):
         attendee = self.get_object(request, object_id)
         if attendee:
             attendee.arrived = True
-            attendee.arrival_time = timezone.now()  # Set timestamp when marking as arrived
+            attendee.arrival_time = timezone.now()
             attendee.save()
+            self.message_user(request, f"{attendee.name} {attendee.last_name} marcado como llegado.", level='SUCCESS')
         return redirect('admin:ponchapr_app_attendee_changelist')
 
     def unmark_arrived(self, request, object_id):
         attendee = self.get_object(request, object_id)
         if attendee:
             attendee.arrived = False
-            attendee.arrival_time = None  # Clear timestamp when unmarking
+            attendee.arrival_time = None
             attendee.save()
+            self.message_user(request, f"{attendee.name} {attendee.last_name} desmarcado como llegado.", level='SUCCESS')
         return redirect('admin:ponchapr_app_attendee_changelist')
 
     def get_available_seat(self):
@@ -299,17 +398,17 @@ class AttendeeAdmin(admin.ModelAdmin):
             if available_seat is not None:
                 return available_table, available_seat
 
-        return None, None  # If no seats are available
-    
-    @staff_member_required
-    def qr_code_verify(request):
-        return render(request, 'admin/ponchapr_app/qr_code_verify.html')
+        return None, None
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date', 'start_time', 'end_time', 'is_active')
+    list_display = ('name', 'date', 'start_time', 'end_time', 'is_active', 'attendee_count')
     list_filter = ('is_active', 'date')
     search_fields = ('name',)
     actions = ['make_active']
+    
+    def attendee_count(self, obj):
+        return obj.attendee_set.count()
+    attendee_count.short_description = 'Participantes Registrados'
     
     def make_active(self, request, queryset):
         # Solo activar el primer evento seleccionado
@@ -342,48 +441,36 @@ class RegionAdmin(admin.ModelAdmin):
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('satisfaction', 'usefulness', 'category', 'comments', 'review_date')
-    fields = ('satisfaction', 'usefulness', 'category', 'comments', 'review_date')  # Include 'category' in the detail view
+    fields = ('satisfaction', 'usefulness', 'category', 'comments', 'review_date')
+    list_filter = ('satisfaction', 'usefulness', 'category', 'review_date')
+    search_fields = ('comments', 'category')
+    date_hierarchy = 'review_date'
 
     actions = ['export_reviews_to_txt']
 
     def export_reviews_to_txt(self, request, queryset):
         # Create the HttpResponse object with plain text content
         response = HttpResponse(content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="reviews.txt"'
+        response['Content-Disposition'] = 'attachment; filename="evaluaciones.txt"'
 
         # Write the selected reviews to the response
         for review in queryset:
             response.write(
-                f"Satisfaction: {review.satisfaction}\n"
-                f"Usefulness: {review.usefulness}\n"
-                f"Category: {review.category}\n"
-                f"Comments: {review.comments}\n"
-                f"Review Date: {review.review_date}\n\n"
+                f"Satisfacción: {review.satisfaction}\n"
+                f"Utilidad: {review.usefulness}\n"
+                f"Categoría: {review.category}\n"
+                f"Comentarios: {review.comments}\n"
+                f"Fecha de Evaluación: {review.review_date}\n\n"
+                f"{'='*50}\n\n"
             )
 
         return response
 
-    export_reviews_to_txt.short_description = "Export selected reviews to text file"
-    # Restringir permisos de edición
-    def has_change_permission(self, request, obj=None):
-        return request.user.has_perm('registry_app.change_review')
+    export_reviews_to_txt.short_description = "Exportar evaluaciones seleccionadas a archivo de texto"
 
-
-class RegionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'active')
-    search_fields = ('name',)
-    list_filter = ('active',)
-
+# Register models
 admin.site.register(Region, RegionAdmin)
-# @admin.register(FileDownload)
-# class FileDownloadAdmin(admin.ModelAdmin):
-#     list_display = ('file', 'display_name', 'download_count')  # Add display_name here
-#     list_editable = ('display_name',)  # Allow editing directly in the list view
-#     search_fields = ('file', 'display_name')  # Enable search functionality
-#     list_filter = ('download_count',)
-
 admin.site.register(Attendee, AttendeeAdmin)
 admin.site.register(Review, ReviewAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(LocalOffice, LocalOfficeAdmin)
-

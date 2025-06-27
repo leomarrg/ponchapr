@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Registro Confirmado - 1er Conversatorio</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333333;
+            line-height: 1.6;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1c2854 0%, #164b68 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            color: #1c2854;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .main-message {
+            background: linear-gradient(135deg, #e5bc44 0%, #92b730 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            line-height: 1.7;
+        }
+        
+        .event-details {
+            background-color: #e8f4f8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .event-details h3 {
+            color: #1c2854;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .detail-item {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #164b68;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .highlight-box {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .highlight-box h4 {
+            color: #856404;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .highlight-box p {
+            color: #856404;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        
+        .registration-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #e5bc44;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .registration-info h4 {
+            color: #1c2854;
+            margin-top: 0;
+        }
+        
+        .footer {
+            background-color: #1c2854;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .main-message {
+                font-size: 16px;
+                padding: 20px;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>¡Pre-Registro Confirmado!</h1>
+            <p>1er Conversatorio para la Erradicación de la Pobreza Infantil</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <div class="greeting">
+                Estimado/a {{ attendee.name }} {{ attendee.last_name }},
+            </div>
+            
+            <!-- Main Message -->
+            <div class="main-message">
+                ¡Gracias por completar el pre-registro del <strong>1er Conversatorio para la Erradicación de la Pobreza Infantil en Puerto Rico!</strong>
+                <br><br>
+                Te esperamos este <strong>lunes, 30 de junio de 2025</strong> en el <strong>Salón Royal del Hotel Hilton Garden</strong>, a partir de las <strong>8:00 A.M.</strong>
+            </div>
+            
+            <!-- Event Details -->
+            <div class="event-details">
+                <h3>📅 Detalles del Evento</h3>
+                <div class="detail-item">
+                    <span class="detail-label">📍 Lugar:</span>
+                    <span class="detail-value">Salón Royal - Hotel Hilton Garden</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📅 Fecha:</span>
+                    <span class="detail-value">Lunes, 30 de junio de 2025</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">🕗 Hora:</span>
+                    <span class="detail-value">8:00 A.M.</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">👤 Participante:</span>
+                    <span class="detail-value">{{ attendee.name }} {{ attendee.last_name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">🏢 Organización:</span>
+                    <span class="detail-value">{{ attendee.organization }}</span>
+                </div>
+            </div>
+            
+            <!-- Important Notice -->
+            <div class="highlight-box">
+                <h4>📋 Importante - ¡Por favor llegar puntual!</h4>
+                <p>El evento iniciará puntualmente a las 8:00 A.M. Te recomendamos llegar unos minutos antes para el proceso de registro en el lugar.</p>
+            </div>
+            
+            <!-- Registration Info -->
+            <div class="registration-info">
+                <h4>✅ Tu Pre-Registro</h4>
+                <p><strong>Estado:</strong> Confirmado</p>
+                <p><strong>Fecha de registro:</strong> {{ attendee.created_at|date:"d/m/Y H:i" }}</p>
+                <p><strong>Email registrado:</strong> {{ attendee.email }}</p>
+                <p><strong>Teléfono:</strong> {{ attendee.phone_number }}</p>
+            </div>
+            
+            <div class="signature">
+                <p>¡Esperamos contar con tu valiosa participación en este importante conversatorio!</p>
+                
+                <p style="margin-top: 20px;">
+                    Cordialmente,<br>
+                    <strong>Equipo Organizador</strong><br>
+                    <em>1er Conversatorio para la Erradicación de la Pobreza Infantil</em><br>
+                    ADSEF - Gobierno de Puerto Rico
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2025 ADSEF - Gobierno de Puerto Rico</p>
+            <p><strong>Conversatorio para la Erradicación de la Pobreza Infantil</strong></p>
+        </div>
+    </div>
+</body>
+</html>

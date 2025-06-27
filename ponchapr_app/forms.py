@@ -4,81 +4,65 @@ from datetime import date
 
 
 class AttendeeForm(forms.ModelForm):
-    office = forms.ModelChoiceField(
-        queryset=LocalOffice.objects.none(),
-        required=True,
-        widget=forms.Select(attrs={
-            'id': 'office',
-            'required': True,
-        }),
-        label='Oficina'
-    )
     class Meta:
         model = Attendee
-        fields = ['name', 'last_name', 'phone_number', 'email', 'region', 'office']
+        fields = ['name', 'last_name', 'organization', 'phone_number', 'email']
+        
         widgets = {
             'name': forms.TextInput(attrs={
-                'id': 'name',
+                'class': 'form-control',
+                'placeholder': 'Ingrese su nombre',
                 'required': True,
+                'id': 'name'
             }),
             'last_name': forms.TextInput(attrs={
-                'id': 'last-name',
+                'class': 'form-control', 
+                'placeholder': 'Ingrese sus apellidos',
                 'required': True,
+                'id': 'last_name'
+            }),
+            'organization': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre de la organización o agencia',
+                'required': True,
+                'id': 'organization'
             }),
             'phone_number': forms.TextInput(attrs={
-                'id': 'phone',
-                'pattern': '[0-9]{3}-[0-9]{3}-[0-9]{4}',
-                'placeholder': '123-456-7890',
+                'class': 'form-control',
+                'placeholder': '(787) 123-4567',
                 'required': True,
+                'id': 'phone_number'
             }),
-            # 'date_of_birth': forms.DateInput(attrs={
-            #     'id': 'date-of-birth',
-            #     'type': 'date',
-            #     'placeholder': 'mm-dd-yyyy',
-            #     'required': True,
-            # }),
             'email': forms.EmailInput(attrs={
-                'id': 'email',
+                'class': 'form-control',
+                'placeholder': 'ejemplo@correo.com',
                 'required': True,
-            }),
-            'region': forms.Select(attrs={
-                'id': 'region',
-                'required': True,
-            }),
+                'id': 'email'
+            })
         }
+        
         labels = {
             'name': 'Nombre',
-            'last_name': 'Apellidos',
-            'phone_number': 'Número de teléfono',
-            # 'date_of_birth': 'Fecha de nacimiento',
-            'email': 'Correo electrónico',
-            'region': 'Región',
+            'last_name': 'Apellidos', 
+            'organization': 'Organización/Agencia',
+            'phone_number': 'Teléfono',
+            'email': 'Correo electrónico'
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['phone_number'].widget.attrs['type'] = 'tel'
-        # self.fields['date_of_birth'].widget.attrs['type'] = 'date'
-        self.fields['region'].queryset = Region.objects.filter(active=True)
-        self.fields['region'].empty_label = "Seleccione una región"
-        self.fields['office'].empty_label = "Seleccione una oficina"
-
-        if self.instance.pk and self.instance.region:
-            self.fields['office'].queryset = LocalOffice.objects.filter(region=self.instance.region)
     
-        if 'region' in self.data:
-            try:
-                region_id = int(self.data.get('region'))
-                self.fields['office'].queryset = LocalOffice.objects.filter(region_id=region_id)
-            except (ValueError, TypeError):
-                pass
-
     def clean_phone_number(self):
         phone = self.cleaned_data.get('phone_number')
         if phone:
-            digits = ''.join(filter(str.isdigit, phone))
-            if len(digits) != 10:
-                raise forms.ValidationError("El número de teléfono debe contener exactamente 10 dígitos")
+            # Remover caracteres no numéricos excepto + al inicio
+            import re
+            # Mantener solo números, espacios, guiones y paréntesis
+            phone = re.sub(r'[^\d\s\-\(\)\+]', '', phone)
+            
+            # Verificar que tiene al menos 10 dígitos
+            digits_only = re.sub(r'[^\d]', '', phone)
+            if len(digits_only) < 10:
+                raise forms.ValidationError("El número de teléfono debe tener al menos 10 dígitos.")
+                
+            return phone
         return phone
 
     # def clean_date_of_birth(self):

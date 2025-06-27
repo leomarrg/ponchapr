@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido al Evento ADSEF</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333333;
+            line-height: 1.6;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1c2854 0%, #164b68 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px 20px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            color: #1c2854;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .welcome-message {
+            background-color: #f8f9fa;
+            border-left: 4px solid #e5bc44;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .welcome-message h3 {
+            color: #1c2854;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .registration-details {
+            background-color: #e8f4f8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .registration-details h3 {
+            color: #1c2854;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .detail-item {
+            margin: 10px 0;
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #164b68;
+            min-width: 130px;
+            flex-shrink: 0;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #e5bc44 0%, #92b730 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .highlight-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+        }
+        
+        .highlight-box p {
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .event-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .event-info h4 {
+            color: #856404;
+            margin-top: 0;
+            font-size: 16px;
+        }
+        
+        .event-info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+            color: #856404;
+        }
+        
+        .contact-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .contact-info h4 {
+            color: #1c2854;
+            margin-top: 0;
+        }
+        
+        .footer {
+            background-color: #1c2854;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+            }
+            
+            .detail-label {
+                min-width: auto;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>¡Bienvenido!</h1>
+            <p>Evento ADSEF - Compromiso en Acción</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <div class="greeting">
+                Estimado/a {{ attendee.name }} {{ attendee.last_name }},
+            </div>
+            
+            <div class="welcome-message">
+                <h3>🎉 ¡Gracias por registrarte!</h3>
+                <p>Nos complace confirmar tu participación en <strong>"Compromiso en Acción"</strong>, un evento organizado por ADSEF (Administración de Servicios de Salud y Contra la Adicción).</p>
+            </div>
+            
+            <!-- Registration Details -->
+            <div class="registration-details">
+                <h3>📋 Detalles de tu Registro</h3>
+                <div class="detail-item">
+                    <span class="detail-label">Nombre completo:</span>
+                    <span class="detail-value">{{ attendee.name }} {{ attendee.last_name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Organización:</span>
+                    <span class="detail-value">{{ attendee.organization }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Correo electrónico:</span>
+                    <span class="detail-value">{{ attendee.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Teléfono:</span>
+                    <span class="detail-value">{{ attendee.phone_number }}</span>
+                </div>
+                {% if event_date %}
+                <div class="detail-item">
+                    <span class="detail-label">Fecha del evento:</span>
+                    <span class="detail-value">{{ event_date|date:"d/m/Y" }}</span>
+                </div>
+                {% endif %}
+                <div class="detail-item">
+                    <span class="detail-label">Fecha de registro:</span>
+                    <span class="detail-value">{{ attendee.created_at|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+            
+            <!-- Important Notice -->
+            <div class="highlight-box">
+                <h3>✅ ¡Tu Registro está Confirmado!</h3>
+                <p>Tu participación ha sido registrada exitosamente. Esperamos contar contigo en este importante evento.</p>
+            </div>
+            
+            <!-- Event Information -->
+            <div class="event-info">
+                <h4>📍 Información del Evento:</h4>
+                <ul>
+                    <li><strong>Evento:</strong> {{ event_name }}</li>
+                    <li><strong>Organizador:</strong> ADSEF - Administración de Servicios de Salud y Contra la Adicción</li>
+                    <li><strong>Objetivo:</strong> Presentar programas y servicios disponibles</li>
+                    <li><strong>Dirigido a:</strong> Profesionales y organizaciones del sector salud</li>
+                </ul>
+            </div>
+            
+            <!-- What to Expect -->
+            <div class="contact-info">
+                <h4>🎯 Qué Esperar del Evento:</h4>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Presentaciones informativas sobre programas y servicios de ADSEF</li>
+                    <li>Oportunidades de networking con profesionales del sector</li>
+                    <li>Sesiones interactivas y material educativo actualizado</li>
+                    <li>Información sobre recursos y servicios disponibles</li>
+                    <li>Espacio para preguntas y consultas especializadas</li>
+                </ul>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h4>📞 ¿Necesitas Ayuda?</h4>
+                <p>Si tienes alguna pregunta sobre el evento o necesitas asistencia adicional, no dudes en contactarnos:</p>
+                <p><strong>📧 Email:</strong> info@adsef.pr.gov</p>
+                <p><strong>📱 Teléfono:</strong> (787) 763-7575</p>
+                <p><strong>🌐 Portal:</strong> www.adsef.pr.gov</p>
+            </div>
+            
+            <div class="signature">
+                <p>Gracias nuevamente por tu interés en participar. ¡Esperamos verte pronto!</p>
+                
+                <p style="margin-top: 20px;">
+                    Atentamente,<br>
+                    <strong>Equipo de ADSEF</strong><br>
+                    <em>Administración de Servicios de Salud y Contra la Adicción</em><br>
+                    Gobierno de Puerto Rico
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2025 ADSEF - Gobierno de Puerto Rico</p>
+            <p><strong>Compromiso en Acción</strong> | Servicios de Salud y Contra la Adicción</p>
+        </div>
+    </div>
+</body>
+</html>
