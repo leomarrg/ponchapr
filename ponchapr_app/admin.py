@@ -10,7 +10,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.decorators import method_decorator
-from .utils import send_welcome_email_async
+from .utils import send_welcome_email_async, send_pre_registration_email, send_welcome_email  # ← Imports completos
 from datetime import timedelta
 
 admin.site.site_header = "Panel de Administración ADSEF"
@@ -153,8 +153,11 @@ class OrganizationFilter(admin.SimpleListFilter):
     parameter_name = "organization"
     
     def lookups(self, request, model_admin):
-        organizations = Attendee.objects.exclude(organization='').values_list('organization', flat=True).distinct()
-        return [(org, org) for org in organizations if org]
+        try:
+            organizations = Attendee.objects.exclude(organization='').exclude(organization__isnull=True).values_list('organization', flat=True).distinct()
+            return [(org, org) for org in organizations if org]
+        except Exception:
+            return []
     
     def queryset(self, request, queryset):
         if self.value():
@@ -170,7 +173,6 @@ class AttendeeAdmin(admin.ModelAdmin):
         'phone_number', 
         'arrived', 
         'arrival_time', 
-        'unique_id', 
         'checkout_time', 
         'checked_out', 
         'event',
@@ -221,8 +223,11 @@ class AttendeeAdmin(admin.ModelAdmin):
         
         for attendee in queryset:
             try:
-                # Resend email using your existing email function
-                send_welcome_email_async(attendee)
+                # Usar la función correcta según el tipo de registro
+                if attendee.pre_registered:
+                    send_pre_registration_email(attendee)
+                else:
+                    send_welcome_email(attendee)
                 success_count += 1
             except Exception as e:
                 self.message_user(request, f"Error enviando correo a {attendee.email}: {str(e)}", level='ERROR')
@@ -234,7 +239,7 @@ class AttendeeAdmin(admin.ModelAdmin):
         if error_count:
             self.message_user(request, f"Falló el envío de {error_count} correo(s). Revise los logs para más detalles.", level='WARNING')
     
-    resend_email.short_description = "Reenviar correo de bienvenida a participantes seleccionados"
+    resend_email.short_description = "Reenviar correo a participantes seleccionados"
     
     def mark_as_arrived(self, request, queryset):
         updated = 0
@@ -270,39 +275,50 @@ class AttendeeAdmin(admin.ModelAdmin):
     resend_email_button.allow_tags = True
 
     def changelist_view(self, request, extra_context=None):
-        # Get arrival time statistics for the chart
-        arrival_stats = (
-            Attendee.objects
-            .filter(arrived=True)
-            .annotate(hour=ExtractHour('arrival_time'))
-            .values('hour')
-            .annotate(count=Count('id'))
-            .order_by('hour')
-        )
+        try:
+            # Get arrival time statistics for the chart
+            arrival_stats = (
+                Attendee.objects
+                .filter(arrived=True)
+                .annotate(hour=ExtractHour('arrival_time'))
+                .values('hour')
+                .annotate(count=Count('id'))
+                .order_by('hour')
+            )
 
-        # Prepare data for the chart
-        hours = range(24)
-        chart_data = {hour: 0 for hour in hours}
-        for stat in arrival_stats:
-            if stat['hour'] is not None:
-                chart_data[int(stat['hour'])] = stat['count']
+            # Prepare data for the chart
+            hours = range(24)
+            chart_data = {hour: 0 for hour in hours}
+            for stat in arrival_stats:
+                if stat['hour'] is not None:
+                    chart_data[int(stat['hour'])] = stat['count']
 
-        # Get organization statistics
-        org_stats = (
-            Attendee.objects
-            .exclude(organization='')
-            .values('organization')
-            .annotate(count=Count('id'))
-            .order_by('-count')[:10]  # Top 10 organizations
-        )
+            # Get organization statistics
+            org_stats = (
+                Attendee.objects
+                .exclude(organization='')
+                .exclude(organization__isnull=True)
+                .values('organization')
+                .annotate(count=Count('id'))
+                .order_by('-count')[:10]  # Top 10 organizations
+            )
 
-        extra_context = extra_context or {}
-        extra_context.update({
-            'arrival_data': list(chart_data.values()),
-            'hours': list(hours),
-            'org_stats': list(org_stats),
-            'show_scan_buttons': True
-        })
+            extra_context = extra_context or {}
+            extra_context.update({
+                'arrival_data': list(chart_data.values()),
+                'hours': list(hours),
+                'org_stats': list(org_stats),
+                'show_scan_buttons': True
+            })
+        except Exception as e:
+            # En caso de error, proporcionar datos vacíos
+            extra_context = extra_context or {}
+            extra_context.update({
+                'arrival_data': [0] * 24,
+                'hours': list(range(24)),
+                'org_stats': [],
+                'show_scan_buttons': True
+            })
 
         return super().changelist_view(request, extra_context=extra_context)
 
@@ -325,8 +341,15 @@ class AttendeeAdmin(admin.ModelAdmin):
         attendee = self.get_object(request, object_id)
         if attendee:
             try:
-                send_welcome_email_async(attendee)
-                self.message_user(request, f"Correo reenviado exitosamente a {attendee.email}", level='SUCCESS')
+                # Usar la función correcta según el tipo de registro
+                if attendee.pre_registered:
+                    send_pre_registration_email(attendee)
+                    email_type = "pre-registro"
+                else:
+                    send_welcome_email(attendee)
+                    email_type = "bienvenida"
+                
+                self.message_user(request, f"Correo de {email_type} reenviado exitosamente a {attendee.email}", level='SUCCESS')
             except Exception as e:
                 self.message_user(request, f"Error enviando correo a {attendee.email}: {str(e)}", level='ERROR')
         return redirect('admin:ponchapr_app_attendee_changelist')
@@ -435,7 +458,10 @@ class RegionAdmin(admin.ModelAdmin):
     list_filter = ('active',)
     
     def offices_count(self, obj):
-        return obj.offices.count()
+        try:
+            return obj.offices.count()
+        except Exception:
+            return 0
     
     offices_count.short_description = 'Número de Oficinas'
 
