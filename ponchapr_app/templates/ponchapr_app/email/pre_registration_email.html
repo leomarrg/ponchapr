@@ -24,7 +24,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #1c2854 0%, #164b68 100%);
+            background-color: #1c2854;
             color: white;
             text-align: center;
             padding: 30px 20px;
@@ -55,7 +55,7 @@
         }
         
         .main-message {
-            background: linear-gradient(135deg, #e5bc44 0%, #92b730 100%);
+            background-color: #e5bc44;
             color: white;
             padding: 25px;
             border-radius: 8px;
@@ -200,36 +200,36 @@
             <div class="event-details">
                 <h3>📅 Detalles del Evento</h3>
                 <div class="detail-item">
-                    <span class="detail-label">📍 Lugar:</span>
+                    <span class="detail-label"> Lugar:</span>
                     <span class="detail-value">Salón Royal - Hotel Hilton Garden</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">📅 Fecha:</span>
+                    <span class="detail-label"> Fecha:</span>
                     <span class="detail-value">Lunes, 30 de junio de 2025</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">🕗 Hora:</span>
+                    <span class="detail-label"> Hora:</span>
                     <span class="detail-value">8:00 A.M.</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">👤 Participante:</span>
+                    <span class="detail-label"> Participante:</span>
                     <span class="detail-value">{{ attendee.name }} {{ attendee.last_name }}</span>
                 </div>
                 <div class="detail-item">
-                    <span class="detail-label">🏢 Organización:</span>
+                    <span class="detail-label"> Organización:</span>
                     <span class="detail-value">{{ attendee.organization }}</span>
                 </div>
             </div>
             
             <!-- Important Notice -->
             <div class="highlight-box">
-                <h4>📋 Importante - ¡Por favor llegar puntual!</h4>
+                <h4> Importante - ¡Por favor llegar puntual!</h4>
                 <p>El evento iniciará puntualmente a las 8:00 A.M. Te recomendamos llegar unos minutos antes para el proceso de registro en el lugar.</p>
             </div>
             
             <!-- Registration Info -->
             <div class="registration-info">
-                <h4>✅ Tu Pre-Registro</h4>
+                <h4> Tu Pre-Registro</h4>
                 <p><strong>Estado:</strong> Confirmado</p>
                 <p><strong>Fecha de registro:</strong> {{ attendee.created_at|date:"d/m/Y H:i" }}</p>
                 <p><strong>Email registrado:</strong> {{ attendee.email }}</p>
@@ -243,14 +243,14 @@
                     Cordialmente,<br>
                     <strong>Equipo Organizador</strong><br>
                     <em>1er Conversatorio para la Erradicación de la Pobreza Infantil</em><br>
-                    ADSEF - Gobierno de Puerto Rico
+                    Dept. de la Familia - Gobierno de Puerto Rico
                 </p>
             </div>
         </div>
         
         <!-- Footer -->
         <div class="footer">
-            <p>&copy; 2025 ADSEF - Gobierno de Puerto Rico</p>
+            <p>&copy; 2025 Dept. de la Familia - Gobierno de Puerto Rico</p>
             <p><strong>Conversatorio para la Erradicación de la Pobreza Infantil</strong></p>
         </div>
     </div>
