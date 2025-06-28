@@ -140,7 +140,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-LOGIN_URL = '/admin/login/'
 LOGOUT_REDIRECT_URL = '/admin/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'  # Todos van al dashboard
 
