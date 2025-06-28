@@ -722,3 +722,30 @@ def custom_logout(request):
     logout(request)
     messages.success(request, 'Has cerrado sesión exitosamente.')
     return redirect('admin:login')  # Redirige al login del admin
+
+
+# Añadir a ponchapr_app/views.py
+
+from django.contrib.auth import views as auth_views
+from django.shortcuts import redirect
+
+class CustomLoginView(auth_views.LoginView):
+    """
+    Vista de login que redirige según el tipo de usuario
+    """
+    template_name = 'admin/login.html'
+    
+    def get_success_url(self):
+        user = self.request.user
+        
+        # Si es superusuario Y viene de la URL del admin, va al admin
+        if user.is_superuser and '/admin/' in self.request.POST.get('next', ''):
+            return '/admin/'
+        
+        # En todos los demás casos, staff users van al dashboard
+        elif user.is_staff:
+            return '/dashboard/'
+        
+        # Si no es staff, no tiene acceso
+        else:
+            return '/accounts/login/?error=no_permission'
