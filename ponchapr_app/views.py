@@ -22,8 +22,16 @@ def pre_register(request):
         form = AttendeeForm(request.POST)
         if form.is_valid():
             try:
+                # Obtener el evento activo
+                active_event = Event.objects.filter(is_active=True).first()
+                
+                if not active_event:
+                    messages.error(request, "No hay un evento activo configurado. Por favor, contacte al administrador.")
+                    return render(request, 'ponchapr_app/pre_register.html', {'form': AttendeeForm()})
+                
                 attendee = form.save(commit=False)
                 attendee.pre_registered = True
+                attendee.event = active_event  # ← LÍNEA AÑADIDA: Asignar evento activo
                 # Para pre-registro, NO marcar como llegado
                 attendee.arrived = False
                 attendee.save()

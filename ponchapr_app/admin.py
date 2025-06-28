@@ -185,7 +185,6 @@ class AttendeeAdmin(admin.ModelAdmin):
         'arrived', 
         'checked_out',
         'created_at',
-        OrganizationFilter,
         DuplicateNameFilter, 
         DuplicateEmailFilter,
         DuplicatePhoneFilter,
