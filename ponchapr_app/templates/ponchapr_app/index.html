@@ -33,102 +33,115 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <style>
+        /* Ajustes para layout sin sidebar */
+        #content-wrapper {
+            width: 100% !important;
+        }
+        
+        /* Mejorar la búsqueda global */
+        #globalSearch {
+            min-width: 300px;
+        }
+        
+        /* Badges más visibles */
+        .badge {
+            font-size: 0.8em;
+            padding: 0.4em 0.8em;
+        }
+        
+        /* Tabla responsiva */
+        #attendeeDataTable {
+            font-size: 0.9em;
+        }
+        
+        /* Cards de estadísticas más destacadas */
+        .card {
+            border-radius: 0.5rem;
+        }
+        
+        .card-header {
+            border-radius: 0.5rem 0.5rem 0 0 !important;
+        }
+        
+        /* Mejorar visualización en móviles */
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1rem 0.5rem;
+            }
+            
+            #attendeeDataTable {
+                font-size: 0.8em;
+            }
+            
+            .btn {
+                font-size: 0.8em;
+            }
+        }
+    </style>
 </head>
 
 <body id="page-top">
 
     <!-- Page Wrapper -->
     <div id="wrapper">
-        <!-- Sidebar -->
+        <!-- Sidebar comentado completamente
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'dashboard' %}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
                 <div class="sidebar-brand-text mx-3">PonchaPR</div>
             </a>
-
-            <!-- Divider -->
             <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
             <li class="nav-item active">
                 <a class="nav-link" href="{% url 'dashboard' %}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
             </li>
-
-            <!-- Divider -->
             <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Registration
-            </div>
-
-            <!-- Nav Item - Pages Collapse Menu -->
+            <div class="sidebar-heading">Registration</div>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'pre_register' %}">
                     <i class="fas fa-fw fa-user-plus"></i>
                     <span>Pre-Registration</span>
                 </a>
             </li>
-
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'register' %}">
                     <i class="fas fa-fw fa-clipboard-list"></i>
                     <span>Front Desk Registration</span>
                 </a>
             </li>
-
-            <!-- Divider -->
             <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                QR Code Verification
-            </div>
-
+            <div class="sidebar-heading">QR Code Verification</div>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'checkin_qr_code_verify' %}">
                     <i class="fas fa-fw fa-clipboard-list"></i>
                     <span>Check-In Verification</span>
                 </a>
             </li>
-
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'checkout_qr_code_verify' %}">
                     <i class="fas fa-fw fa-clipboard-list"></i>
                     <span>Check-Out Verification</span>
                 </a>
             </li>
-
-            <!-- Divider -->
             <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Admin
-            </div>
-
+            <div class="sidebar-heading">Admin</div>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'admin:index' %}">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>Admin Panel</span>
                 </a>
             </li>
-
-            <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
         </ul>
-        <!-- End of Sidebar -->
+        End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -136,17 +149,13 @@
             <div id="content">
                 <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-
+                    <!-- Topbar simplificado - removido botón de sidebar -->
+                    
                     <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                    <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
+                            <input type="text" class="form-control bg-light border-0 small" placeholder="Buscar participantes..."
+                                aria-label="Search" aria-describedby="basic-addon2" id="globalSearch">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="button">
                                     <i class="fas fa-search fa-sm"></i>
@@ -169,7 +178,7 @@
                                 <form class="form-inline mr-auto w-100 navbar-search">
                                     <div class="input-group">
                                         <input type="text" class="form-control bg-light border-0 small"
-                                            placeholder="Search for..." aria-label="Search"
+                                            placeholder="Buscar participantes..." aria-label="Search"
                                             aria-describedby="basic-addon2">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button">
@@ -187,9 +196,10 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ request.user.username }}</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Dashboard ADSEF</span>
                                 <i class="fas fa-user-circle fa-2x"></i>
                             </a>
+                            <!-- Dropdown comentado para simplificar
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="{% url 'admin:index' %}">
@@ -202,6 +212,7 @@
                                     Logout
                                 </a>
                             </div>
+                            -->
                         </li>
                     </ul>
                 </nav>
@@ -220,7 +231,7 @@
                     <!-- Content Row -->
                     <div class="row">
                         <!-- Total Attendees Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-primary shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -238,7 +249,7 @@
                         </div>
 
                         <!-- Arrived Attendees Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-success shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -256,7 +267,7 @@
                         </div>
 
                         <!-- Checked Out Card -->
-                        <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-info shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
@@ -273,7 +284,7 @@
                             </div>
                         </div>
 
-                        <!-- Quick Actions Card -->
+                        <!-- Quick Actions Card - Comentado para simplificar
                         <div class="col-xl-3 col-md-6 mb-4">
                             <div class="card border-left-warning shadow h-100 py-2">
                                 <div class="card-body">
@@ -297,8 +308,10 @@
                                 </div>
                             </div>
                         </div>
+                        -->
                     </div>
 
+                    <!-- Selector de evento comentado para simplificar
                     <div class="row mb-4">
                         <div class="col-xl-12">
                             <div class="card shadow mb-4">
@@ -329,6 +342,7 @@
                             </div>
                         </div>
                     </div> 
+                    -->
 
                     <!-- Attendance Overview Table -->
                     <div class="row">
@@ -358,8 +372,8 @@
                                                             <th>Nombre</th>
                                                             <th>Apellidos</th>
                                                             <th>Organización</th>
-                                                            <th>Teléfono</th>
                                                             <th>Correo</th>
+                                                            <th>Tipo de Registro</th>
                                                             <th>Fecha de Registro</th>
                                                             <th>Estado</th>
                                                         </tr>
@@ -370,20 +384,24 @@
                                                             <td>{{ attendee.name }}</td>
                                                             <td>{{ attendee.last_name }}</td>
                                                             <td>{{ attendee.organization|default:"-" }}</td>
-                                                            <td>{{ attendee.phone_number|default:"-" }}</td>
                                                             <td>{{ attendee.email }}</td>
+                                                            <td>
+                                                                {% if attendee.pre_registered %}
+                                                                    <span class="badge badge-info">Pre-registrado</span>
+                                                                {% elif attendee.registered_at_event %}
+                                                                    <span class="badge badge-primary">Registro en Sitio</span>
+                                                                {% else %}
+                                                                    <span class="badge badge-secondary">Registrado</span>
+                                                                {% endif %}
+                                                            </td>
                                                             <td>{{ attendee.created_at|date:"d/m/Y g:i A" }}</td>
                                                             <td>
                                                                 {% if attendee.checked_out %}
                                                                     <span class="badge badge-info">Checked Out</span>
                                                                 {% elif attendee.arrived %}
                                                                     <span class="badge badge-success">Checked In</span>
-                                                                {% elif attendee.pre_registered %}
-                                                                    <span class="badge badge-warning">Pre-Registrado</span>
-                                                                {% elif attendee.registered_at_event %}
-                                                                    <span class="badge badge-primary">Registro en Sitio</span>
                                                                 {% else %}
-                                                                    <span class="badge badge-secondary">Registrado</span>
+                                                                    <span class="badge badge-warning">No ha llegado</span>
                                                                 {% endif %}
                                                             </td>
                                                         </tr>
@@ -496,7 +514,7 @@
                         </div>
                     </div>
 
-                    <!-- Attendance Progress and About the Event -->
+                    <!-- Progreso de Asistencia y Información del Evento comentado para simplificar
                     <div class="row">
                         <div class="col-lg-6 mb-4">
                             <div class="card shadow mb-4">
@@ -506,7 +524,6 @@
                                 <div class="card-body">
                                     <h4 class="small font-weight-bold">Tasa de Check-in <span class="float-right" id="progressPercentage"></span></h4>
                                     <div class="progress mb-4">
-                                        <!-- Progress bar will be updated by JS -->
                                         <div class="progress-bar bg-info" role="progressbar" id="progressBar" style="width: 0%"
                                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
@@ -526,6 +543,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
 
                 </div>
                 <!-- /.container-fluid -->
@@ -552,7 +570,7 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
+    <!-- Logout Modal comentado para simplificar
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -571,6 +589,7 @@
             </div>
         </div>
     </div>
+    -->
 
     <!-- Bootstrap core JavaScript (if not already loaded) -->
     <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
@@ -582,11 +601,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize DataTables if available
+            // Initialize DataTables con funcionalidad de búsqueda mejorada
             if (typeof $.fn.DataTable !== 'undefined') {
                 $('#attendeeDataTable').DataTable({
-                    "pageLength": 10,
-                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                    "pageLength": 25,
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Todos"]],
                     "order": [[5, "desc"]], // Ordenar por fecha de registro (descendente)
                     "language": {
                         "lengthMenu": "Mostrar _MENU_ registros por página",
@@ -601,7 +620,18 @@
                             "next": "Siguiente",
                             "previous": "Anterior"
                         }
-                    }
+                    },
+                    "columnDefs": [
+                        {
+                            "targets": [4, 6], // Columnas de Tipo de Registro y Estado
+                            "orderable": true
+                        }
+                    ]
+                });
+
+                // Conectar búsqueda global con DataTable
+                $('#globalSearch').on('keyup', function() {
+                    $('#attendeeDataTable').DataTable().search(this.value).draw();
                 });
             }
 
