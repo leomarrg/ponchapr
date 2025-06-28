@@ -13,8 +13,8 @@ from django.utils.decorators import method_decorator
 from .utils import send_welcome_email_async, send_pre_registration_email, send_welcome_email  # ← Imports completos
 from datetime import timedelta
 
-admin.site.site_header = "Panel de Administración ADSEF"
-admin.site.site_title = "Administración de ADSEF"
+admin.site.site_header = "Panel de Administración del Departamento de la Familia"
+admin.site.site_title = "Administración de Departamento de la Familia"
 admin.site.index_title = "Bienvenido al Panel de Administración"
 
 def export_to_text(modeladmin, request, queryset):
