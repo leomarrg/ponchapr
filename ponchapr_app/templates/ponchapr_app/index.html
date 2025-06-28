@@ -248,36 +248,36 @@
                             </div>
                         </div>
 
-                        <!-- Arrived Attendees Card -->
+                        <!-- Pre-registered Card -->
                         <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-success shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Checked In</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ arrived_attendees }}</div>
+                                                Pre-registered</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pre_registered_count|default:0 }}</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Checked Out Card -->
+                        <!-- Registered at Event Card -->
                         <div class="col-xl-4 col-md-6 mb-4">
                             <div class="card border-left-info shadow h-100 py-2">
                                 <div class="card-body">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                Checked Out</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ checked_out_attendees }}</div>
+                                                Registered at Event</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ front_desk_count|default:0 }}</div>
                                         </div>
                                         <div class="col-auto">
-                                            <i class="fas fa-sign-out-alt fa-2x text-gray-300"></i>
+                                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -499,14 +499,14 @@
                                 <div class="card-body">
                                     <div style="position: relative; height: 250px; width: 100%;">
                                         <canvas id="attendanceBarChart"
-                                            data-arrived-attendees="{{ arrived_attendees|default:0 }}"
-                                            data-checked-out-attendees="{{ checked_out_attendees|default:0 }}">
+                                            data-pre-registered="{{ pre_registered_count|default:0 }}"
+                                            data-registered-at-event="{{ front_desk_count|default:0 }}">
                                         </canvas>
                                     </div>
                                     <div class="text-center mt-3">
-                                        <div class="small text-muted">Asistencia esperada: 200</div>
+                                        <div class="small text-muted">Meta de participantes: 200</div>
                                         <div class="font-weight-bold">
-                                            Tasa actual de asistencia: <span id="checkedInCount">{{ arrived_attendees|default:0 }}</span> / 200 (<span id="computedPercentage"></span>%)
+                                            Total registrados: <span id="totalRegistered">{{ total_attendees|default:0 }}</span> / 200 (<span id="computedPercentage"></span>%)
                                         </div>
                                     </div>
                                 </div>
@@ -643,44 +643,39 @@
             }
 
             // Retrieve dynamic data from canvas attributes
-            var arrived = parseInt(chartCanvas.getAttribute('data-arrived-attendees')) || 0;
-            var checkedOut = parseInt(chartCanvas.getAttribute('data-checked-out-attendees')) || 0;
-            var expectedAttendance = 200; // Hardcoded expected value
-            var computedPercentage = (arrived / expectedAttendance) * 100;
+            var preRegistered = parseInt(chartCanvas.getAttribute('data-pre-registered')) || 0;
+            var registeredAtEvent = parseInt(chartCanvas.getAttribute('data-registered-at-event')) || 0;
+            var totalRegistered = preRegistered + registeredAtEvent;
+            var expectedAttendance = 200; // Meta de participantes
+            var computedPercentage = (totalRegistered / expectedAttendance) * 100;
 
-            // Update attendance text and progress bar
+            // Update attendance text
             var computedPercentageElem = document.getElementById('computedPercentage');
             if (computedPercentageElem) {
-                computedPercentageElem.textContent = computedPercentage.toFixed(2);
+                computedPercentageElem.textContent = computedPercentage.toFixed(1);
             }
 
-            var progressBar = document.getElementById('progressBar');
-            if (progressBar) {
-                progressBar.style.width = computedPercentage + '%';
-                progressBar.setAttribute('aria-valuenow', computedPercentage);
+            var totalRegisteredElem = document.getElementById('totalRegistered');
+            if (totalRegisteredElem) {
+                totalRegisteredElem.textContent = totalRegistered;
             }
 
-            var progressPercentageElem = document.getElementById('progressPercentage');
-            if (progressPercentageElem) {
-                progressPercentageElem.textContent = computedPercentage.toFixed(2) + '%';
-            }
-
-            // Initialize the bar chart with dynamic data
+            // Initialize the bar chart with registration type data
             var ctx = chartCanvas.getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Check-in', 'Check-out'],
+                    labels: ['Pre-registrados', 'Registro en Sitio'],
                     datasets: [{
-                        label: 'Cantidad de Asistentes',
-                        data: [arrived, checkedOut],
+                        label: 'Cantidad de Participantes',
+                        data: [preRegistered, registeredAtEvent],
                         backgroundColor: [
-                            'rgba(75, 192, 192, 0.6)',
-                            'rgba(54, 162, 235, 0.6)'
+                            'rgba(54, 162, 235, 0.6)',   // Azul para pre-registrados
+                            'rgba(75, 192, 192, 0.6)'    // Verde para registro en sitio
                         ],
                         borderColor: [
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(54, 162, 235, 1)'
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)'
                         ],
                         borderWidth: 1
                     }]
@@ -696,7 +691,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: Math.max(expectedAttendance, arrived + 10),
+                            max: Math.max(expectedAttendance, totalRegistered + 10),
                             ticks: {
                                 stepSize: 10
                             }

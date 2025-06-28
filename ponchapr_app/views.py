@@ -129,47 +129,81 @@ def check_in_attendee(request, attendee_id):
     return redirect('admin:ponchapr_app_attendee_changelist')
 
 @staff_member_required
-def dashboard(request):
-    # Basic statistics
-    total_attendees = Attendee.objects.count()
-    arrived_attendees = Attendee.objects.filter(arrived=True).count()
-    checked_out_attendees = Attendee.objects.filter(checked_out=True).count()
+def dashboard_view(request):
+    event_id = request.GET.get('event_id')
+    
+    if event_id:
+        selected_event = get_object_or_404(Event, id=event_id)
+    else:
+        selected_event = Event.objects.filter(is_active=True).first()
+    
+    # Get all events for the selector
+    all_events = Event.objects.all().order_by('-date')
+
+    # Basic statistics - filter by selected event
+    if selected_event:
+        total_attendees = Attendee.objects.filter(event=selected_event).count()
+        arrived_attendees = Attendee.objects.filter(event=selected_event, arrived=True).count()
+        checked_out_attendees = Attendee.objects.filter(event=selected_event, checked_out=True).count()
+        pre_registered_count = Attendee.objects.filter(event=selected_event, pre_registered=True).count()
+        front_desk_count = Attendee.objects.filter(event=selected_event, registered_at_event=True).count()
+    else:
+        total_attendees = Attendee.objects.count()
+        arrived_attendees = Attendee.objects.filter(arrived=True).count()
+        checked_out_attendees = Attendee.objects.filter(checked_out=True).count()
+        pre_registered_count = Attendee.objects.filter(pre_registered=True).count()
+        front_desk_count = Attendee.objects.filter(registered_at_event=True).count()
     
     # Calculate attendance percentages
-    arrival_percentage = 0
+    expected_attendees = 200
     if total_attendees > 0:
         arrival_percentage = int((arrived_attendees / total_attendees) * 100)
+    else:
+        arrival_percentage = 0
     
-    # Get registration type counts for pie chart
-    pre_registered_count = Attendee.objects.filter(pre_registered=True).count()
-    front_desk_count = Attendee.objects.filter(registered_at_event=True).count()
-    
-    # Calculate pre-registration percentage
+    # Pre-registered percentage
     pre_registered_percentage = 0
     if total_attendees > 0:
         pre_registered_percentage = int((pre_registered_count / total_attendees) * 100)
     
-    # Get hourly check-in data for the area chart
-    hourly_checkins = (
-        Attendee.objects
-        .filter(arrived=True, arrival_time__isnull=False)
-        .annotate(hour=TruncHour('arrival_time'))
-        .values('hour')
-        .annotate(count=Count('id'))
-        .order_by('hour')
-    )
+    # Get all attendees for the data table - ordered by creation date (most recent first)
+    attendees = Attendee.objects.filter(event=selected_event).order_by('-created_at') if selected_event else []
     
-    # Format chart data for JS
-    chart_labels = []
-    chart_data = []
+    # Get organization statistics for the dashboard
+    organization_stats = {}
+    if selected_event:
+        org_data = (
+            Attendee.objects.filter(event=selected_event)
+            .exclude(organization__isnull=True)
+            .exclude(organization='')
+            .values('organization')
+            .annotate(
+                total=Count('id'),
+                pre_registered=Count('id', filter=Q(pre_registered=True)),
+                registered_at_event=Count('id', filter=Q(registered_at_event=True))
+            )
+            .order_by('-total')[:10]  # Top 10 organizations
+        )
+        organization_stats = list(org_data)
     
-    for entry in hourly_checkins:
-        if entry['hour']:
-            chart_labels.append(entry['hour'].strftime('%H:%M'))
-            chart_data.append(entry['count'])
+    # Get registration timeline (last 7 days)
+    from datetime import timedelta
+    end_date = timezone.now()
+    start_date = end_date - timedelta(days=7)
     
-    # Get all attendees for the data table with related regions
-    attendees = Attendee.objects.all().select_related('region').order_by('-created_at')
+    daily_registrations = []
+    if selected_event:
+        daily_data = (
+            Attendee.objects.filter(
+                event=selected_event,
+                created_at__range=(start_date, end_date)
+            )
+            .extra(select={'day': 'date(created_at)'})
+            .values('day')
+            .annotate(count=Count('id'))
+            .order_by('day')
+        )
+        daily_registrations = list(daily_data)
     
     context = {
         'total_attendees': total_attendees,
@@ -177,14 +211,17 @@ def dashboard(request):
         'checked_out_attendees': checked_out_attendees,
         'arrival_percentage': arrival_percentage,
         'pre_registered_count': pre_registered_count,
-        'front_desk_count': front_desk_count,
         'pre_registered_percentage': pre_registered_percentage,
-        'chart_labels': json.dumps(chart_labels),
-        'chart_data': json.dumps(chart_data),
+        'front_desk_count': front_desk_count,
+        'expected_attendees': expected_attendees,
+        'selected_event': selected_event,
+        'all_events': all_events,
         'attendees': attendees,
+        'organization_stats': organization_stats,
+        'daily_registrations': daily_registrations,
     }
     
-    return render(request, 'admin/index.html', context)
+    return render(request, "ponchapr_app/index.html", context)
 
 def verify_checkin_qr_code(request):
     if request.method == 'POST':
