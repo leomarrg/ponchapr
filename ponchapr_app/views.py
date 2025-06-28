@@ -749,3 +749,11 @@ class CustomLoginView(auth_views.LoginView):
         # Si no es staff, no tiene acceso
         else:
             return '/accounts/login/?error=no_permission'
+        
+
+@staff_member_required
+def presentations_view(request):
+    """
+    Vista del portal de presentaciones
+    """
+    return render(request, 'ponchapr_app/presentations.html')
