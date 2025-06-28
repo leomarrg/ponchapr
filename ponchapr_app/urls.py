@@ -20,4 +20,6 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
 
     path('get-offices/', views.get_offices, name='get_offices'),
+
+    path('custom-logout/', views.custom_logout, name='custom_logout'),
 ]

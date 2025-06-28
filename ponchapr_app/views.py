@@ -15,7 +15,9 @@ from io import BytesIO
 import logging
 from django.db.models import Q, Count
 from collections import defaultdict
-
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.contrib import messages
 
 def pre_register(request):
     if request.method == 'POST':
@@ -711,3 +713,12 @@ def get_offices(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'No se proporcionó un ID de región'}, status=400)
+
+
+def custom_logout(request):
+    """
+    Logout personalizado que redirige al login
+    """
+    logout(request)
+    messages.success(request, 'Has cerrado sesión exitosamente.')
+    return redirect('admin:login')  # Redirige al login del admin
