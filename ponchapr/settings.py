@@ -140,8 +140,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Configuración de autenticación
-LOGIN_URL = '/admin/login/'
+
 LOGOUT_REDIRECT_URL = 'admin/login/?next=/dashboard/'
 
 # Static files (CSS, JavaScript, Images)
