@@ -576,11 +576,6 @@ def generate_report(request):
         # Get all attendees for this event - order by organization and then by created_at
         attendees = Attendee.objects.filter(event=event).order_by('organization', '-created_at')
 
-        # Get absolute path to the logo
-        import os
-        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        logo_path = os.path.join(base_dir, 'ponchapr_app', 'static', 'images', 'logo.png')
-
         # Build the context dictionary
         context = {
             'event': event,
@@ -592,39 +587,33 @@ def generate_report(request):
             'front_desk_count': front_desk_count,
             'attendees': attendees,
             'generated_at': timezone.now(),
-            'logo_path': logo_path
         }
         
         # Add any additional calculations or data needed for the report
         if attendees:
-            # Calculate organization distribution (replacing region distribution)
-            organization_distribution = {}
+            # Calculate organization distribution
             organization_counts = {}
+            organization_distribution = {}
+            
             for attendee in attendees:
                 org_name = attendee.organization if attendee.organization else 'Sin Organización'
-                if org_name in organization_distribution:
-                    organization_distribution[org_name] += 1
-                    organization_counts[org_name] += 1
-                else:
-                    organization_distribution[org_name] = 1
-                    organization_counts[org_name] = 1
+                organization_counts[org_name] = organization_counts.get(org_name, 0) + 1
             
             # Calculate percentages
             total = len(attendees)
-            for org in organization_distribution:
-                organization_distribution[org] = (organization_distribution[org] / total) * 100
+            for org, count in organization_counts.items():
+                organization_distribution[org] = (count / total) * 100
                 
             context['organization_distribution'] = organization_distribution
             context['organization_counts'] = organization_counts
             
             # Calculate registration distribution by date
-            from collections import defaultdict
-            registration_by_date = defaultdict(int)
+            registration_by_date = {}
             for attendee in attendees:
                 date_key = attendee.created_at.date()
-                registration_by_date[date_key] += 1
+                registration_by_date[date_key] = registration_by_date.get(date_key, 0) + 1
             
-            context['registration_by_date'] = dict(registration_by_date)
+            context['registration_by_date'] = registration_by_date
             
             # Calculate average time spent at event (for checked-out attendees)
             from django.db.models import F, ExpressionWrapper, DurationField, Avg
@@ -665,13 +654,6 @@ def generate_report(request):
         # Create a response with the PDF
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="ADSEF_Event_Report_{event.name}_{event.date}.pdf"'
-        
-        # Add a custom filter to access dictionary items by key in templates
-        from django.template.defaulttags import register
-        
-        @register.filter
-        def get_item(dictionary, key):
-            return dictionary.get(key)
         
         # Render the template to a string
         template = get_template('ponchapr_app/event_report.html')
