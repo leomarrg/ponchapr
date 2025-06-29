@@ -1,0 +1,683 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Evaluación - Departamento de la Familia</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1c2854;
+            color: #333;
+            line-height: 1.4;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Escudo de fondo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("{% static 'img/Escudo@2x.png' %}") no-repeat center center;
+            background-size: 50%;
+            opacity: 0.1;
+            z-index: -1;
+        }
+        
+        /* Contenedor principal */
+        .informe-container {
+            background: white;
+            margin: 20px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #1c2854;
+            padding-bottom: 15px;
+        }
+        
+        .logo {
+            width: 70px;
+            height: 70px;
+            margin-right: 20px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .title-info h1 {
+            color: #1c2854;
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+        }
+        
+        .title-info h2 {
+            color: #7f8c8d;
+            font-size: 1rem;
+            font-weight: normal;
+            margin-bottom: 8px;
+        }
+        
+        .fecha {
+            color: #95a5a6;
+            font-size: 0.85rem;
+        }
+        
+        /* Estadísticas rápidas */
+        .stats-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .stats-summary h3 {
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .stats-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .stat-label {
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        /* Información del total */
+        .total-info {
+            background: #e8f4fd;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        
+        .total-info strong {
+            color: #1c2854;
+            font-size: 1.1rem;
+        }
+        
+        /* Tabla de respuestas */
+        .responses-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background: #1c2854;
+            color: white;
+            border-radius: 5px;
+            font-size: 1.1rem;
+        }
+        
+        /* Container de tabla con scroll horizontal si es necesario */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        
+        .responses-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 900px; /* Aumentar ancho mínimo para comentarios */
+        }
+        
+        .responses-table th {
+            background: #34495e;
+            color: white;
+            padding: 8px 6px;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .responses-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #ecf0f1;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+        
+        .responses-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .responses-table tr:hover {
+            background: #e3f2fd;
+        }
+        
+        /* Badges de evaluación más pequeños */
+        .eval-badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 25px;
+        }
+        
+        .eval-muy_buena {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .eval-buena {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .eval-regular {
+            background: #ffeaa7;
+            color: #6c5c00;
+        }
+        
+        .eval-mala {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .eval-incompleta {
+            background: #f1c0c7;
+            color: #721c24;
+        }
+        
+        .eval-empty {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        /* Promedio destacado */
+        .promedio-cell {
+            font-weight: bold;
+            color: #1c2854;
+        }
+        
+        /* Comentarios */
+        .comentarios-section {
+            margin-top: 30px;
+            page-break-inside: avoid;
+        }
+        
+        .comentarios-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background: #1c2854;
+            color: white;
+            border-radius: 5px;
+        }
+        
+        .comentario-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid #3498db;
+            border-radius: 5px;
+            page-break-inside: avoid;
+        }
+        
+        .comentario-meta {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            margin-bottom: 6px;
+        }
+        
+        .comentario-texto {
+            color: #2c3e50;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+        
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 15px;
+        }
+        
+        /* Botones para la versión web */
+        .print-actions {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .btn-primary { background: #3498db; }
+        .btn-success { background: #27ae60; }
+        .btn-secondary { background: #95a5a6; }
+        
+        /* Leyenda */
+        .leyenda {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .leyenda h4 {
+            color: #1c2854;
+            margin-bottom: 10px;
+        }
+        
+        .leyenda-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+        
+        .leyenda-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        
+        /* Estilos para impresión/PDF */
+        @media print {
+            body {
+                background-color: #1c2854 !important;
+                font-size: 10px;
+            }
+            
+            .informe-container {
+                margin: 0;
+                box-shadow: none;
+                padding: 20px;
+            }
+            
+            .print-actions {
+                display: none !important;
+            }
+            
+            .responses-table {
+                font-size: 8px;
+            }
+            
+            .responses-table th {
+                font-size: 8px;
+                padding: 4px 2px;
+            }
+            
+            .responses-table td {
+                padding: 3px 2px;
+            }
+            
+            .eval-badge {
+                font-size: 7px;
+                padding: 1px 3px;
+            }
+            
+            /* Forzar saltos de página cuando sea necesario */
+            .page-break {
+                page-break-before: always;
+            }
+            
+            .table-container {
+                overflow: visible;
+            }
+        }
+        
+        /* Contador de respuestas */
+        .contador-respuestas {
+            position: sticky;
+            top: 0;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #856404;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Botones de acción -->
+    {% if not es_pdf %}
+    <div class="print-actions">
+        <button onclick="window.print()" class="btn btn-primary">Imprimir/PDF</button>
+        <a href="{% url 'presentaciones:exportar_pdf' %}" class="btn btn-success">Descargar PDF</a>
+        <a href="{% url 'presentaciones:dashboard' %}" class="btn btn-secondary">Volver</a>
+    </div>
+    {% endif %}
+
+    <div class="informe-container">
+        <!-- Header con logo -->
+        <div class="header">
+            <div class="logo">
+                <img src="{% static 'img/DEPTO_FAMILIA@4x.png' %}" alt="Logo Departamento de la Familia">
+            </div>
+            <div class="title-info">
+                <h1>Informe Completo de Evaluación de Presentaciones</h1>
+                <h2>Departamento de la Familia de Puerto Rico</h2>
+                <div class="fecha">Generado el {{ fecha_generacion|date:"d \d\e F \d\e Y" }} a las {{ fecha_generacion|time:"H:i" }}</div>
+            </div>
+        </div>
+
+        <!-- Resumen de estadísticas -->
+        <div class="stats-summary">
+            <h3>Resumen General</h3>
+            <div class="stats-row">
+                <span class="stat-label">Total de Respuestas:</span>
+                <span class="stat-value">{{ stats.total_respuestas }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Respuestas Completas:</span>
+                <span class="stat-value">{{ stats.respuestas_completas }} ({{ stats.respuestas_completas|add:0|mul:100|div:stats.total_respuestas|floatformat:1 }}%)</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Con Comentarios:</span>
+                <span class="stat-value">{{ stats.respuestas_con_comentarios }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Promedio General:</span>
+                <span class="stat-value">{{ stats.promedio_general|floatformat:1 }}</span>
+            </div>
+        </div>
+
+        <!-- Información destacada -->
+        <div class="total-info">
+            <strong>Este informe contiene TODAS las {{ stats.total_respuestas }} respuestas registradas en el sistema.</strong>
+            <br><small>Cada respuesta se muestra en una fila individual para facilitar la lectura y análisis.</small>
+        </div>
+
+        <!-- Leyenda de evaluaciones -->
+        <div class="leyenda">
+            <h4>Leyenda de Evaluaciones</h4>
+            <div class="leyenda-grid">
+                <div class="leyenda-item">
+                    <span class="eval-badge eval-muy_buena">MB</span>
+                    <span>Muy Buena</span>
+                </div>
+                <div class="leyenda-item">
+                    <span class="eval-badge eval-buena">B</span>
+                    <span>Buena</span>
+                </div>
+                <div class="leyenda-item">
+                    <span class="eval-badge eval-regular">R</span>
+                    <span>Regular</span>
+                </div>
+                <div class="leyenda-item">
+                    <span class="eval-badge eval-mala">M</span>
+                    <span>Mala</span>
+                </div>
+                <div class="leyenda-item">
+                    <span class="eval-badge eval-incompleta">I</span>
+                    <span>Incompleta</span>
+                </div>
+                <div class="leyenda-item">
+                    <span class="eval-badge eval-empty">-</span>
+                    <span>Sin Respuesta</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de respuestas -->
+        <div class="responses-section">
+            <h3>Listado Completo de Respuestas ({{ stats.total_respuestas }} registros)</h3>
+            
+            <!-- Contador dinámico -->
+            <div class="contador-respuestas">
+                Mostrando todas las respuestas registradas en el sistema
+            </div>
+            
+            <div class="table-container">
+                <table class="responses-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;">ID</th>
+                            <th style="width: 80px;">Fecha</th>
+                            <th style="width: 60px;">ADFAN</th>
+                            <th style="width: 70px;">ACUDEN</th>
+                            <th style="width: 60px;">ADSEF</th>
+                            <th style="width: 60px;">ASUME</th>
+                            <th style="width: 90px;">Secretariado</th>
+                            <th style="width: 60px;">Promedio</th>
+                            <th style="width: 200px;">Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for respuesta in respuestas_recientes %}
+                        <tr>
+                            <td><strong>{{ respuesta.id }}</strong></td>
+                            <td>{{ respuesta.creado_en|date:"d/m/Y" }}<br><small>{{ respuesta.creado_en|time:"H:i" }}</small></td>
+                            <td>
+                                {% if respuesta.evaluacion_adfan %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_adfan }}">
+                                        {% if respuesta.evaluacion_adfan == 'muy_buena' %}MB
+                                        {% elif respuesta.evaluacion_adfan == 'buena' %}B
+                                        {% elif respuesta.evaluacion_adfan == 'regular' %}R
+                                        {% elif respuesta.evaluacion_adfan == 'mala' %}M
+                                        {% elif respuesta.evaluacion_adfan == 'incompleta' %}I
+                                        {% else %}{{ respuesta.evaluacion_adfan|slice:":2"|upper }}{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_acuden %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_acuden }}">
+                                        {% if respuesta.evaluacion_acuden == 'muy_buena' %}MB
+                                        {% elif respuesta.evaluacion_acuden == 'buena' %}B
+                                        {% elif respuesta.evaluacion_acuden == 'regular' %}R
+                                        {% elif respuesta.evaluacion_acuden == 'mala' %}M
+                                        {% elif respuesta.evaluacion_acuden == 'incompleta' %}I
+                                        {% else %}{{ respuesta.evaluacion_acuden|slice:":2"|upper }}{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_adsef %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_adsef }}">
+                                        {% if respuesta.evaluacion_adsef == 'muy_buena' %}MB
+                                        {% elif respuesta.evaluacion_adsef == 'buena' %}B
+                                        {% elif respuesta.evaluacion_adsef == 'regular' %}R
+                                        {% elif respuesta.evaluacion_adsef == 'mala' %}M
+                                        {% elif respuesta.evaluacion_adsef == 'incompleta' %}I
+                                        {% else %}{{ respuesta.evaluacion_adsef|slice:":2"|upper }}{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_asume %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_asume }}">
+                                        {% if respuesta.evaluacion_asume == 'muy_buena' %}MB
+                                        {% elif respuesta.evaluacion_asume == 'buena' %}B
+                                        {% elif respuesta.evaluacion_asume == 'regular' %}R
+                                        {% elif respuesta.evaluacion_asume == 'mala' %}M
+                                        {% elif respuesta.evaluacion_asume == 'incompleta' %}I
+                                        {% else %}{{ respuesta.evaluacion_asume|slice:":2"|upper }}{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_secretariado %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_secretariado }}">
+                                        {% if respuesta.evaluacion_secretariado == 'muy_buena' %}MB
+                                        {% elif respuesta.evaluacion_secretariado == 'buena' %}B
+                                        {% elif respuesta.evaluacion_secretariado == 'regular' %}R
+                                        {% elif respuesta.evaluacion_secretariado == 'mala' %}M
+                                        {% elif respuesta.evaluacion_secretariado == 'incompleta' %}I
+                                        {% else %}{{ respuesta.evaluacion_secretariado|slice:":2"|upper }}{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="promedio-cell">
+                                {% if respuesta.calificacion_promedio > 0 %}
+                                    {{ respuesta.calificacion_promedio|floatformat:1 }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td style="text-align: left; padding: 4px 6px; font-size: 0.65rem; max-width: 200px;">
+                                {% if respuesta.comentarios and respuesta.comentarios|length > 0 %}
+                                    <div style="overflow: hidden; text-overflow: ellipsis; max-height: 40px; line-height: 1.2;">
+                                        {{ respuesta.comentarios|truncatechars:120 }}
+                                    </div>
+                                {% else %}
+                                    <span style="color: #6c757d; font-style: italic;">Sin comentarios</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 20px; color: #7f8c8d;">
+                                No hay respuestas registradas en el sistema.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Resumen de estadísticas por categoría -->
+        <div class="stats-summary">
+            <h3>Distribución de Respuestas</h3>
+            <div class="stats-row">
+                <span class="stat-label">Total de registros mostrados:</span>
+                <span class="stat-value">{{ respuestas_recientes|length }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Porcentaje de completitud:</span>
+                <span class="stat-value">{{ stats.respuestas_completas|add:0|mul:100|div:stats.total_respuestas|floatformat:1 }}%</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Respuestas con comentarios:</span>
+                <span class="stat-value">{{ stats.respuestas_con_comentarios|add:0|mul:100|div:stats.total_respuestas|floatformat:1 }}%</span>
+            </div>
+        </div>
+
+        <!-- Comentarios destacados -->
+        <!-- Los comentarios ahora están integrados en la tabla principal -->
+        <div class="stats-summary">
+            <h3>Información sobre Comentarios</h3>
+            <div class="stats-row">
+                <span class="stat-label">Respuestas con comentarios:</span>
+                <span class="stat-value">{{ stats.respuestas_con_comentarios }} de {{ stats.total_respuestas }}</span>
+            </div>
+            <div class="stats-row">
+                <span class="stat-label">Porcentaje con comentarios:</span>
+                <span class="stat-value">{{ stats.respuestas_con_comentarios|add:0|mul:100|div:stats.total_respuestas|floatformat:1 }}%</span>
+            </div>
+            <p style="margin-top: 10px; font-size: 0.85rem; color: #7f8c8d;">
+                <strong>Nota:</strong> Todos los comentarios están ahora incluidos directamente en la tabla principal 
+                para facilitar la lectura y análisis conjunto de evaluaciones y observaciones.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Departamento de la Familia de Puerto Rico</strong></p>
+            <p>Sistema de Evaluación de Presentaciones - Informe Completo</p>
+            <p>Documento generado automáticamente el {{ fecha_generacion|date:"d \d\e F \d\e Y" }} a las {{ fecha_generacion|time:"H:i" }}</p>
+            <p><small>Este informe contiene todas las {{ stats.total_respuestas }} respuestas registradas en el sistema</small></p>
+        </div>
+    </div>
+
+    <script>
+        // Agregar funcionalidad para mostrar progreso de carga si hay muchas respuestas
+        document.addEventListener('DOMContentLoaded', function() {
+            const totalRows = {{ stats.total_respuestas }};
+            const table = document.querySelector('.responses-table tbody');
+            
+            if (totalRows > 100) {
+                console.log(`Cargando ${totalRows} respuestas en el informe completo...`);
+            }
+            
+            // Agregar conteo dinámico si es necesario
+            const contador = document.querySelector('.contador-respuestas');
+            if (contador && totalRows > 0) {
+                contador.innerHTML = `Mostrando todas las ${totalRows} respuestas registradas en el sistema`;
+            }
+        });
+        
+        // Función para imprimir con configuraciones optimizadas
+        function imprimirInforme() {
+            window.print();
+        }
+        
+        // Agregar funcionalidad de filtrado rápido por teclado (opcional)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                imprimirInforme();
+            }
+        });
+    </script>
+</body>
+</html>

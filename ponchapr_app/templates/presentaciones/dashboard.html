@@ -1,0 +1,395 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dashboard Administrativo - Encuestas</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    </head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Panel de Administración - Encuestas</h1>
+            <p>Portal de Presentaciones - Gestión de respuestas y análisis de datos</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">{{ total_respuestas }}</span>
+                    <span class="stat-label">Respuestas Totales</span>
+                </div>
+                
+                <div class="stat-card">
+                    <span class="stat-number">{{ tasa_completitud }}%</span>
+                    <span class="stat-label">Tasa de Completitud</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{ respuestas_hoy }}</span>
+                    <span class="stat-label">Respuestas Hoy</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="responses-section">
+            <div class="responses-header">
+                <h2>Respuestas de la Encuesta ({{ total_respuestas }})</h2>
+                <div class="admin-controls">
+                    <form method="GET" style="display: inline-flex; gap: 10px; flex-wrap: wrap;">
+                        <input type="text" 
+                               name="search" 
+                               class="search-box" 
+                               placeholder="Buscar en comentarios..." 
+                               value="{{ request.GET.search }}">
+                        
+                        <select name="fecha" onchange="this.form.submit()">
+                            <option value="all" {% if filtro_fecha == 'all' %}selected{% endif %}>Todas las fechas</option>
+                            <option value="today" {% if filtro_fecha == 'today' %}selected{% endif %}>Hoy</option>
+                            <option value="week" {% if filtro_fecha == 'week' %}selected{% endif %}>Esta semana</option>
+                            <option value="month" {% if filtro_fecha == 'month' %}selected{% endif %}>Este mes</option>
+                        </select>
+                        
+                        <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+                    </form>
+                    <div class="admin-actions">
+                        <a href="{% url 'admin:encuestas_respuestaencuesta_changelist' %}" class="btn btn-warning">
+                            Admin Completo
+                        </a>
+                        <a href="{% url 'presentaciones:exportar_pdf' %}" class="btn btn-danger">
+                            Generar Informe PDF
+                        </a>
+                        <a href="{% url 'presentaciones:portal' %}" class="btn btn-success">
+                            Volver al Portal
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {% if page_obj %}
+            <div class="table-responsive">
+                <table class="responses-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>ADFAN</th>
+                            <th>ACUDEN</th>
+                            <th>ADSEF</th>
+                            <th>ASUME</th>
+                            <th>Secretariado</th>
+                            <th>Comentarios</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for respuesta in respuestas %}
+                        <tr>
+                            <td><strong>{{ respuesta.id }}</strong></td>
+                            <td>{{ respuesta.creado_en|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if respuesta.evaluacion_adfan %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_adfan }}">
+                                        {{ respuesta.get_evaluacion_adfan_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_acuden %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_acuden }}">
+                                        {{ respuesta.get_evaluacion_acuden_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_adsef %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_adsef }}">
+                                        {{ respuesta.get_evaluacion_adsef_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_asume %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_asume }}">
+                                        {{ respuesta.get_evaluacion_asume_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if respuesta.evaluacion_secretariado %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_secretariado }}">
+                                        {{ respuesta.get_evaluacion_secretariado_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="eval-badge eval-empty">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="comments-cell">
+                                {% if respuesta.comentarios %}
+                                    <div class="comment-preview" title="{{ respuesta.comentarios }}">
+                                        {{ respuesta.comentarios|truncatechars:50 }}
+                                        {% if respuesta.comentarios|length > 50 %}
+                                            <button class="btn-show-more" onclick="showFullComment('{{ respuesta.comentarios|escapejs }}')">
+                                                ... ver más
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="no-comments">Sin comentarios</span>
+                                {% endif %}
+                                <!-- Modal para comentarios completos -->
+                                <div id="commentsModal" class="modal">
+                                    <div class="modal-content">
+                                        <span class="close" onclick="closeCommentsModal()">&times;</span>
+                                        <h2>Comentario Completo</h2>
+                                        <div id="fullCommentContent">
+                                            <!-- El comentario completo se cargará aquí -->
+                                        </div>
+                                        <div style="margin-top: 20px; text-align: center;">
+                                            <button class="btn btn-secondary" onclick="closeCommentsModal()">Cerrar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if respuesta.esta_completa %}
+                                    <span class="status-badge status-complete">✓ Completa</span>
+                                {% else %}
+                                    <span class="status-badge status-partial">⚠ Incompleta</span>
+                                {% endif %}
+                            </td>
+                            <td class="response-actions">
+                                <button class="btn btn-primary btn-small" onclick="viewResponse({{ respuesta.id }})">👁️ Ver</button>
+                                <a href="{% url 'admin:encuestas_respuestaencuesta_change' respuesta.id %}" class="btn btn-secondary btn-small">✏️ Editar</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="btn btn-secondary">« Primera</a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-secondary">‹ Anterior</a>
+                {% endif %}
+                
+                <span class="current-page">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn btn-secondary">Siguiente ›</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-secondary">Última »</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <div class="no-responses">
+                <div style="text-align: center; padding: 60px 20px; background: rgba(255, 255, 255, 0.9); border-radius: 20px;">
+                    <h3 style="color: #7f8c8d; margin-bottom: 15px;">📊 No hay respuestas disponibles</h3>
+                    <p style="color: #95a5a6;">Las respuestas aparecerán aquí cuando los usuarios completen la encuesta.</p>
+                    <a href="{% url 'encuestas:formulario' %}" class="btn btn-primary" style="margin-top: 20px;">📝 Ir al Formulario</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de respuesta -->
+    <div id="responseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Detalles de la Respuesta</h2>
+            <div id="responseDetails">
+                <!-- Los detalles se cargarán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para ver detalles de respuesta
+        function viewResponse(responseId) {
+            document.getElementById('responseDetails').innerHTML = `
+                <p>Cargando detalles de la respuesta ${responseId}...</p>
+                <p>Para ver todos los detalles completos, use el botón "Editar" que lo llevará al admin de Django.</p>
+                <div style="margin-top: 20px;">
+                    <a href="/admin/encuestas/respuestaencuesta/${responseId}/change/" class="btn btn-primary" target="_blank">📊 Ver en Admin</a>
+                </div>
+            `;
+            document.getElementById('responseModal').style.display = 'block';
+        }
+        // Función para mostrar comentario completo
+        function showFullComment(comment) {
+            document.getElementById('fullCommentContent').textContent = comment;
+            document.getElementById('commentsModal').style.display = 'block';
+        }
+
+        // Función para cerrar modal de comentarios
+        function closeCommentsModal() {
+            document.getElementById('commentsModal').style.display = 'none';
+        }
+
+        // Actualizar el event listener para cerrar modales
+        window.onclick = function(event) {
+            const responseModal = document.getElementById('responseModal');
+            const commentsModal = document.getElementById('commentsModal');
+            
+            if (event.target === responseModal) {
+                responseModal.style.display = 'none';
+            }
+            if (event.target === commentsModal) {
+                commentsModal.style.display = 'none';
+            }
+        }
+
+        // Cerrar modales con tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+                closeCommentsModal();
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('responseModal').style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('responseModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        
+    </script>
+
+    <style>
+        /* Estilos específicos para el dashboard */
+        .eval-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+        
+        .eval-muy_buena {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .eval-buena {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .eval-incompleta {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .eval-empty {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .admin-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .current-page {
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .average-score {
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 8px;
+            display: inline-block;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .score-3 {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .score-2 {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .score-1 {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .score-empty {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-controls {
+                flex-direction: column;
+            }
+            
+            .admin-controls form {
+                flex-direction: column !important;
+            }
+            
+            .responses-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</body>
+</html>

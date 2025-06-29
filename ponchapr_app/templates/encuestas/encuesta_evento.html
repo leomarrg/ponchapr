@@ -1,0 +1,514 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Evaluación de Presentaciones - Departamento de la Familia</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20240624-fix">
+        <style>
+            body::before {
+                content: "";
+                position: absolute;
+                top: 0; 
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: url("{% static 'img/Escudo@2x.png' %}") no-repeat right top;
+                background-size: contain;
+                opacity: 0.2;
+                z-index: -1;
+            }
+        </style>
+    </head>
+<body>
+    <div class="survey-header">
+        <div class="logo-section">
+            <div class="header-logo">
+                <img src="{% static 'img/DEPTO_FAMILIA@4x.png' %}" alt="Escudo del Departamento de la Familia">
+            </div>
+            <h1>Evaluación de Presentaciones</h1>
+            <p>Departamento de la Familia</p>
+        </div>
+    </div>
+    <div class="survey-container">
+        <div class="survey-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="success-message" style="display: block;">
+                        {% if message.tags == 'success' %}{% else %}{% endif %} {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="objective-section">
+                <h3>Objetivo</h3>
+                <p>Conocer su opinión sobre la calidad y utilidad de la información presentada por cada una de las administraciones.</p>
+            </div>
+
+            <div class="instructions">
+                <h4>Instrucciones</h4>
+                <p>Por favor, marque la opción que mejor describa su opinión sobre cada presentación.</p>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+            <form id="evaluationForm" method="post">
+                {% csrf_token %}
+                
+                <div class="section">
+                    <div class="section-title">
+                        1. Evaluación por Administración <span class="required-indicator">*</span>
+                    </div>
+
+                    <!-- ADFAN -->
+                    <div class="administration-block">
+                        <div class="admin-title">a) Administración de Familias y Niños (ADFAN)</div>
+                        <div class="admin-subtitle">La información presentada fue:</div>
+                        <div class="radio-group">
+                            {% for choice in form.evaluacion_adfan %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_adfan', '{{ choice.choice_value }}')">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.evaluacion_adfan.errors %}
+                            <div class="validation-message" style="display: block;">
+                                {{ form.evaluacion_adfan.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ACUDEN -->
+                    <div class="administration-block">
+                        <div class="admin-title">b) Administración para el Cuidado y Desarrollo Integral de la Niñez (ACUDEN)</div>
+                        <div class="admin-subtitle">La información presentada fue:</div>
+                        <div class="radio-group">
+                            {% for choice in form.evaluacion_acuden %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_acuden', '{{ choice.choice_value }}')">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.evaluacion_acuden.errors %}
+                            <div class="validation-message" style="display: block;">
+                                {{ form.evaluacion_acuden.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ADSEF -->
+                    <div class="administration-block">
+                        <div class="admin-title">c) Administración de Desarrollo Socioeconómico de la Familia (ADSEF)</div>
+                        <div class="admin-subtitle">La información presentada fue:</div>
+                        <div class="radio-group">
+                            {% for choice in form.evaluacion_adsef %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_adsef', '{{ choice.choice_value }}')">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.evaluacion_adsef.errors %}
+                            <div class="validation-message" style="display: block;">
+                                {{ form.evaluacion_adsef.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- ASUME -->
+                    <div class="administration-block">
+                        <div class="admin-title">d) Administración para el Sustento de Menores (ASUME)</div>
+                        <div class="admin-subtitle">La información presentada fue:</div>
+                        <div class="radio-group">
+                            {% for choice in form.evaluacion_asume %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_asume', '{{ choice.choice_value }}')">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.evaluacion_asume.errors %}
+                            <div class="validation-message" style="display: block;">
+                                {{ form.evaluacion_asume.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Secretariado -->
+                    <div class="administration-block">
+                        <div class="admin-title">e) Secretariado del Departamento de la Familia</div>
+                        <div class="admin-subtitle">La información presentada fue:</div>
+                        <div class="radio-group">
+                            {% for choice in form.evaluacion_secretariado %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_secretariado', '{{ choice.choice_value }}')">
+                                    {{ choice.tag }}
+                                    <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if form.evaluacion_secretariado.errors %}
+                            <div class="validation-message" style="display: block;">
+                                {{ form.evaluacion_secretariado.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="validation-message" id="evaluationError">
+                        Por favor, complete la evaluación de todas las administraciones.
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">2. Comentarios adicionales</div>
+                    
+                    <div class="comments-section">
+                        <div class="comments-title">¿Desea añadir algún comentario o sugerencia sobre las presentaciones?</div>
+                        <div class="comments-subtitle">O desea mayor información sobre un programa en particular?</div>
+                        
+                        <div class="textarea-container">
+                            {{ form.comentarios }}
+                            <div class="char-counter">
+                                <span id="charCount">0</span>/1000
+                            </div>
+                        </div>
+                        {% if form.comentarios.errors %}
+                            <div class="validation-message" style="display: block;">
+                                {{ form.comentarios.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                         Limpiar Formulario
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                         Enviar Evaluación
+                    </button>
+                </div>
+            </form>
+
+            <!-- Enlaces adicionales -->
+            <div class="additional-links" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1;">
+                <a href="{% url 'presentaciones:portal' %}" class="btn btn-success">
+                     Volver al Portal de Presentaciones
+                </a>
+                {% if user.is_staff %}
+                    <a href="{% url 'presentaciones:dashboard' %}" class="btn btn-warning">
+                         Ver Dashboard Admin
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables para el seguimiento del progreso
+        const administrations = ['evaluacion_adfan', 'evaluacion_acuden', 'evaluacion_adsef', 'evaluacion_asume', 'evaluacion_secretariado'];
+        let completedEvaluations = new Set();
+
+        // Seleccionar opción de radio
+        function selectOption(element, adminName, value) {
+            // Remover selección previa del mismo grupo
+            const siblings = element.parentElement.querySelectorAll('.radio-option');
+            siblings.forEach(sibling => sibling.classList.remove('selected'));
+            
+            // Agregar selección actual
+            element.classList.add('selected');
+            
+            // Marcar el radio button
+            const radio = element.querySelector('input[type="radio"]');
+            radio.checked = true;
+            
+            // Actualizar progreso
+            completedEvaluations.add(adminName);
+            updateProgress();
+            
+            // Ocultar mensaje de error si existe
+            document.getElementById('evaluationError').style.display = 'none';
+        }
+
+        // Actualizar barra de progreso
+        function updateProgress() {
+            const progress = (completedEvaluations.size / administrations.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Actualizar contador de caracteres
+        function updateCharCounter(textarea) {
+            const count = textarea.value.length;
+            document.getElementById('charCount').textContent = count;
+            
+            const counter = document.querySelector('.char-counter');
+            if (count > 900) {
+                counter.style.color = '#e74c3c';
+            } else if (count > 800) {
+                counter.style.color = '#f39c12';
+            } else {
+                counter.style.color = '#95a5a6';
+            }
+        }
+
+        // Validar formulario
+        function validateForm() {
+            let isValid = true;
+            
+            // Verificar que todas las administraciones estén evaluadas
+            for (let admin of administrations) {
+                const selected = document.querySelector(`input[name="${admin}"]:checked`);
+                if (!selected) {
+                    isValid = false;
+                    break;
+                }
+            }
+            
+            if (!isValid) {
+                document.getElementById('evaluationError').style.display = 'block';
+                document.getElementById('evaluationError').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }
+            
+            return isValid;
+        }
+
+        // Limpiar formulario
+        function resetForm() {
+            if (confirm('¿Está seguro de que desea limpiar todo el formulario?')) {
+                document.getElementById('evaluationForm').reset();
+                
+                // Limpiar selecciones visuales
+                document.querySelectorAll('.radio-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                
+                // Resetear progreso
+                completedEvaluations.clear();
+                updateProgress();
+                
+                // Limpiar contador de caracteres
+                document.getElementById('charCount').textContent = '0';
+                document.querySelector('.char-counter').style.color = '#95a5a6';
+                
+                // Ocultar mensajes
+                document.getElementById('evaluationError').style.display = 'none';
+                document.querySelectorAll('.success-message').forEach(msg => {
+                    msg.style.display = 'none';
+                });
+            }
+        }
+
+        // Event listener para el formulario
+        document.getElementById('evaluationForm').addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Deshabilitar botón temporalmente
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '📤 Enviando...';
+        });
+
+        // Inicializar contador de caracteres
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('textarea[name="comentarios"]');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    updateCharCounter(this);
+                });
+                updateCharCounter(textarea);
+            }
+            
+            // Verificar opciones ya seleccionadas (en caso de errores de formulario)
+            document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+                const option = radio.closest('.radio-option');
+                if (option) {
+                    option.classList.add('selected');
+                    completedEvaluations.add(radio.name);
+                }
+            });
+            updateProgress();
+        });
+    </script>
+
+<style>
+    /* Estilos específicos para la encuesta con logo centralizado */
+    .logo-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .logo-section .header-logo {
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: 400px !important;
+        height: 400px !important;
+    }
+    
+    .logo-section .header-logo img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: contain;
+    }
+    
+    /* MEJORAR TEXTAREA - AGREGAR ESTO */
+    .textarea-container {
+        position: relative;
+        margin-top: 15px;
+    }
+    
+    .comments-textarea,
+    textarea[name="comentarios"] {
+        width: 100%;
+        min-height: 120px;
+        padding: 15px 20px;
+        border: 2px solid #ecf0f1 !important;
+        border-radius: 12px !important;
+        font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif !important;
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+        color: #2c3e50 !important;
+        background: #fafbfc !important;
+        resize: vertical;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .comments-textarea:focus,
+    textarea[name="comentarios"]:focus {
+        outline: none !important;
+        border-color: #3498db !important;
+        background: #fff !important;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+        transform: translateY(-2px);
+    }
+    
+    .comments-textarea::placeholder,
+    textarea[name="comentarios"]::placeholder {
+        color: #95a5a6 !important;
+        font-style: italic;
+    }
+    
+    .char-counter {
+        position: absolute;
+        bottom: 10px;
+        right: 15px;
+        color: #95a5a6;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid #ecf0f1;
+    }
+    
+    /* Responsive para textarea */
+    @media (max-width: 768px) {
+        .comments-textarea,
+        textarea[name="comentarios"] {
+            min-height: 100px;
+            padding: 12px 15px;
+            font-size: 0.95rem !important;
+        }
+        
+        .char-counter {
+            bottom: 8px;
+            right: 12px;
+            font-size: 0.8rem;
+        }
+    }
+    
+    /* Responsive para la encuesta */
+    @media (min-width: 768px) and (max-width: 991px) {
+        .logo-section .header-logo {
+            width: 350px !important;
+            height: 350px !important;
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .logo-section .header-logo {
+            width: 270px !important;
+            height: 270px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .logo-section .header-logo {
+            width: 220px !important;
+            height: 220px !important;
+        }
+    }
+    
+    /* Asegurar que el logo-placeholder no interfiera */
+    .logo-placeholder {
+        display: none !important;
+    }
+    
+    /* Enlaces adicionales */
+    .additional-links {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .additional-links {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+    
+    /* Mejora visual para toda la sección de comentarios */
+    .comments-section {
+        background: rgba(248, 249, 250, 0.5);
+        padding: 25px;
+        border-radius: 15px;
+        border: 1px solid #ecf0f1;
+    }
+    
+    .comments-title {
+        color: #2c3e50 !important;
+        font-weight: 600 !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .comments-subtitle {
+        color: #7f8c8d !important;
+        font-style: italic;
+        margin-bottom: 20px !important;
+    }
+    
+    /* Animación suave para el textarea */
+    .textarea-container {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    </style>
+</body>
+</html>

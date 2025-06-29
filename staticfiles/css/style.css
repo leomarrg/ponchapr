@@ -533,7 +533,7 @@ body {
 }
 
 .survey-btn {
-    background-color: #eb961e;
+    background-color: #1c2854;
     color: white;
     padding: 15px 40px;
     border: none;
@@ -960,8 +960,8 @@ body {
         left: auto !important;
         top: auto !important;
         transform: none !important;
-        width: 290px !important;
-        height: 290px !important;
+        width: 240px !important;
+        height: 240px !important;
         margin-bottom: -55px;
     }
     
@@ -1216,7 +1216,7 @@ body {
 }
 
 .main-logo img {
-    max-height: 130px; /* Ajusta según el tamaño que necesites */
+    max-height: 100px; /* Ajusta según el tamaño que necesites */
     width: auto;
     height: auto;
     object-fit: contain;
@@ -1225,12 +1225,12 @@ body {
 /* Responsive para el logo principal */
 @media (max-width: 768px) {
     .main-logo img {
-        max-height: 80px;
+        max-height: 60px;
     }
 }
 
 @media (max-width: 480px) {
     .main-logo img {
-        max-height: 70px;
+        max-height: 60px;
     }
 }

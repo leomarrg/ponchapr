@@ -18,8 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from ponchapr_app import views as registry_views  # Import the views from your registry_app
+from presentaciones import views
+from encuestas import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('ponchapr_app.urls')),  # Include app URLs
+    path('encuestas/', include('encuestas.urls')),
+    path('presentaciones/', include('presentaciones.urls')),
 ]
