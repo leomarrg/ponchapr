@@ -751,7 +751,6 @@ class CustomLoginView(auth_views.LoginView):
             return '/accounts/login/?error=no_permission'
         
 
-@staff_member_required
 def presentations_view(request):
     """
     Vista del portal de presentaciones
