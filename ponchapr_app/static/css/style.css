@@ -1060,7 +1060,7 @@ body {
         transform: none !important;
         width: 290px !important;
         height: 290px !important;
-        margin-bottom: -45px;
+        margin-bottom: -55px;
     }
     
     .header h1 {
@@ -1104,6 +1104,7 @@ body {
         transform: none !important;
         width: 240px !important;
         height: 240px !important;
+        margin-bottom: -45px;
     }
     
     .header h1 {
