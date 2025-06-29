@@ -17,7 +17,7 @@
         
         body {
             font-family: 'Montserrat', sans-serif;
-            color: white;
+            color:#ffffff;
             background-color: #1c2854;
             line-height: 1.6;
             overflow-x: hidden;
@@ -42,8 +42,8 @@
             height: 100%;
             background-size: cover;
             background-position: center;
-            opacity: 0.3;
             z-index: 0;
+            background-color: #053250;
         }
         
         .content {
@@ -64,7 +64,6 @@
         
         .compromiso-img {
             margin-top: 40px;
-            margin-bottom: -70px;
             max-width: 100%;
             height: auto;
         }
@@ -86,7 +85,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #8acff3;
+            background-color: #0d8ee4;
             opacity: 0.3;
             z-index: -1;
         }
@@ -121,16 +120,16 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: white;
+            color: #ffffff;
         }
         
         .form-group input {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(13, 142, 228, 0.2);
             border-radius: 5px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
+            background-color: rgba(13, 142, 228, 0.1);
+            color: #ffffff;
             font-family: 'Montserrat', sans-serif;
             font-size: 16px;
             transition: all 0.3s ease;
@@ -144,7 +143,7 @@
         }
         
         .form-group input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
+            color: #ffffff;
         }
         
         .error-message {
@@ -154,8 +153,8 @@
         }
         
         .submit-btn {
-            background-color: #e5bc44;
-            color: white;
+            background-color: #eb961e;
+            color: #ffffff;
             border: none;
             border-radius: 30px;
             padding: 14px 45px;
@@ -198,12 +197,12 @@
         
         .escudo-overlay {
             position: absolute;
-            bottom: 0;
-            right: 0;
+            bottom: 10%;
+            right: 65%;
             opacity: 0.3;
             z-index: 0;
             max-width: 80%;
-            height: auto;
+            height: 80%;
         }
         
         /* Mensajes de alerta */
@@ -217,7 +216,7 @@
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
-            color: white;
+            color: rgb(0, 0, 0);
             background-color: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px);
             border-left: 4px solid transparent;
@@ -267,7 +266,7 @@
         <div class="content">
             <div class="content-inner">
                 <!-- Imagen de "Compromiso en acción" -->
-                <img src="{% static 'css/img/logo_conversatorio_4x.png' %}" alt="COMPROMISO EN acción" class="compromiso-img">
+                <img src="{% static 'css/img/logo_conversatorio.png' %}" alt="COMPROMISO EN acción" class="compromiso-img">
             </div>
             
             <!-- Franja verde semi-transparente a todo el ancho -->
