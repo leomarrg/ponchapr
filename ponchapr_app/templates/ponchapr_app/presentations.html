@@ -1,424 +1,128 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Construyendo Puentes - Portal de Presentaciones</title>
-        <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20240624-fix">
-        <style>
-            body::before {
-                content: "";
-                position: absolute;
-                top: 0; 
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: url("{% static 'img/Escudo@2x.png' %}") no-repeat right top;
-                background-size: contain;
-                opacity: 0.2;
-                z-index: -1;
-            }
-        </style>
-    </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <!-- Logo del escudo a la izquierda -->
-            <div class="header-logo">
-                <img src="{% static 'img/DEPTO_FAMILIA@4x.png' %}" alt="Escudo del Departamento de la Familia">
-            </div>
-            
-            <div class="main-logo">
-                <img src="{% static 'img/Construyendo Puentes_1@4x.png' %}" alt="Construyendo Puentes">
-            </div>
-            <p>Accede y descarga todas las presentaciones</p>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-number">{{ total_presentaciones }}</span>
-                    <span class="stat-label">Presentaciones</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">{{ total_participantes }}</span>
-                    <span class="stat-label">Participantes</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">{{ dias_evento }}</span>
-                    <span class="stat-label">Días de evento</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- SECCIÓN DE VIDEO DE BIENVENIDA -->
-        {% if video_bienvenida %}
-        <div class="welcome-video-section">
-            <h2>Video de Bienvenida</h2>
-            <div class="welcome-video-container">
-                <video class="welcome-video" controls preload="metadata">
-                    <source src="{{ video_bienvenida.video.url }}" type="video/mp4">
-                    <source src="{{ video_bienvenida.video.url }}" type="video/webm">
-                    <source src="{{ video_bienvenida.video.url }}" type="video/ogg">
-                    Tu navegador no soporta video HTML5.
-                </video>
-            </div>
-        </div>
-        {% endif %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-        <div class="presentations-grid">
-            {% for presentacion in presentaciones %}
-            <div class="presentation-card" data-id="{{ presentacion.id }}">
-                <div class="presentation-thumbnail {% if presentacion.imagen_thumbnail %}has-image{% endif %}">
-                    {% if presentacion.imagen_thumbnail %}
-                        <img src="{{ presentacion.imagen_thumbnail.url }}" 
-                             alt="{{ presentacion.titulo }}" 
-                             class="thumbnail-image">
-                    {% else %}
-                        <div class="thumbnail-placeholder">📊</div>
-                    {% endif %}
-                </div>
-                <div class="presentation-info">
-                    <h3>{{ presentacion.titulo }}</h3>
-                    <p><strong>Ponente:</strong> {{ presentacion.ponente }}</p>
-                    <p><strong>Fecha:</strong> {{ presentacion.fecha|date:"d \d\e F, Y" }}</p>
-                    <div class="presentation-meta">
-                        <span class="duration">{{ presentacion.duracion_minutos }} min</span>
+    <title>Portal de Presentaciones - Departamento de la Familia</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin-2.min.css' %}" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* Ajustes para layout sin sidebar */
+        #content-wrapper {
+            width: 100% !important;
+        }
+        
+        .presentation-card {
+            transition: transform 0.2s;
+        }
+        
+        .presentation-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+        }
+        
+        .coming-soon {
+            opacity: 0.7;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                <!-- Topbar -->
+
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Hero Section -->
+                    <div class="hero-section text-center">
+                        <div class="container">
+                            <h1 class="display-4 font-weight-bold">
+                                <i class="fas fa-presentation-screen mr-3"></i>
+                                Portal de Presentaciones
+                            </h1>
+                            
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white mt-5">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Departamento de la Familia 2025</span>
                     </div>
                 </div>
-                <div class="buttons-container">
-                    <button class="btn btn-primary" onclick="viewPresentation({{ presentacion.id }})">Ver Presentación</button>
-                    {% if presentacion.archivo_pdf %}
-                    <a href="{% url 'presentaciones:descargar' presentacion.id %}" class="btn btn-secondary" target="_blank">Descargar PDF</a>
-                    {% else %}
-                    <button class="btn btn-secondary" disabled style="opacity: 0.6;">PDF no disponible</button>
-                    {% endif %}
-                </div>
-            </div>
-            {% empty %}
-            <div class="no-presentations" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: rgba(255, 255, 255, 0.9); border-radius: 20px;">
-                <h3 style="color: #7f8c8d; margin-bottom: 15px;">📋 No hay presentaciones disponibles</h3>
-                <p style="color: #95a5a6;">Las presentaciones se agregarán desde el panel administrativo.</p>
-                {% if user.is_staff %}
-                <a href="{% url 'admin:presentaciones_presentacion_add' %}" class="btn btn-primary" style="margin-top: 20px;">➕ Agregar Primera Presentación</a>
-                {% endif %}
-            </div>
-            {% endfor %}
+            </footer>
+            <!-- End of Footer -->
         </div>
-
-        <div class="survey-section">
-            <h2>¡Tu opinión es importante!</h2>
-            <br>
-            <p>Ayúdanos a mejorar completando nuestra encuesta sobre el evento. Solo te tomará 3 minutos.</p>
-            <br>
-            <a href="{% url 'encuestas:formulario' %}" class="survey-btn">Completar Encuesta del Evento</a>
-        </div>
+        <!-- End of Content Wrapper -->
     </div>
+    <!-- End of Page Wrapper -->
 
-    <!-- Modal para visualizar presentaciones -->
-    <div id="presentationModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Visualizando Presentación</h2>
-            <div id="modalContent">
-                <p>La presentación se está cargando...</p>
-            </div>
-            <div style="margin-top: 20px;">
-                <button class="btn btn-primary" onclick="closeModal()">Cerrar</button>
-            </div>
-        </div>
-    </div>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
 
     <script>
-        // CSRF Token para peticiones AJAX
-        const csrfToken = '{{ csrf_token }}';
-        
-        // Función para ver presentación
-        async function viewPresentation(presentationId) {
-            try {
-                // Mostrar modal con loading
-                document.getElementById('modalContent').innerHTML = '<p>Cargando detalles de la presentación...</p>';
-                document.getElementById('presentationModal').style.display = 'block';
-                
-                const response = await fetch(`/api/presentacion/${presentationId}/`);
-                const data = await response.json();
-                
-                if (response.ok) {
-                    document.getElementById('modalTitle').textContent = data.titulo;
-                    document.getElementById('modalContent').innerHTML = `
-                        <div class="presentation-details">
-                            <p><strong>Ponente:</strong> ${data.ponente}</p>
-                            <p><strong>Administración:</strong> ${data.administracion}</p>
-                            <p><strong>Fecha:</strong> ${data.fecha}</p>
-                            <p><strong>Duración:</strong> ${data.duracion} minutos</p>
-                            <hr style="margin: 20px 0; border: none; border-top: 1px solid #ecf0f1;">
-                            <p><strong>Descripción:</strong></p>
-                            <p style="line-height: 1.6; color: #7f8c8d;">${data.descripcion}</p>
-                            
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
-                                <p><strong>📊 Vista previa de la presentación</strong></p>
-                                <p style="color: #666;">
-                                    ${data.tiene_pdf ? 
-                                        'Puede descargar el archivo PDF usando el botón "Descargar PDF".' : 
-                                        'No hay archivo PDF disponible para esta presentación.'
-                                    }
-                                </p>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    document.getElementById('modalContent').innerHTML = `
-                        <div style="text-align: center; padding: 20px;">
-                            <p style="color: #e74c3c;">❌ Error al cargar la presentación</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <p style="color: #e74c3c;">🔌 Error de conexión</p>
-                    </div>
-                `;
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('presentationModal').style.display = 'none';
-        }
-
-        // Cerrar modal al hacer clic fuera de él
-        window.onclick = function(event) {
-            const modal = document.getElementById('presentationModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
-
+        // Animación simple para las cards
         document.addEventListener('DOMContentLoaded', function() {
-        // Manejo de imágenes de thumbnail
-        const thumbnailImages = document.querySelectorAll('.thumbnail-image');
-        
-        thumbnailImages.forEach(img => {
-            const container = img.closest('.presentation-thumbnail');
-            
-            img.onload = function() {
-                // Imagen cargada exitosamente
-                container.classList.add('has-image');
-                this.style.opacity = '1';
-            };
-            
-            img.onerror = function() {
-                // Error al cargar imagen - mostrar placeholder
-                container.classList.remove('has-image');
-                this.style.display = 'none';
-                
-                // Crear placeholder si no existe
-                if (!container.querySelector('.thumbnail-placeholder')) {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'thumbnail-placeholder';
-                    placeholder.textContent = '📊';
-                    container.appendChild(placeholder);
-                }
-            };
-            
-            // Si la imagen ya está en caché, trigger onload manualmente
-            if (img.complete && img.naturalHeight !== 0) {
-                img.onload();
-            }
+            const cards = document.querySelectorAll('.presentation-card');
+            cards.forEach((card, index) => {
+                card.style.animation = `fadeInUp 0.6s ease-out ${index * 0.2}s both`;
+            });
         });
 
-        // Animaciones de entrada existentes
-        const cards = document.querySelectorAll('.presentation-card');
-        cards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(50px)';
-            
-            setTimeout(() => {
-                card.style.transition = 'all 0.6s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
-    });
-
-    // Agregar este script temporalmente para debug
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DEBUG CSS THUMBNAILS ===');
-    
-    const thumbnails = document.querySelectorAll('.presentation-thumbnail');
-    
-    thumbnails.forEach((thumb, index) => {
-        console.log(`Thumbnail ${index}:`);
-        console.log('- Classes:', thumb.className);
-        console.log('- Has image:', thumb.querySelector('img') !== null);
-        
-        // Verificar estilos computados del ::before
-        const beforeStyle = window.getComputedStyle(thumb, '::before');
-        console.log('- ::before content:', beforeStyle.content);
-        console.log('- ::before display:', beforeStyle.display);
-        
-        // Forzar eliminación con JavaScript si es necesario
+        // CSS para la animación
         const style = document.createElement('style');
         style.textContent = `
-            .presentation-thumbnail:nth-child(${index + 1})::before {
-                content: none !important;
-                display: none !important;
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
         `;
         document.head.appendChild(style);
-    });
-});
-
-// Script para debuggear media queries específicamente
-console.log('=== DEBUGGEANDO MEDIA QUERIES ===');
-
-// 1. Verificar el ancho actual de la ventana
-console.log('Ancho de ventana:', window.innerWidth + 'px');
-
-// 2. Verificar si las media queries están funcionando
-function testMediaQuery(query, name) {
-    const mq = window.matchMedia(query);
-    console.log(`${name} (${query}):`, mq.matches ? 'SÍ APLICA' : 'No aplica');
-    return mq.matches;
-}
-
-// Probar diferentes media queries
-console.log('--- TESTING MEDIA QUERIES ---');
-testMediaQuery('(max-width: 480px)', 'Móvil pequeño');
-testMediaQuery('(min-width: 481px) and (max-width: 767px)', 'Móvil grande');
-testMediaQuery('(min-width: 768px) and (max-width: 991px)', 'Tablet');
-testMediaQuery('(min-width: 992px)', 'Desktop');
-
-// 3. Verificar todas las reglas CSS (incluyendo media queries)
-console.log('--- TODAS LAS REGLAS CSS ---');
-const sheets = Array.from(document.styleSheets);
-let mediaRulesFound = 0;
-
-sheets.forEach((sheet, sheetIndex) => {
-    try {
-        const rules = Array.from(sheet.cssRules || sheet.rules);
-        rules.forEach((rule, ruleIndex) => {
-            if (rule.type === CSSRule.MEDIA_RULE) {
-                mediaRulesFound++;
-                console.log(`Media Rule ${mediaRulesFound}:`, rule.conditionText);
-                
-                // Verificar si tiene reglas para header-logo
-                const innerRules = Array.from(rule.cssRules);
-                innerRules.forEach(innerRule => {
-                    if (innerRule.selectorText && innerRule.selectorText.includes('.header-logo')) {
-                        console.log(`  ↳ Header-logo rule:`, innerRule.cssText);
-                    }
-                });
-            }
-        });
-    } catch (e) {
-        console.log(`Error accediendo hoja ${sheetIndex}:`, e.message);
-    }
-});
-
-console.log(`Total media rules encontradas: ${mediaRulesFound}`);
-
-// 4. Verificar estilos computados en diferentes tamaños
-const headerLogo = document.querySelector('.header-logo');
-if (headerLogo) {
-    const computedStyle = window.getComputedStyle(headerLogo);
-    console.log('--- ESTILOS COMPUTADOS ACTUALES ---');
-    console.log('Width:', computedStyle.width);
-    console.log('Height:', computedStyle.height);
-    console.log('Position:', computedStyle.position);
-    console.log('Left:', computedStyle.left);
-    console.log('Top:', computedStyle.top);
-    console.log('Transform:', computedStyle.transform);
-}
     </script>
-
-    <style>
-        /* Estilos existentes para thumbnails */
-        .presentation-thumbnail {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .thumbnail-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .thumbnail-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            opacity: 0.8;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-radius: 12px;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* NUEVOS ESTILOS PARA VIDEO DE BIENVENIDA */
-        .welcome-video-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .welcome-video-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-        }
-
-        .welcome-video-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-        .welcome-video {
-            width: 100%;
-            height: auto;
-            min-height: 300px;
-        }
-
-        .presentation-details {
-            text-align: left;
-        }
-
-        .presentation-details p {
-            margin-bottom: 10px;
-        }
-
-        /* Responsive para videos */
-        @media (max-width: 768px) {
-            .welcome-video {
-                min-height: 200px;
-            }
-            
-            .welcome-video-section {
-                padding: 20px;
-                margin-bottom: 30px;
-            }
-            
-            .welcome-video-section h2 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
 </body>
+
 </html>
