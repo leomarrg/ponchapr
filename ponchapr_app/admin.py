@@ -170,11 +170,10 @@ class AttendeeAdmin(admin.ModelAdmin):
         'last_name', 
         'organization', 
         'email', 
-        'phone_number', 
-        'arrived', 
+        'phone_number',
+        'marked_as_arrived', 
+        'arrived',
         'arrival_time', 
-        'checkout_time', 
-        'checked_out', 
         'event',
         'created_at'
     )
@@ -183,7 +182,6 @@ class AttendeeAdmin(admin.ModelAdmin):
         'pre_registered', 
         'registered_at_event', 
         'arrived', 
-        'checked_out',
         'created_at',
         DuplicateNameFilter, 
         DuplicateEmailFilter,

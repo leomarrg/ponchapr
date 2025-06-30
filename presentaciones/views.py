@@ -19,6 +19,10 @@ def portal_presentaciones(request):
     
     # Cambio: Obtener TODOS los videos activos ordenados
     videos_evento = VideoEvento.objects.filter(activo=True).order_by('orden')
+
+     # ✅ LÍNEA AGREGADA: Obtener el evento activo
+    from ponchapr_app.models import Event  # Import del modelo Event
+    evento_activo = Event.objects.filter(is_active=True).first()
     
     # Estadísticas del evento
     total_presentaciones = presentaciones.count()
@@ -31,6 +35,7 @@ def portal_presentaciones(request):
         'total_participantes': total_participantes,
         'videos_evento': videos_evento,  # Cambio: videos_evento en lugar de video_bienvenida
         'dias_evento': dias_evento,
+        'event_name': evento_activo.name if evento_activo else 'No hay evento activo',
     }
     return render(request, 'presentaciones/portal_ppt.html', context)
 
