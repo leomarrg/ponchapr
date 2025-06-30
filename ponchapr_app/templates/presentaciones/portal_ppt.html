@@ -176,7 +176,7 @@
                 document.getElementById('modalContent').innerHTML = '<p>Cargando detalles de la presentación...</p>';
                 document.getElementById('presentationModal').style.display = 'block';
                 
-                const response = await fetch(`/api/presentacion/${presentationId}/`);
+                const response = await fetch(`/presentaciones/presentacion/${presentationId}/`);
                 const data = await response.json();
                 
                 if (response.ok) {
