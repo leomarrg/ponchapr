@@ -85,21 +85,15 @@ class AttendeeForm(forms.ModelForm):
             if existing_attendee:
                 raise forms.ValidationError("Este correo electrónico ya está registrado para este evento.")
 
-        # Check if the email domain is valid
-        if email:
-            valid_domains = ['pr.gov', 'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com']
-            domain = email.split('@')[-1]
-            
-            if not any(domain.endswith(valid_domain) for valid_domain in valid_domains):
-                raise forms.ValidationError(f"Por favor utilice un correo electrónico con un dominio válido como: {', '.join(valid_domains)}")
+        # ← ELIMINADA TODA LA VALIDACIÓN DE DOMINIOS
         
         return email
-    
-    def clean_region(self):
-        region = self.cleaned_data.get('region')
-        if not region:
-            raise forms.ValidationError("Por favor seleccione una región")
-        return region
+        
+        def clean_region(self):
+            region = self.cleaned_data.get('region')
+            if not region:
+                raise forms.ValidationError("Por favor seleccione una región")
+            return region
 
 class ReviewForm(forms.ModelForm):
     satisfaction = forms.ChoiceField(
