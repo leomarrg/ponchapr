@@ -54,9 +54,9 @@
                 }
             }
 
-            /* ESTILOS PARA EL MODAL - ESTO ES LO QUE FALTABA */
+            /* ESTILOS PARA EL MODAL ACTUALIZADO */
             .modal {
-                display: none; /* Oculto por defecto */
+                display: none;
                 position: fixed;
                 z-index: 1000;
                 left: 0;
@@ -71,80 +71,342 @@
             .modal-content {
                 background-color: #ffffff;
                 margin: 5% auto;
-                padding: 30px;
+                padding: 0;
                 border-radius: 15px;
                 box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
                 width: 90%;
-                max-width: 700px;
+                max-width: none;
                 max-height: 85vh;
-                overflow-y: auto;
                 position: relative;
                 animation: slideIn 0.3s ease;
+                display: flex;
+                flex-direction: column;
             }
 
-            .close {
-                color: #aaa;
-                float: right;
-                font-size: 28px;
-                font-weight: bold;
-                position: absolute;
-                right: 20px;
-                top: 15px;
-                cursor: pointer;
-                transition: color 0.3s ease;
+            .modal-fullscreen {
+                width: 95%;
+                height: 95%;
+                max-width: none;
+                max-height: none;
+                margin: 2.5vh auto;
+                display: flex;
+                flex-direction: column;
             }
 
-            .close:hover,
-            .close:focus {
-                color: #e74c3c;
-                text-decoration: none;
+            .modal-fullscreen.fullscreen-active {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                border-radius: 0;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 10000;
             }
 
-            #modalTitle {
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px 20px;
+                border-bottom: 1px solid #ecf0f1;
+                background: #f8f9fa;
+                border-radius: 15px 15px 0 0;
+                flex-shrink: 0;
+            }
+
+            .modal-header h2 {
+                margin: 0;
+                font-size: 1.2rem;
                 color: #2c3e50;
-                font-size: 1.5rem;
-                font-weight: 600;
-                margin-bottom: 20px;
-                margin-right: 40px; /* Espacio para el botón cerrar */
-                line-height: 1.3;
+                flex-grow: 1;
+                margin-right: 20px;
             }
 
-            .presentation-details {
-                text-align: left;
+            .modal-controls {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .modal-controls .close {
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #7f8c8d;
+                padding: 0;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: all 0.3s ease;
+            }
+
+            .modal-controls .close:hover {
+                background: #e74c3c;
+                color: white;
+            }
+
+            .modal-pdf-container {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+                background: white;
+                border-radius: 0 0 15px 15px;
+                padding: 20px;
+            }
+
+            .pdf-viewer-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+            }
+
+            .pdf-viewer-container iframe {
+                flex-grow: 1;
+                border: none;
+                background: white;
+                min-height: 500px;
+                border-radius: 10px;
+            }
+
+            .pdf-fallback {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                background: #f8f9fa;
+                border: 2px dashed #dee2e6;
+                border-radius: 10px;
+                margin: 20px;
+            }
+
+            .pdf-fallback-content {
+                text-align: center;
+                padding: 40px;
+                max-width: 400px;
+            }
+
+            .pdf-fallback-content h3 {
+                color: #7f8c8d;
+                margin-bottom: 15px;
+            }
+
+            .pdf-fallback-content p {
+                color: #95a5a6;
+                margin-bottom: 20px;
+            }
+
+            .no-pdf-message {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                background: #f8f9fa;
+            }
+
+            .no-pdf-content {
+                text-align: center;
+                padding: 40px;
+                max-width: 500px;
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .no-pdf-content h3 {
+                color: #e67e22;
+                margin-bottom: 15px;
+            }
+
+            .no-pdf-content p {
+                color: #7f8c8d;
+                margin-bottom: 10px;
                 line-height: 1.6;
             }
 
-            .presentation-details p {
-                margin-bottom: 12px;
-                color: #34495e;
+            .btn-small {
+                padding: 6px 12px;
+                font-size: 0.85rem;
             }
 
-            .presentation-details strong {
+            /* ESTILOS PARA VISTA MÓVIL DE PDF */
+            .mobile-pdf-viewer {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .mobile-pdf-content {
+                background: white;
+                border-radius: 20px;
+                padding: 30px;
+                text-align: center;
+                max-width: 400px;
+                width: 100%;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .pdf-preview-icon {
+                font-size: 4rem;
+                margin-bottom: 20px;
+                opacity: 0.8;
+            }
+
+            .mobile-pdf-content h3 {
                 color: #2c3e50;
+                margin-bottom: 15px;
+                font-size: 1.4rem;
+            }
+
+            .mobile-pdf-content p {
+                color: #7f8c8d;
+                margin-bottom: 20px;
+                line-height: 1.6;
+            }
+
+            .mobile-options {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .mobile-btn {
+                padding: 15px 20px !important;
+                font-size: 1rem !important;
+                border-radius: 12px !important;
+                text-decoration: none !important;
+                display: block !important;
+                transition: all 0.3s ease !important;
+                font-weight: 600 !important;
+            }
+
+            .mobile-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .mobile-note {
+                background: #f8f9fa;
+                border-left: 4px solid #3498db;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                text-align: left;
+            }
+
+            .mobile-note p {
+                margin: 0;
+                color: #2c3e50;
+                font-size: 0.9rem;
+            }
+
+            .mobile-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-tertiary {
+                background: #95a5a6 !important;
+                color: white !important;
+                border: none !important;
+                padding: 10px 15px !important;
+                border-radius: 8px !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                font-size: 0.9rem !important;
+            }
+
+            .btn-tertiary:hover {
+                background: #7f8c8d !important;
+            }
+
+            .mobile-desktop-warning {
+                background: #fff3cd;
+                color: #856404;
+                padding: 10px;
+                text-align: center;
+                border-radius: 8px 8px 0 0;
+                font-size: 0.85rem;
                 font-weight: 600;
             }
 
-            .presentation-details hr {
-                margin: 20px 0;
-                border: none;
-                border-top: 2px solid #ecf0f1;
+            .mobile-desktop-warning p {
+                margin: 0;
             }
 
-            /* Animaciones para el modal */
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
+            /* NUEVOS ESTILOS PARA VIDEOS DEL EVENTO */
+            .videos-evento {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 30px;
+                margin-bottom: 40px;
             }
 
-            @keyframes slideIn {
-                from { 
-                    transform: translateY(-50px);
-                    opacity: 0;
-                }
-                to { 
-                    transform: translateY(0);
-                    opacity: 1;
-                }
+            .videos-evento h2 {
+                color: #2c3e50;
+                margin-bottom: 30px;
+                font-size: 1.8rem;
+                text-align: center;
+            }
+
+            .videos-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+                gap: 30px;
+                align-items: start;
+            }
+
+            .video-item {
+                background: white;
+                border-radius: 15px;
+                padding: 20px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .video-item:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            }
+
+            .video-item h3 {
+                color: #2c3e50;
+                margin-bottom: 15px;
+                font-size: 1.3rem;
+                font-weight: 600;
+            }
+
+            .video-item p {
+                color: #7f8c8d;
+                margin-bottom: 20px;
+                line-height: 1.6;
+                font-size: 0.95rem;
+            }
+
+            .video-container {
+                border-radius: 12px;
+                overflow: hidden;
+                background: #000;
+            }
+
+            .video-item video {
+                width: 100%;
+                height: auto;
+                min-height: 250px;
+                display: block;
             }
 
             /* Estilos para thumbnails */
@@ -181,65 +443,76 @@
                 left: 0;
             }
 
-            /* Estilos para video de bienvenida */
-            .welcome-video-section {
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(10px);
-                border-radius: 20px;
-                padding: 30px;
-                margin-bottom: 40px;
-                text-align: center;
+            /* Animaciones para el modal */
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
             }
 
-            .welcome-video-section h2 {
-                color: #2c3e50;
-                margin-bottom: 20px;
-                font-size: 1.8rem;
-            }
-
-            .welcome-video-container {
-                max-width: 1200px;
-                margin: 0 auto;
-                border-radius: 15px;
-                overflow: hidden;
-            }
-
-            .welcome-video {
-                width: 100%;
-                height: auto;
-                min-height: 300px;
+            @keyframes slideIn {
+                from { 
+                    transform: translateY(-50px);
+                    opacity: 0;
+                }
+                to { 
+                    transform: translateY(0);
+                    opacity: 1;
+                }
             }
 
             /* Responsive para móviles */
             @media (max-width: 768px) {
-                .modal-content {
-                    margin: 10% auto;
-                    padding: 20px;
-                    width: 95%;
+                .modal-fullscreen {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    border-radius: 0;
                 }
 
-                #modalTitle {
-                    font-size: 1.3rem;
-                    margin-right: 35px;
+                .mobile-pdf-viewer {
+                    padding: 10px;
                 }
 
-                .close {
-                    font-size: 24px;
-                    right: 15px;
-                    top: 12px;
+                .mobile-pdf-content {
+                    margin: 0;
+                    border-radius: 0;
+                    min-height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
                 }
 
-                .welcome-video {
+                .videos-grid {
+                    grid-template-columns: 1fr;
+                    gap: 20px;
+                }
+
+                .video-item {
+                    padding: 15px;
+                }
+
+                .video-item h3 {
+                    font-size: 1.2rem;
+                }
+
+                .video-item video {
                     min-height: 200px;
                 }
-                
-                .welcome-video-section {
+
+                .videos-evento {
                     padding: 20px;
                     margin-bottom: 30px;
                 }
-                
-                .welcome-video-section h2 {
+
+                .videos-evento h2 {
                     font-size: 1.5rem;
+                    margin-bottom: 20px;
+                }
+            }
+
+            @media (max-width: 600px) {
+                .videos-grid {
+                    grid-template-columns: 1fr;
                 }
             }
 
@@ -273,23 +546,6 @@
             .btn-secondary:hover {
                 background-color: #7f8c8d;
             }
-
-            /* Estilos para la información destacada en el modal */
-            .presentation-details .highlight-box {
-                background: #f8f9fa;
-                padding: 20px;
-                border-radius: 10px;
-                margin: 15px 0;
-                border-left: 4px solid #3498db;
-            }
-
-            .presentation-details .highlight-box p {
-                margin: 0;
-            }
-
-            .presentation-details .highlight-box strong {
-                color: #3498db;
-            }
         </style>
     </head>
 <body>
@@ -322,21 +578,29 @@
             </div>
         </div>
 
-        <!-- SECCIÓN DE VIDEO DE BIENVENIDA -->
+        <!-- SECCIÓN DE VIDEOS DEL EVENTO MEJORADA -->
         {% if videos_evento %}
-            <div class="videos-evento">
+        <div class="videos-evento">
+            <h2>Videos del Evento</h2>
+            <div class="videos-grid">
                 {% for video in videos_evento %}
-                    <div class="video-item">
-                        <h3>{{ video.titulo }}</h3>
-                        {% if video.descripcion %}
-                            <p>{{ video.descripcion }}</p>
-                        {% endif %}
-                        <video controls>
+                <div class="video-item">
+                    <h3>{{ video.titulo }}</h3>
+                    {% if video.descripcion %}
+                        <p>{{ video.descripcion }}</p>
+                    {% endif %}
+                    <div class="video-container">
+                        <video controls preload="metadata">
                             <source src="{{ video.video.url }}" type="video/mp4">
+                            <source src="{{ video.video.url }}" type="video/webm">
+                            <source src="{{ video.video.url }}" type="video/ogg">
+                            Tu navegador no soporta video HTML5.
                         </video>
                     </div>
+                </div>
                 {% endfor %}
             </div>
+        </div>
         {% endif %}
 
         <div class="presentations-grid">
@@ -360,10 +624,11 @@
                     </div>
                 </div>
                 <div class="buttons-container">
-                    <button class="btn btn-primary" onclick="viewPresentation({{ presentacion.id }})">Ver Presentación</button>
                     {% if presentacion.archivo_pdf %}
+                    <button class="btn btn-primary" onclick="viewPresentation({{ presentacion.id }}, '{{ presentacion.titulo|escapejs }}', '{{ presentacion.archivo_pdf.url }}')">Ver Presentación</button>
                     <a href="{% url 'presentaciones:descargar' presentacion.id %}" class="btn btn-secondary" target="_blank">Descargar PDF</a>
                     {% else %}
+                    <button class="btn btn-primary" onclick="showNoPdfMessage('{{ presentacion.titulo|escapejs }}')">Ver Presentación</button>
                     <button class="btn btn-secondary" disabled style="opacity: 0.6;">PDF no disponible</button>
                     {% endif %}
                 </div>
@@ -388,16 +653,19 @@
         </div>
     </div>
 
-    <!-- Modal para visualizar presentaciones -->
+    <!-- Modal para visualizar presentaciones con visor de PDF -->
     <div id="presentationModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Visualizando Presentación</h2>
-            <div id="modalContent">
-                <p>La presentación se está cargando...</p>
+        <div class="modal-content modal-fullscreen">
+            <div class="modal-header">
+                <h2 id="modalTitle">Visualizando Presentación</h2>
+                <div class="modal-controls">
+                    <button class="btn btn-secondary btn-small" onclick="toggleFullscreen()">⛶ Pantalla Completa</button>
+                    <button class="btn btn-primary btn-small" onclick="downloadCurrentPdf()">📥 Descargar</button>
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
             </div>
-            <div style="margin-top: 20px; text-align: center;">
-                <button class="btn btn-primary" onclick="closeModal()">Cerrar</button>
+            <div id="modalContent" class="modal-pdf-container">
+                <p>Cargando presentación...</p>
             </div>
         </div>
     </div>
@@ -405,82 +673,194 @@
     <script>
         // CSRF Token para peticiones AJAX
         const csrfToken = '{{ csrf_token }}';
+        let currentPdfUrl = '';
         
-        // Función para ver presentación
-        async function viewPresentation(presentationId) {
-            try {
-                console.log('🔍 Intentando cargar presentación ID:', presentationId);
-                
-                // Mostrar modal con loading
-                document.getElementById('modalContent').innerHTML = '<p>Cargando detalles de la presentación...</p>';
-                document.getElementById('presentationModal').style.display = 'block';
-                
-                const url = `/presentaciones/presentacion/${presentationId}/`;
-                console.log('🌐 URL de la API:', url);
-                
-                const response = await fetch(url);
-                console.log('📡 Respuesta de la API:', response.status, response.statusText);
-                
-                const data = await response.json();
-                console.log('📦 Datos recibidos:', data);
-                
-                if (response.ok) {
-                    document.getElementById('modalTitle').textContent = data.titulo;
-                    document.getElementById('modalContent').innerHTML = `
-                        <div class="presentation-details">
-                            <p><strong>Ponente:</strong> ${data.ponente}</p>
-                            <p><strong>Administración:</strong> ${data.administracion}</p>
-                            <p><strong>Fecha:</strong> ${data.fecha}</p>
-                            <p><strong>Duración:</strong> ${data.duracion} minutos</p>
-                            <hr>
-                            <p><strong>Descripción:</strong></p>
-                            <p style="line-height: 1.6; color: #7f8c8d;">${data.descripcion}</p>
+        // Función para detectar dispositivos móviles
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        }
+        
+        // Función para ver presentación (ahora muestra el PDF)
+        function viewPresentation(presentationId, title, pdfUrl) {
+            currentPdfUrl = pdfUrl;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('presentationModal').style.display = 'block';
+            
+            const modalContent = document.getElementById('modalContent');
+            
+            // Verificar si es dispositivo móvil
+            if (isMobileDevice()) {
+                // Para móviles: mostrar opciones de descarga/vista externa
+                modalContent.innerHTML = `
+                    <div class="mobile-pdf-viewer">
+                        <div class="mobile-pdf-content">
+                            <div class="pdf-preview-icon">📱</div>
+                            <h3>Ver en dispositivo móvil</h3>
+                            <p>Para una mejor experiencia en tu dispositivo móvil, te recomendamos:</p>
                             
-                            <div class="highlight-box">
-                                <p><strong>📊 Vista previa de la presentación</strong></p>
-                                <p style="color: #666;">
-                                    ${data.tiene_pdf ? 
-                                        'Puede descargar el archivo PDF usando el botón "Descargar PDF".' : 
-                                        'No hay archivo PDF disponible para esta presentación.'
-                                    }
-                                </p>
+                            <div class="mobile-options">
+                                <a href="${pdfUrl}" target="_blank" class="btn btn-primary mobile-btn">
+                                    📖 Abrir PDF en Nueva Pestaña
+                                </a>
+                                <a href="${pdfUrl}" download="${title}.pdf" class="btn btn-secondary mobile-btn">
+                                    📥 Descargar PDF
+                                </a>
+                            </div>
+                            
+                            <div class="mobile-note">
+                                <p><small>💡 <strong>Tip:</strong> Una vez abierto en nueva pestaña, podrás hacer zoom, navegar entre páginas usando los controles táctiles nativos de tu dispositivo.</small></p>
+                            </div>
+                            
+                            <div class="mobile-actions">
+                                <button class="btn btn-tertiary" onclick="showDesktopViewer('${pdfUrl}', '${title}')">
+                                    🖥️ Intentar vista de escritorio
+                                </button>
+                                <button class="btn btn-tertiary" onclick="closeModal()">
+                                    ❌ Cerrar
+                                </button>
                             </div>
                         </div>
-                    `;
-                } else {
-                    document.getElementById('modalContent').innerHTML = `
-                        <div style="text-align: center; padding: 20px;">
-                            <p style="color: #e74c3c;">❌ Error al cargar la presentación</p>
-                            <p style="color: #666; font-size: 14px;">Código de error: ${response.status}</p>
-                            <p style="color: #666; font-size: 12px;">URL: ${url}</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('💥 Error:', error);
-                document.getElementById('modalContent').innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <p style="color: #e74c3c;">🔌 Error de conexión</p>
-                        <p style="color: #666; font-size: 14px;">Detalles: ${error.message}</p>
-                        <p style="color: #666; font-size: 12px;">URL intentada: /presentaciones/presentacion/${presentationId}/</p>
                     </div>
                 `;
+            } else {
+                // Para escritorio: mostrar iframe como antes
+                modalContent.innerHTML = `
+                    <div class="pdf-viewer-container">
+                        <iframe 
+                            src="${pdfUrl}#toolbar=1&navpanes=1&scrollbar=1&view=FitH" 
+                            type="application/pdf"
+                            width="100%" 
+                            height="100%"
+                            frameborder="0"
+                            title="Visualizador de ${title}">
+                        </iframe>
+                        <div class="pdf-fallback" style="display: none;">
+                            <div class="pdf-fallback-content">
+                                <h3>📄 No se puede mostrar el PDF</h3>
+                                <p>Tu navegador no soporta la visualización de PDFs.</p>
+                                <div style="margin-top: 20px;">
+                                    <a href="${pdfUrl}" target="_blank" class="btn btn-primary">
+                                        📥 Descargar PDF
+                                    </a>
+                                    <a href="${pdfUrl}" target="_blank" class="btn btn-secondary">
+                                        🔗 Abrir en nueva pestaña
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Verificar si el iframe puede cargar el PDF
+                const iframe = modalContent.querySelector('iframe');
+                const fallback = modalContent.querySelector('.pdf-fallback');
+                
+                iframe.onload = function() {
+                    console.log('PDF cargado correctamente');
+                };
+                
+                iframe.onerror = function() {
+                    iframe.style.display = 'none';
+                    fallback.style.display = 'block';
+                };
+                
+                // Timeout para detectar si no carga
+                setTimeout(() => {
+                    try {
+                        if (!iframe.contentDocument && !iframe.contentWindow) {
+                            iframe.style.display = 'none';
+                            fallback.style.display = 'block';
+                        }
+                    } catch (e) {
+                        iframe.style.display = 'none';
+                        fallback.style.display = 'block';
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Función para forzar vista de escritorio en móvil
+        function showDesktopViewer(pdfUrl, title) {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="pdf-viewer-container">
+                    <div class="mobile-desktop-warning">
+                        <p>⚠️ Vista de escritorio en móvil - Es posible que la navegación sea limitada</p>
+                    </div>
+                    <iframe 
+                        src="${pdfUrl}#toolbar=1&navpanes=0&scrollbar=1&view=FitW" 
+                        type="application/pdf"
+                        width="100%" 
+                        height="100%"
+                        frameborder="0"
+                        title="Visualizador de ${title}">
+                    </iframe>
+                </div>
+            `;
+        }
+        
+        // Función para mostrar mensaje cuando no hay PDF
+        function showNoPdfMessage(title) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('presentationModal').style.display = 'block';
+            document.getElementById('modalContent').innerHTML = `
+                <div class="no-pdf-message">
+                    <div class="no-pdf-content">
+                        <h3>📄 Presentación no disponible</h3>
+                        <p>La presentación "<strong>${title}</strong>" aún no tiene un archivo PDF disponible.</p>
+                        <p>Por favor, contacte al administrador o intente más tarde.</p>
+                        <div style="margin-top: 30px;">
+                            <button class="btn btn-primary" onclick="closeModal()">
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Función para descargar el PDF actual
+        function downloadCurrentPdf() {
+            if (currentPdfUrl) {
+                const link = document.createElement('a');
+                link.href = currentPdfUrl;
+                link.download = document.getElementById('modalTitle').textContent + '.pdf';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
+        // Función para alternar pantalla completa
+        function toggleFullscreen() {
+            const modal = document.getElementById('presentationModal');
+            const modalContent = modal.querySelector('.modal-content');
+            
+            if (modalContent.classList.contains('fullscreen-active')) {
+                modalContent.classList.remove('fullscreen-active');
+                document.body.style.overflow = 'auto';
+            } else {
+                modalContent.classList.add('fullscreen-active');
+                document.body.style.overflow = 'hidden';
             }
         }
 
         function closeModal() {
             document.getElementById('presentationModal').style.display = 'none';
+            document.querySelector('.modal-content').classList.remove('fullscreen-active');
+            document.body.style.overflow = 'auto';
+            currentPdfUrl = '';
         }
 
         // Cerrar modal al hacer clic fuera de él
         window.onclick = function(event) {
             const modal = document.getElementById('presentationModal');
             if (event.target === modal) {
-                modal.style.display = 'none';
+                closeModal();
             }
         }
-
-        // Cerrar modal con tecla Escape
+        
+        // Cerrar modal con tecla ESC
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeModal();
@@ -495,14 +875,17 @@
                 const container = img.closest('.presentation-thumbnail');
                 
                 img.onload = function() {
+                    // Imagen cargada exitosamente
                     container.classList.add('has-image');
                     this.style.opacity = '1';
                 };
                 
                 img.onerror = function() {
+                    // Error al cargar imagen - mostrar placeholder
                     container.classList.remove('has-image');
                     this.style.display = 'none';
                     
+                    // Crear placeholder si no existe
                     if (!container.querySelector('.thumbnail-placeholder')) {
                         const placeholder = document.createElement('div');
                         placeholder.className = 'thumbnail-placeholder';
@@ -511,12 +894,13 @@
                     }
                 };
                 
+                // Si la imagen ya está en caché, trigger onload manualmente
                 if (img.complete && img.naturalHeight !== 0) {
                     img.onload();
                 }
             });
 
-            // Animaciones de entrada
+            // Animaciones de entrada para las tarjetas de presentación
             const cards = document.querySelectorAll('.presentation-card');
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
@@ -527,6 +911,19 @@
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
                 }, index * 100);
+            });
+
+            // Animaciones de entrada para los videos
+            const videoItems = document.querySelectorAll('.video-item');
+            videoItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    item.style.transition = 'all 0.6s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, (index * 150) + 300); // Delay después de las tarjetas
             });
         });
     </script>
