@@ -19,41 +19,276 @@
                 opacity: 0.2;
                 z-index: -1;
             }
-            /* Ajustes para tablets (768px to 991px) */
+            
+            /* Media queries existentes */
             @media (min-width: 768px) and (max-width: 991px) {
                 body::before {
-                    top: 25%; /* Mueve la imagen más abajo */
-                    background-position: right center; /* Centra verticalmente */
+                    top: 25%;
+                    background-position: right center;
                 }
             }
 
-            /* Ajustes para móviles grandes (481px to 767px) */
             @media (min-width: 481px) and (max-width: 767px) {
                 body::before {
-                    top: 35%; /* Mueve la imagen más abajo */
-                    background-position: center bottom; /* Posición centrada hacia abajo */
-                    background-size: cover; /* Opcional: cambia a cover para mejor ajuste */
+                    top: 35%;
+                    background-position: center bottom;
+                    background-size: cover;
                 }
             }
 
-            /* Ajustes para móviles pequeños (max 480px) */
             @media (max-width: 480px) {
                 body::before {
-                    top: 40%; /* Mueve la imagen aún más abajo */
-                    background-position: center bottom; /* Posición centrada hacia abajo */
-                    background-size: cover; /* Cambia a cover para móviles pequeños */
-                    opacity: 0.15; /* Opcional: reduce más la opacidad en móviles */
+                    top: 40%;
+                    background-position: center bottom;
+                    background-size: cover;
+                    opacity: 0.15;
                 }
             }
 
-            /* Alternativa: Si quieres que la imagen esté completamente abajo en móviles */
             @media (max-width: 767px) {
                 body::before {
-                    top: auto; /* Elimina el top */
-                    bottom: 0; /* Posiciona desde abajo */
-                    height: 60%; /* Reduce la altura para que no ocupe toda la pantalla */
+                    top: auto;
+                    bottom: 0;
+                    height: 60%;
                     background-position: center bottom;
                 }
+            }
+
+            /* ESTILOS PARA EL MODAL - ESTO ES LO QUE FALTABA */
+            .modal {
+                display: none; /* Oculto por defecto */
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.6);
+                backdrop-filter: blur(3px);
+                animation: fadeIn 0.3s ease;
+            }
+
+            .modal-content {
+                background-color: #ffffff;
+                margin: 5% auto;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                width: 90%;
+                max-width: 700px;
+                max-height: 85vh;
+                overflow-y: auto;
+                position: relative;
+                animation: slideIn 0.3s ease;
+            }
+
+            .close {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                position: absolute;
+                right: 20px;
+                top: 15px;
+                cursor: pointer;
+                transition: color 0.3s ease;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: #e74c3c;
+                text-decoration: none;
+            }
+
+            #modalTitle {
+                color: #2c3e50;
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 20px;
+                margin-right: 40px; /* Espacio para el botón cerrar */
+                line-height: 1.3;
+            }
+
+            .presentation-details {
+                text-align: left;
+                line-height: 1.6;
+            }
+
+            .presentation-details p {
+                margin-bottom: 12px;
+                color: #34495e;
+            }
+
+            .presentation-details strong {
+                color: #2c3e50;
+                font-weight: 600;
+            }
+
+            .presentation-details hr {
+                margin: 20px 0;
+                border: none;
+                border-top: 2px solid #ecf0f1;
+            }
+
+            /* Animaciones para el modal */
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes slideIn {
+                from { 
+                    transform: translateY(-50px);
+                    opacity: 0;
+                }
+                to { 
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            /* Estilos para thumbnails */
+            .presentation-thumbnail {
+                position: relative;
+                width: 100%;
+                height: 200px;
+                border-radius: 12px;
+                overflow: hidden;
+            }
+
+            .thumbnail-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 12px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            .thumbnail-placeholder {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 4rem;
+                opacity: 0.8;
+                background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                border-radius: 12px;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+            /* Estilos para video de bienvenida */
+            .welcome-video-section {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 30px;
+                margin-bottom: 40px;
+                text-align: center;
+            }
+
+            .welcome-video-section h2 {
+                color: #2c3e50;
+                margin-bottom: 20px;
+                font-size: 1.8rem;
+            }
+
+            .welcome-video-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                border-radius: 15px;
+                overflow: hidden;
+            }
+
+            .welcome-video {
+                width: 100%;
+                height: auto;
+                min-height: 300px;
+            }
+
+            /* Responsive para móviles */
+            @media (max-width: 768px) {
+                .modal-content {
+                    margin: 10% auto;
+                    padding: 20px;
+                    width: 95%;
+                }
+
+                #modalTitle {
+                    font-size: 1.3rem;
+                    margin-right: 35px;
+                }
+
+                .close {
+                    font-size: 24px;
+                    right: 15px;
+                    top: 12px;
+                }
+
+                .welcome-video {
+                    min-height: 200px;
+                }
+                
+                .welcome-video-section {
+                    padding: 20px;
+                    margin-bottom: 30px;
+                }
+                
+                .welcome-video-section h2 {
+                    font-size: 1.5rem;
+                }
+            }
+
+            /* Mejorar botones en el modal */
+            .btn {
+                background-color: #3498db;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background-color 0.3s ease;
+                text-decoration: none;
+                display: inline-block;
+                margin: 5px;
+            }
+
+            .btn:hover {
+                background-color: #2980b9;
+            }
+
+            .btn-primary {
+                background-color: #3498db;
+            }
+
+            .btn-secondary {
+                background-color: #95a5a6;
+            }
+
+            .btn-secondary:hover {
+                background-color: #7f8c8d;
+            }
+
+            /* Estilos para la información destacada en el modal */
+            .presentation-details .highlight-box {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 10px;
+                margin: 15px 0;
+                border-left: 4px solid #3498db;
+            }
+
+            .presentation-details .highlight-box p {
+                margin: 0;
+            }
+
+            .presentation-details .highlight-box strong {
+                color: #3498db;
             }
         </style>
     </head>
@@ -159,7 +394,7 @@
             <div id="modalContent">
                 <p>La presentación se está cargando...</p>
             </div>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 20px; text-align: center;">
                 <button class="btn btn-primary" onclick="closeModal()">Cerrar</button>
             </div>
         </div>
@@ -172,12 +407,20 @@
         // Función para ver presentación
         async function viewPresentation(presentationId) {
             try {
+                console.log('🔍 Intentando cargar presentación ID:', presentationId);
+                
                 // Mostrar modal con loading
                 document.getElementById('modalContent').innerHTML = '<p>Cargando detalles de la presentación...</p>';
                 document.getElementById('presentationModal').style.display = 'block';
                 
-                const response = await fetch(`/presentaciones/presentacion/${presentationId}/`);
+                const url = `/presentaciones/presentacion/${presentationId}/`;
+                console.log('🌐 URL de la API:', url);
+                
+                const response = await fetch(url);
+                console.log('📡 Respuesta de la API:', response.status, response.statusText);
+                
                 const data = await response.json();
+                console.log('📦 Datos recibidos:', data);
                 
                 if (response.ok) {
                     document.getElementById('modalTitle').textContent = data.titulo;
@@ -187,11 +430,11 @@
                             <p><strong>Administración:</strong> ${data.administracion}</p>
                             <p><strong>Fecha:</strong> ${data.fecha}</p>
                             <p><strong>Duración:</strong> ${data.duracion} minutos</p>
-                            <hr style="margin: 20px 0; border: none; border-top: 1px solid #ecf0f1;">
+                            <hr>
                             <p><strong>Descripción:</strong></p>
                             <p style="line-height: 1.6; color: #7f8c8d;">${data.descripcion}</p>
                             
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                            <div class="highlight-box">
                                 <p><strong>📊 Vista previa de la presentación</strong></p>
                                 <p style="color: #666;">
                                     ${data.tiene_pdf ? 
@@ -206,14 +449,18 @@
                     document.getElementById('modalContent').innerHTML = `
                         <div style="text-align: center; padding: 20px;">
                             <p style="color: #e74c3c;">❌ Error al cargar la presentación</p>
+                            <p style="color: #666; font-size: 14px;">Código de error: ${response.status}</p>
+                            <p style="color: #666; font-size: 12px;">URL: ${url}</p>
                         </div>
                     `;
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('💥 Error:', error);
                 document.getElementById('modalContent').innerHTML = `
                     <div style="text-align: center; padding: 20px;">
                         <p style="color: #e74c3c;">🔌 Error de conexión</p>
+                        <p style="color: #666; font-size: 14px;">Detalles: ${error.message}</p>
+                        <p style="color: #666; font-size: 12px;">URL intentada: /presentaciones/presentacion/${presentationId}/</p>
                     </div>
                 `;
             }
@@ -231,231 +478,55 @@
             }
         }
 
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
-        // Manejo de imágenes de thumbnail
-        const thumbnailImages = document.querySelectorAll('.thumbnail-image');
-        
-        thumbnailImages.forEach(img => {
-            const container = img.closest('.presentation-thumbnail');
+            // Manejo de imágenes de thumbnail
+            const thumbnailImages = document.querySelectorAll('.thumbnail-image');
             
-            img.onload = function() {
-                // Imagen cargada exitosamente
-                container.classList.add('has-image');
-                this.style.opacity = '1';
-            };
-            
-            img.onerror = function() {
-                // Error al cargar imagen - mostrar placeholder
-                container.classList.remove('has-image');
-                this.style.display = 'none';
+            thumbnailImages.forEach(img => {
+                const container = img.closest('.presentation-thumbnail');
                 
-                // Crear placeholder si no existe
-                if (!container.querySelector('.thumbnail-placeholder')) {
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'thumbnail-placeholder';
-                    placeholder.textContent = '📊';
-                    container.appendChild(placeholder);
-                }
-            };
-            
-            // Si la imagen ya está en caché, trigger onload manualmente
-            if (img.complete && img.naturalHeight !== 0) {
-                img.onload();
-            }
-        });
-
-        // Animaciones de entrada existentes
-        const cards = document.querySelectorAll('.presentation-card');
-        cards.forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(50px)';
-            
-            setTimeout(() => {
-                card.style.transition = 'all 0.6s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 100);
-        });
-    });
-
-    // Agregar este script temporalmente para debug
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DEBUG CSS THUMBNAILS ===');
-    
-    const thumbnails = document.querySelectorAll('.presentation-thumbnail');
-    
-    thumbnails.forEach((thumb, index) => {
-        console.log(`Thumbnail ${index}:`);
-        console.log('- Classes:', thumb.className);
-        console.log('- Has image:', thumb.querySelector('img') !== null);
-        
-        // Verificar estilos computados del ::before
-        const beforeStyle = window.getComputedStyle(thumb, '::before');
-        console.log('- ::before content:', beforeStyle.content);
-        console.log('- ::before display:', beforeStyle.display);
-        
-        // Forzar eliminación con JavaScript si es necesario
-        const style = document.createElement('style');
-        style.textContent = `
-            .presentation-thumbnail:nth-child(${index + 1})::before {
-                content: none !important;
-                display: none !important;
-            }
-        `;
-        document.head.appendChild(style);
-    });
-});
-
-// Script para debuggear media queries específicamente
-console.log('=== DEBUGGEANDO MEDIA QUERIES ===');
-
-// 1. Verificar el ancho actual de la ventana
-console.log('Ancho de ventana:', window.innerWidth + 'px');
-
-// 2. Verificar si las media queries están funcionando
-function testMediaQuery(query, name) {
-    const mq = window.matchMedia(query);
-    console.log(`${name} (${query}):`, mq.matches ? 'SÍ APLICA' : 'No aplica');
-    return mq.matches;
-}
-
-// Probar diferentes media queries
-console.log('--- TESTING MEDIA QUERIES ---');
-testMediaQuery('(max-width: 480px)', 'Móvil pequeño');
-testMediaQuery('(min-width: 481px) and (max-width: 767px)', 'Móvil grande');
-testMediaQuery('(min-width: 768px) and (max-width: 991px)', 'Tablet');
-testMediaQuery('(min-width: 992px)', 'Desktop');
-
-// 3. Verificar todas las reglas CSS (incluyendo media queries)
-console.log('--- TODAS LAS REGLAS CSS ---');
-const sheets = Array.from(document.styleSheets);
-let mediaRulesFound = 0;
-
-sheets.forEach((sheet, sheetIndex) => {
-    try {
-        const rules = Array.from(sheet.cssRules || sheet.rules);
-        rules.forEach((rule, ruleIndex) => {
-            if (rule.type === CSSRule.MEDIA_RULE) {
-                mediaRulesFound++;
-                console.log(`Media Rule ${mediaRulesFound}:`, rule.conditionText);
+                img.onload = function() {
+                    container.classList.add('has-image');
+                    this.style.opacity = '1';
+                };
                 
-                // Verificar si tiene reglas para header-logo
-                const innerRules = Array.from(rule.cssRules);
-                innerRules.forEach(innerRule => {
-                    if (innerRule.selectorText && innerRule.selectorText.includes('.header-logo')) {
-                        console.log(`  ↳ Header-logo rule:`, innerRule.cssText);
+                img.onerror = function() {
+                    container.classList.remove('has-image');
+                    this.style.display = 'none';
+                    
+                    if (!container.querySelector('.thumbnail-placeholder')) {
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'thumbnail-placeholder';
+                        placeholder.textContent = '📊';
+                        container.appendChild(placeholder);
                     }
-                });
-            }
+                };
+                
+                if (img.complete && img.naturalHeight !== 0) {
+                    img.onload();
+                }
+            });
+
+            // Animaciones de entrada
+            const cards = document.querySelectorAll('.presentation-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
         });
-    } catch (e) {
-        console.log(`Error accediendo hoja ${sheetIndex}:`, e.message);
-    }
-});
-
-console.log(`Total media rules encontradas: ${mediaRulesFound}`);
-
-// 4. Verificar estilos computados en diferentes tamaños
-const headerLogo = document.querySelector('.header-logo');
-if (headerLogo) {
-    const computedStyle = window.getComputedStyle(headerLogo);
-    console.log('--- ESTILOS COMPUTADOS ACTUALES ---');
-    console.log('Width:', computedStyle.width);
-    console.log('Height:', computedStyle.height);
-    console.log('Position:', computedStyle.position);
-    console.log('Left:', computedStyle.left);
-    console.log('Top:', computedStyle.top);
-    console.log('Transform:', computedStyle.transform);
-}
     </script>
-
-    <style>
-        /* Estilos existentes para thumbnails */
-        .presentation-thumbnail {
-            position: relative;
-            width: 100%;
-            height: 200px;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .thumbnail-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 12px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .thumbnail-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            opacity: 0.8;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-radius: 12px;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* NUEVOS ESTILOS PARA VIDEO DE BIENVENIDA */
-        .welcome-video-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .welcome-video-section h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-        }
-
-        .welcome-video-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-        .welcome-video {
-            width: 100%;
-            height: auto;
-            min-height: 300px;
-        }
-
-        .presentation-details {
-            text-align: left;
-        }
-
-        .presentation-details p {
-            margin-bottom: 10px;
-        }
-
-        /* Responsive para videos */
-        @media (max-width: 768px) {
-            .welcome-video {
-                min-height: 200px;
-            }
-            
-            .welcome-video-section {
-                padding: 20px;
-                margin-bottom: 30px;
-            }
-            
-            .welcome-video-section h2 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
 </body>
 </html>
