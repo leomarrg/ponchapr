@@ -9,6 +9,7 @@ class Administracion(models.Model):
         ('MPG PR', 'ManpowerGroup Puerto Rico'),
         ('acuden', 'Administración para el Cuidado y Desarrollo Integral de la Niñez'),
         ('div analisis social', 'División de Análisis Social y Políticas, Estudios Técnicos, Inc.'),
+        ('2Gen', 'Centros 2Gen')
     ]
     
     codigo = models.CharField(max_length=20, choices=TIPOS_CHOICES, unique=True)
