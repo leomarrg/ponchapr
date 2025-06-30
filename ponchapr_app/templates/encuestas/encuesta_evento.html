@@ -348,7 +348,7 @@
                     updateCharCounter(this);
                     // Limpiar mensajes de error de comentarios cuando el usuario empiece a escribir
                     const errorMsg = this.parentElement.querySelector('.validation-message');
-                    if (errorMsg && this.value.trim().length >= 10) {
+                    if (errorMsg && this.value.trim().length >= 0) {
                         errorMsg.style.display = 'none';
                     }
                 });
