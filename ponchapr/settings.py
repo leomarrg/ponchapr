@@ -142,9 +142,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-LOGIN_URL = '/accounts/login/'          # Página de login personalizada
-LOGIN_REDIRECT_URL = '/dashboard/'      # Después del login van al dashboard
-LOGOUT_REDIRECT_URL = '/accounts/login/' # Después del logout van al login
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
