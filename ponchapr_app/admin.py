@@ -171,7 +171,7 @@ class AttendeeAdmin(admin.ModelAdmin):
         'organization', 
         'email', 
         'phone_number',
-        'marked_as_arrived', 
+        'marked_as_arrived_button', 
         'arrived',
         'arrival_time', 
         'event',
