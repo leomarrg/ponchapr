@@ -37,6 +37,19 @@ def dashboard_admin(request):
     """Dashboard administrativo para gestión de respuestas"""
     respuestas = RespuestaEncuesta.objects.all().order_by('-creado_en')
     
+    # Filtros
+    search_query = request.GET.get('search', '')
+    if search_query:
+        respuestas = respuestas.filter(comentarios__icontains=search_query)
+    
+    fecha_filter = request.GET.get('fecha', 'all')
+    if fecha_filter == 'today':
+        respuestas = respuestas.filter(creado_en__date=timezone.now().date())
+    elif fecha_filter == 'week':
+        respuestas = respuestas.filter(creado_en__date__gte=timezone.now().date() - timedelta(days=7))
+    elif fecha_filter == 'month':
+        respuestas = respuestas.filter(creado_en__date__gte=timezone.now().date() - timedelta(days=30))
+    
     # Paginación
     paginator = Paginator(respuestas, 25)
     page_number = request.GET.get('page')
@@ -47,7 +60,7 @@ def dashboard_admin(request):
     
     # Calcular promedio de calificaciones
     promedios = []
-    for respuesta in respuestas:
+    for respuesta in RespuestaEncuesta.objects.all():
         promedio = respuesta.calificacion_promedio()
         if promedio > 0:
             promedios.append(promedio)
@@ -56,16 +69,13 @@ def dashboard_admin(request):
     
     # Respuestas de hoy
     hoy = timezone.now().date()
-    respuestas_hoy = respuestas.filter(creado_en__date=hoy).count()
-    
+    respuestas_hoy = RespuestaEncuesta.objects.filter(creado_en__date=hoy).count()
+
     # Tasa de completitud
-    respuestas_completas = sum(1 for r in respuestas if r.esta_completa())
-    tasa_completitud = (respuestas_completas / total_respuestas * 100) if total_respuestas > 0 else 0
-    
-    # Filtros
-    filtro_fecha = request.GET.get('fecha', 'all')
-    filtro_calificacion = request.GET.get('calificacion', 'all')
-    
+    todas_respuestas = RespuestaEncuesta.objects.all()
+    respuestas_completas = sum(1 for r in todas_respuestas if r.esta_completa())
+    tasa_completitud = (respuestas_completas / todas_respuestas.count() * 100) if todas_respuestas.count() > 0 else 0
+
     context = {
         'page_obj': page_obj,
         'respuestas': page_obj.object_list,
@@ -73,8 +83,7 @@ def dashboard_admin(request):
         'promedio_calificacion': round(promedio_general, 1),
         'respuestas_hoy': respuestas_hoy,
         'tasa_completitud': round(tasa_completitud),
-        'filtro_fecha': filtro_fecha,
-        'filtro_calificacion': filtro_calificacion,
+        'filtro_fecha': fecha_filter,
     }
     return render(request, 'presentaciones/dashboard.html', context)
 

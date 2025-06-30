@@ -1,3 +1,4 @@
+# encuestas/models.py
 from django.db import models
 
 class RespuestaEncuesta(models.Model):
@@ -7,43 +8,43 @@ class RespuestaEncuesta(models.Model):
         ('incompleta', 'Incompleta'),
     ]
     
-    # Evaluaciones por administración
-    evaluacion_adfan = models.CharField(
+    # Nuevas evaluaciones por presentación
+    evaluacion_indice_bienestar = models.CharField(
         max_length=20, 
         choices=CALIFICACION_CHOICES, 
         blank=True,
-        verbose_name="ADFAN"
+        verbose_name="Índice de Bienestar de la Niñez y la Juventud"
     )
-    evaluacion_acuden = models.CharField(
+    evaluacion_tendencias_laborales = models.CharField(
         max_length=20, 
         choices=CALIFICACION_CHOICES, 
         blank=True,
-        verbose_name="ACUDEN"
+        verbose_name="Tendencias Laborales en Puerto Rico"
     )
-    evaluacion_adsef = models.CharField(
+    evaluacion_panel_emprender = models.CharField(
         max_length=20, 
         choices=CALIFICACION_CHOICES, 
         blank=True,
-        verbose_name="ADSEF"
+        verbose_name="Panel: Apoyos y Oportunidades para Emprender"
     )
-    evaluacion_asume = models.CharField(
+    evaluacion_plan_decenal = models.CharField(
         max_length=20, 
         choices=CALIFICACION_CHOICES, 
         blank=True,
-        verbose_name="ASUME"
+        verbose_name="Plan Decenal para Combatir la Pobreza Infantil"
     )
-    evaluacion_secretariado = models.CharField(
+    evaluacion_panel_bigeneracional = models.CharField(
         max_length=20, 
         choices=CALIFICACION_CHOICES, 
         blank=True,
-        verbose_name="Secretariado"
+        verbose_name="Panel: Iniciativas Bigeneracionales"
     )
     
-    # Comentarios
+    # Comentarios ahora obligatorios
     comentarios = models.TextField(
-        blank=True, 
         max_length=1000,
-        verbose_name="Comentarios adicionales"
+        verbose_name="Comentarios adicionales",
+        help_text="Campo obligatorio: Comparta sus comentarios, sugerencias o solicitudes de información adicional"
     )
     
     # Metadatos
@@ -62,11 +63,11 @@ class RespuestaEncuesta(models.Model):
     def calificacion_promedio(self):
         """Calcula el promedio de calificaciones"""
         calificaciones = [
-            self.evaluacion_adfan,
-            self.evaluacion_acuden, 
-            self.evaluacion_adsef,
-            self.evaluacion_asume,
-            self.evaluacion_secretariado
+            self.evaluacion_indice_bienestar,
+            self.evaluacion_tendencias_laborales, 
+            self.evaluacion_panel_emprender,
+            self.evaluacion_plan_decenal,
+            self.evaluacion_panel_bigeneracional
         ]
         
         valores = []
@@ -83,10 +84,10 @@ class RespuestaEncuesta(models.Model):
     def esta_completa(self):
         """Verifica si la encuesta está completa"""
         evaluaciones = [
-            self.evaluacion_adfan,
-            self.evaluacion_acuden,
-            self.evaluacion_adsef,
-            self.evaluacion_asume,
-            self.evaluacion_secretariado
+            self.evaluacion_indice_bienestar,
+            self.evaluacion_tendencias_laborales,
+            self.evaluacion_panel_emprender,
+            self.evaluacion_plan_decenal,
+            self.evaluacion_panel_bigeneracional
         ]
-        return all(evaluaciones)
+        return all(evaluaciones) and bool(self.comentarios and self.comentarios.strip())

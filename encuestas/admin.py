@@ -1,3 +1,4 @@
+# encuestas/admin.py
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import RespuestaEncuesta
@@ -7,38 +8,41 @@ class RespuestaEncuestaAdmin(admin.ModelAdmin):
     list_display = [
         'id', 
         'creado_en_formateado', 
-        'evaluacion_adfan', 
-        'evaluacion_acuden',
-        'evaluacion_adsef',
-        'evaluacion_asume', 
-        'evaluacion_secretariado',
+        'evaluacion_indice_bienestar', 
+        'evaluacion_tendencias_laborales',
+        'evaluacion_panel_emprender',
+        'evaluacion_plan_decenal', 
+        'evaluacion_panel_bigeneracional',
         'promedio_display',
-        'completa_display'
+        'completa_display',
+        'comentarios_preview'
     ]
     list_filter = [
         'creado_en', 
-        'evaluacion_adfan', 
-        'evaluacion_acuden',
-        'evaluacion_adsef',
-        'evaluacion_asume',
-        'evaluacion_secretariado'
+        'evaluacion_indice_bienestar', 
+        'evaluacion_tendencias_laborales',
+        'evaluacion_panel_emprender',
+        'evaluacion_plan_decenal',
+        'evaluacion_panel_bigeneracional'
     ]
     readonly_fields = ['creado_en', 'ip_address', 'user_agent', 'calificacion_promedio']
     search_fields = ['comentarios']
     date_hierarchy = 'creado_en'
     
     fieldsets = (
-        ('Evaluaciones por Administración', {
+        ('Evaluaciones por Presentación', {
             'fields': (
-                'evaluacion_adfan',
-                'evaluacion_acuden', 
-                'evaluacion_adsef',
-                'evaluacion_asume',
-                'evaluacion_secretariado'
-            )
+                'evaluacion_indice_bienestar',
+                'evaluacion_tendencias_laborales', 
+                'evaluacion_panel_emprender',
+                'evaluacion_plan_decenal',
+                'evaluacion_panel_bigeneracional'
+            ),
+            'description': 'Evaluación de cada presentación del Primer Conversatorio para la Erradicación de la Pobreza Infantil'
         }),
-        ('Comentarios', {
-            'fields': ('comentarios',)
+        ('Comentarios Obligatorios', {
+            'fields': ('comentarios',),
+            'description': 'Comentarios y sugerencias del participante (campo obligatorio)'
         }),
         ('Metadatos', {
             'fields': ('creado_en', 'ip_address', 'user_agent', 'calificacion_promedio'),
@@ -70,3 +74,10 @@ class RespuestaEncuestaAdmin(admin.ModelAdmin):
         else:
             return format_html('<span style="color: red;">✗ Incompleta</span>')
     completa_display.short_description = 'Estado'
+    
+    def comentarios_preview(self, obj):
+        if obj.comentarios:
+            preview = obj.comentarios[:50] + '...' if len(obj.comentarios) > 50 else obj.comentarios
+            return format_html('<span title="{}">{}</span>', obj.comentarios, preview)
+        return format_html('<span style="color: #ccc;">Sin comentarios</span>')
+    comentarios_preview.short_description = 'Comentarios (Vista Previa)'

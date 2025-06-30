@@ -4,17 +4,17 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Evaluación de Presentaciones - Departamento de la Familia</title>
+        <title>Evaluación de Presentaciones - 1er Conversatorio para la Erradicación de la Pobreza Infantil</title>
         <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20240624-fix">
         <style>
             body::before {
                 content: "";
                 position: absolute;
-                top: 0; 
-                left: 0;
-                width: 100%;
+                top: 5%; 
+                left: 20%;
+                width: 70%;
                 height: 100%;
-                background: url("{% static 'img/Escudo@2x.png' %}") no-repeat right top;
+                background: url("{% static 'css/img/kids.png' %}") no-repeat right top;
                 background-size: contain;
                 opacity: 0.2;
                 z-index: -1;
@@ -25,7 +25,7 @@
     <div class="survey-header">
         <div class="logo-section">
             <div class="header-logo">
-                <img src="{% static 'img/DEPTO_FAMILIA@4x.png' %}" alt="Escudo del Departamento de la Familia">
+                <img src="{% static 'css/img/DEPTO_FAMILIA@4x.png' %}" alt="Escudo del Departamento de la Familia">
             </div>
             <h1>Evaluación de Presentaciones</h1>
             <p>Departamento de la Familia</p>
@@ -43,12 +43,15 @@
 
             <div class="objective-section">
                 <h3>Objetivo</h3>
-                <p>Conocer su opinión sobre la calidad y utilidad de la información presentada por cada una de las administraciones.</p>
+                <p>Conocer su opinión sobre la calidad y utilidad de la información presentada en cada una de las presentaciones del conversatorio.</p>
             </div>
 
             <div class="instructions">
                 <h4>Instrucciones</h4>
-                <p>Por favor, marque la opción que mejor describa su opinión sobre cada presentación.</p>
+                <p>Por favor, marque la opción que mejor describa su opinión sobre cada presentación y comparta sus comentarios.</p>
+                <div class="required-notice">
+                    <strong>Importante:</strong> Todos los campos son obligatorios, incluyendo los comentarios.
+                </div>
             </div>
 
             <div class="progress-bar">
@@ -60,115 +63,118 @@
                 
                 <div class="section">
                     <div class="section-title">
-                        1. Evaluación por Administración <span class="required-indicator">*</span>
+                        1. Evaluación por Presentación <span class="required-indicator">*</span>
                     </div>
 
-                    <!-- ADFAN -->
+                    <!-- Índice de Bienestar -->
                     <div class="administration-block">
-                        <div class="admin-title">a) Administración de Familias y Niños (ADFAN)</div>
+                        <div class="admin-title">a) Índice de Bienestar de la Niñez y la Juventud</div>
                         <div class="admin-subtitle">La información presentada fue:</div>
                         <div class="radio-group">
-                            {% for choice in form.evaluacion_adfan %}
-                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_adfan', '{{ choice.choice_value }}')">
+                            {% for choice in form.evaluacion_indice_bienestar %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_indice_bienestar', '{{ choice.choice_value }}')">
                                     {{ choice.tag }}
                                     <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                                 </div>
                             {% endfor %}
                         </div>
-                        {% if form.evaluacion_adfan.errors %}
+                        {% if form.evaluacion_indice_bienestar.errors %}
                             <div class="validation-message" style="display: block;">
-                                {{ form.evaluacion_adfan.errors.0 }}
+                                {{ form.evaluacion_indice_bienestar.errors.0 }}
                             </div>
                         {% endif %}
                     </div>
 
-                    <!-- ACUDEN -->
+                    <!-- Tendencias Laborales -->
                     <div class="administration-block">
-                        <div class="admin-title">b) Administración para el Cuidado y Desarrollo Integral de la Niñez (ACUDEN)</div>
+                        <div class="admin-title">b) Tendencias Laborales en Puerto Rico</div>
                         <div class="admin-subtitle">La información presentada fue:</div>
                         <div class="radio-group">
-                            {% for choice in form.evaluacion_acuden %}
-                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_acuden', '{{ choice.choice_value }}')">
+                            {% for choice in form.evaluacion_tendencias_laborales %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_tendencias_laborales', '{{ choice.choice_value }}')">
                                     {{ choice.tag }}
                                     <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                                 </div>
                             {% endfor %}
                         </div>
-                        {% if form.evaluacion_acuden.errors %}
+                        {% if form.evaluacion_tendencias_laborales.errors %}
                             <div class="validation-message" style="display: block;">
-                                {{ form.evaluacion_acuden.errors.0 }}
+                                {{ form.evaluacion_tendencias_laborales.errors.0 }}
                             </div>
                         {% endif %}
                     </div>
 
-                    <!-- ADSEF -->
+                    <!-- Panel Emprender -->
                     <div class="administration-block">
-                        <div class="admin-title">c) Administración de Desarrollo Socioeconómico de la Familia (ADSEF)</div>
+                        <div class="admin-title">c) Panel: Apoyos y Oportunidades para Emprender</div>
                         <div class="admin-subtitle">La información presentada fue:</div>
                         <div class="radio-group">
-                            {% for choice in form.evaluacion_adsef %}
-                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_adsef', '{{ choice.choice_value }}')">
+                            {% for choice in form.evaluacion_panel_emprender %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_panel_emprender', '{{ choice.choice_value }}')">
                                     {{ choice.tag }}
                                     <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                                 </div>
                             {% endfor %}
                         </div>
-                        {% if form.evaluacion_adsef.errors %}
+                        {% if form.evaluacion_panel_emprender.errors %}
                             <div class="validation-message" style="display: block;">
-                                {{ form.evaluacion_adsef.errors.0 }}
+                                {{ form.evaluacion_panel_emprender.errors.0 }}
                             </div>
                         {% endif %}
                     </div>
 
-                    <!-- ASUME -->
+                    <!-- Plan Decenal -->
                     <div class="administration-block">
-                        <div class="admin-title">d) Administración para el Sustento de Menores (ASUME)</div>
+                        <div class="admin-title">d) Plan Decenal para Combatir la Pobreza Infantil y la Desigualdad Social en Puerto Rico</div>
                         <div class="admin-subtitle">La información presentada fue:</div>
                         <div class="radio-group">
-                            {% for choice in form.evaluacion_asume %}
-                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_asume', '{{ choice.choice_value }}')">
+                            {% for choice in form.evaluacion_plan_decenal %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_plan_decenal', '{{ choice.choice_value }}')">
                                     {{ choice.tag }}
                                     <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                                 </div>
                             {% endfor %}
                         </div>
-                        {% if form.evaluacion_asume.errors %}
+                        {% if form.evaluacion_plan_decenal.errors %}
                             <div class="validation-message" style="display: block;">
-                                {{ form.evaluacion_asume.errors.0 }}
+                                {{ form.evaluacion_plan_decenal.errors.0 }}
                             </div>
                         {% endif %}
                     </div>
 
-                    <!-- Secretariado -->
+                    <!-- Panel Bigeneracional -->
                     <div class="administration-block">
-                        <div class="admin-title">e) Secretariado del Departamento de la Familia</div>
+                        <div class="admin-title">e) Panel: Iniciativas Bigeneracionales</div>
                         <div class="admin-subtitle">La información presentada fue:</div>
                         <div class="radio-group">
-                            {% for choice in form.evaluacion_secretariado %}
-                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_secretariado', '{{ choice.choice_value }}')">
+                            {% for choice in form.evaluacion_panel_bigeneracional %}
+                                <div class="radio-option" onclick="selectOption(this, 'evaluacion_panel_bigeneracional', '{{ choice.choice_value }}')">
                                     {{ choice.tag }}
                                     <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
                                 </div>
                             {% endfor %}
                         </div>
-                        {% if form.evaluacion_secretariado.errors %}
+                        {% if form.evaluacion_panel_bigeneracional.errors %}
                             <div class="validation-message" style="display: block;">
-                                {{ form.evaluacion_secretariado.errors.0 }}
+                                {{ form.evaluacion_panel_bigeneracional.errors.0 }}
                             </div>
                         {% endif %}
                     </div>
 
                     <div class="validation-message" id="evaluationError">
-                        Por favor, complete la evaluación de todas las administraciones.
+                        Por favor, complete la evaluación de todas las presentaciones.
                     </div>
                 </div>
 
                 <div class="section">
-                    <div class="section-title">2. Comentarios adicionales</div>
+                    <div class="section-title">2. Comentarios adicionales <span class="required-indicator">*</span></div>
                     
                     <div class="comments-section">
                         <div class="comments-title">¿Desea añadir algún comentario o sugerencia sobre las presentaciones?</div>
                         <div class="comments-subtitle">O desea mayor información sobre un programa en particular?</div>
+                        <div class="required-notice" style="margin: 10px 0; font-size: 0.9em;">
+                            <strong>Campo obligatorio:</strong> Sus comentarios son muy importantes para mejorar futuros eventos.
+                        </div>
                         
                         <div class="textarea-container">
                             {{ form.comentarios }}
@@ -210,7 +216,7 @@
 
     <script>
         // Variables para el seguimiento del progreso
-        const administrations = ['evaluacion_adfan', 'evaluacion_acuden', 'evaluacion_adsef', 'evaluacion_asume', 'evaluacion_secretariado'];
+        const administrations = ['evaluacion_indice_bienestar', 'evaluacion_tendencias_laborales', 'evaluacion_panel_emprender', 'evaluacion_plan_decenal', 'evaluacion_panel_bigeneracional'];
         let completedEvaluations = new Set();
 
         // Seleccionar opción de radio
@@ -259,12 +265,25 @@
         function validateForm() {
             let isValid = true;
             
-            // Verificar que todas las administraciones estén evaluadas
+            // Verificar que todas las presentaciones estén evaluadas
             for (let admin of administrations) {
                 const selected = document.querySelector(`input[name="${admin}"]:checked`);
                 if (!selected) {
                     isValid = false;
                     break;
+                }
+            }
+            
+            // Verificar comentarios obligatorios
+            const comentarios = document.querySelector('textarea[name="comentarios"]');
+            if (!comentarios.value.trim() || comentarios.value.trim().length < 10) {
+                isValid = false;
+                if (!document.querySelector('.comments-section .validation-message')) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'validation-message';
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = 'Los comentarios son obligatorios y deben tener al menos 10 caracteres.';
+                    comentarios.parentElement.appendChild(errorDiv);
                 }
             }
             
@@ -302,6 +321,9 @@
                 document.querySelectorAll('.success-message').forEach(msg => {
                     msg.style.display = 'none';
                 });
+                document.querySelectorAll('.validation-message').forEach(msg => {
+                    msg.style.display = 'none';
+                });
             }
         }
 
@@ -324,6 +346,11 @@
             if (textarea) {
                 textarea.addEventListener('input', function() {
                     updateCharCounter(this);
+                    // Limpiar mensajes de error de comentarios cuando el usuario empiece a escribir
+                    const errorMsg = this.parentElement.querySelector('.validation-message');
+                    if (errorMsg && this.value.trim().length >= 10) {
+                        errorMsg.style.display = 'none';
+                    }
                 });
                 updateCharCounter(textarea);
             }
@@ -341,7 +368,7 @@
     </script>
 
 <style>
-    /* Estilos específicos para la encuesta con logo centralizado */
+    /* Estilos específicos para la nueva encuesta */
     .logo-section {
         display: flex;
         flex-direction: column;
@@ -356,6 +383,8 @@
         transform: none !important;
         width: 400px !important;
         height: 400px !important;
+        margin-bottom: -40px !important;
+        margin-top: -10px;
     }
     
     .logo-section .header-logo img {
@@ -365,7 +394,31 @@
         object-fit: contain;
     }
     
-    /* MEJORAR TEXTAREA - AGREGAR ESTO */
+    .logo-section h2 {
+        color: #2c3e50;
+        font-size: 1.3rem;
+        margin: 10px 0;
+        font-weight: 600;
+    }
+    
+    /* Indicador de campo obligatorio */
+    .required-indicator {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    
+    .required-notice {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 15px 0;
+        color: #856404;
+        font-weight: 500;
+    }
+    
+    /* Mejorar textarea para comentarios obligatorios */
     .textarea-container {
         position: relative;
         margin-top: 15px;
@@ -374,62 +427,66 @@
     .comments-textarea,
     textarea[name="comentarios"] {
         width: 100%;
-        min-height: 120px;
-        padding: 15px 20px;
-        border: 2px solid #ecf0f1 !important;
+        min-height: 140px;
+        padding: 20px;
+        border: 3px solid #3498db !important;
         border-radius: 12px !important;
         font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif !important;
         font-size: 1rem !important;
         line-height: 1.6 !important;
         color: #2c3e50 !important;
-        background: #fafbfc !important;
+        background: #f8f9fc !important;
         resize: vertical;
         transition: all 0.3s ease !important;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.1) !important;
     }
     
     .comments-textarea:focus,
     textarea[name="comentarios"]:focus {
         outline: none !important;
-        border-color: #3498db !important;
+        border-color: #e74c3c !important;
         background: #fff !important;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+        box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.15) !important;
         transform: translateY(-2px);
     }
     
     .comments-textarea::placeholder,
     textarea[name="comentarios"]::placeholder {
-        color: #95a5a6 !important;
+        color: #7f8c8d !important;
         font-style: italic;
+        font-weight: 500;
     }
     
     .char-counter {
         position: absolute;
-        bottom: 10px;
-        right: 15px;
+        bottom: 12px;
+        right: 18px;
         color: #95a5a6;
-        font-size: 0.85rem;
-        font-weight: 600;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 2px 6px;
-        border-radius: 6px;
-        border: 1px solid #ecf0f1;
+        font-size: 0.9rem;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 4px 8px;
+        border-radius: 8px;
+        border: 2px solid #ecf0f1;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
-    /* Responsive para textarea */
-    @media (max-width: 768px) {
-        .comments-textarea,
-        textarea[name="comentarios"] {
-            min-height: 100px;
-            padding: 12px 15px;
-            font-size: 0.95rem !important;
-        }
-        
-        .char-counter {
-            bottom: 8px;
-            right: 12px;
-            font-size: 0.8rem;
-        }
+    /* Estilos para validación de comentarios */
+    .validation-message {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-weight: 600;
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     /* Responsive para la encuesta */
@@ -445,12 +502,33 @@
             width: 270px !important;
             height: 270px !important;
         }
+        
+        .logo-section h2 {
+            font-size: 1.1rem;
+        }
+        
+        .comments-textarea,
+        textarea[name="comentarios"] {
+            min-height: 120px;
+            padding: 15px;
+            font-size: 0.95rem !important;
+        }
+        
+        .char-counter {
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+        }
     }
     
     @media (max-width: 480px) {
         .logo-section .header-logo {
             width: 220px !important;
             height: 220px !important;
+        }
+        
+        .logo-section h2 {
+            font-size: 1rem;
         }
     }
     
@@ -476,16 +554,18 @@
     
     /* Mejora visual para toda la sección de comentarios */
     .comments-section {
-        background: rgba(248, 249, 250, 0.5);
-        padding: 25px;
+        background: rgba(248, 249, 250, 0.8);
+        padding: 30px;
         border-radius: 15px;
-        border: 1px solid #ecf0f1;
+        border: 2px solid #3498db;
+        box-shadow: 0 4px 20px rgba(52, 152, 219, 0.1);
     }
     
     .comments-title {
         color: #2c3e50 !important;
         font-weight: 600 !important;
         margin-bottom: 8px !important;
+        font-size: 1.1rem !important;
     }
     
     .comments-subtitle {
@@ -509,6 +589,23 @@
             transform: translateY(0);
         }
     }
-    </style>
+    
+    /* Destacar mejor los títulos de las presentaciones */
+    .admin-title {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white !important;
+        padding: 12px 20px !important;
+        border-radius: 10px !important;
+        font-weight: 600 !important;
+        margin-bottom: 15px !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .admin-subtitle {
+        font-weight: 600 !important;
+        color: #34495e !important;
+        margin-bottom: 12px !important;
+    }
+</style>
 </body>
 </html>

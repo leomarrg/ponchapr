@@ -4,14 +4,14 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard Administrativo - Encuestas</title>
+        <title>Dashboard Administrativo - Evaluación Conversatorio</title>
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
 <body>
     <div class="admin-container">
         <div class="admin-header">
-            <h1>Panel de Administración - Encuestas</h1>
-            <p>Portal de Presentaciones - Gestión de respuestas y análisis de datos</p>
+            <h1>Panel de Administración - Evaluación de Presentaciones</h1>
+            <p>Primer Conversatorio para la Erradicación de la Pobreza Infantil en Puerto Rico</p>
             
             <div class="stats-grid">
                 <div class="stat-card">
@@ -26,6 +26,10 @@
                 <div class="stat-card">
                     <span class="stat-number">{{ respuestas_hoy }}</span>
                     <span class="stat-label">Respuestas Hoy</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">{{ promedio_calificacion }}</span>
+                    <span class="stat-label">Promedio General</span>
                 </div>
             </div>
         </div>
@@ -48,7 +52,7 @@
                             <option value="month" {% if filtro_fecha == 'month' %}selected{% endif %}>Este mes</option>
                         </select>
                         
-                        <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+                        <button type="submit" class="btn btn-primary">Filtrar</button>
                     </form>
                     <div class="admin-actions">
                         <a href="{% url 'admin:encuestas_respuestaencuesta_changelist' %}" class="btn btn-warning">
@@ -71,13 +75,14 @@
                         <tr>
                             <th>ID</th>
                             <th>Fecha</th>
-                            <th>ADFAN</th>
-                            <th>ACUDEN</th>
-                            <th>ADSEF</th>
-                            <th>ASUME</th>
-                            <th>Secretariado</th>
+                            <th>Índice Bienestar</th>
+                            <th>Tendencias Lab.</th>
+                            <th>Panel Emprender</th>
+                            <th>Plan Decenal</th>
+                            <th>Panel Bigener.</th>
                             <th>Comentarios</th>
                             <th>Estado</th>
+                            <th>Promedio</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -87,45 +92,45 @@
                             <td><strong>{{ respuesta.id }}</strong></td>
                             <td>{{ respuesta.creado_en|date:"d/m/Y H:i" }}</td>
                             <td>
-                                {% if respuesta.evaluacion_adfan %}
-                                    <span class="eval-badge eval-{{ respuesta.evaluacion_adfan }}">
-                                        {{ respuesta.get_evaluacion_adfan_display }}
+                                {% if respuesta.evaluacion_indice_bienestar %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_indice_bienestar }}">
+                                        {{ respuesta.get_evaluacion_indice_bienestar_display }}
                                     </span>
                                 {% else %}
                                     <span class="eval-badge eval-empty">-</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if respuesta.evaluacion_acuden %}
-                                    <span class="eval-badge eval-{{ respuesta.evaluacion_acuden }}">
-                                        {{ respuesta.get_evaluacion_acuden_display }}
+                                {% if respuesta.evaluacion_tendencias_laborales %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_tendencias_laborales }}">
+                                        {{ respuesta.get_evaluacion_tendencias_laborales_display }}
                                     </span>
                                 {% else %}
                                     <span class="eval-badge eval-empty">-</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if respuesta.evaluacion_adsef %}
-                                    <span class="eval-badge eval-{{ respuesta.evaluacion_adsef }}">
-                                        {{ respuesta.get_evaluacion_adsef_display }}
+                                {% if respuesta.evaluacion_panel_emprender %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_panel_emprender }}">
+                                        {{ respuesta.get_evaluacion_panel_emprender_display }}
                                     </span>
                                 {% else %}
                                     <span class="eval-badge eval-empty">-</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if respuesta.evaluacion_asume %}
-                                    <span class="eval-badge eval-{{ respuesta.evaluacion_asume }}">
-                                        {{ respuesta.get_evaluacion_asume_display }}
+                                {% if respuesta.evaluacion_plan_decenal %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_plan_decenal }}">
+                                        {{ respuesta.get_evaluacion_plan_decenal_display }}
                                     </span>
                                 {% else %}
                                     <span class="eval-badge eval-empty">-</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if respuesta.evaluacion_secretariado %}
-                                    <span class="eval-badge eval-{{ respuesta.evaluacion_secretariado }}">
-                                        {{ respuesta.get_evaluacion_secretariado_display }}
+                                {% if respuesta.evaluacion_panel_bigeneracional %}
+                                    <span class="eval-badge eval-{{ respuesta.evaluacion_panel_bigeneracional }}">
+                                        {{ respuesta.get_evaluacion_panel_bigeneracional_display }}
                                     </span>
                                 {% else %}
                                     <span class="eval-badge eval-empty">-</span>
@@ -144,30 +149,20 @@
                                 {% else %}
                                     <span class="no-comments">Sin comentarios</span>
                                 {% endif %}
-                                <!-- Modal para comentarios completos -->
-                                <div id="commentsModal" class="modal">
-                                    <div class="modal-content">
-                                        <span class="close" onclick="closeCommentsModal()">&times;</span>
-                                        <h2>Comentario Completo</h2>
-                                        <div id="fullCommentContent">
-                                            <!-- El comentario completo se cargará aquí -->
-                                        </div>
-                                        <div style="margin-top: 20px; text-align: center;">
-                                            <button class="btn btn-secondary" onclick="closeCommentsModal()">Cerrar</button>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
                             <td>
                                 {% if respuesta.esta_completa %}
-                                    <span class="status-badge status-complete">✓ Completa</span>
+                                    <span class="status-badge status-complete">Completa</span>
                                 {% else %}
-                                    <span class="status-badge status-partial">⚠ Incompleta</span>
+                                    <span class="status-badge status-partial">Incompleta</span>
                                 {% endif %}
                             </td>
+                            <td>
+                                <span class="promedio-badge">{{ respuesta.calificacion_promedio|floatformat:1 }}</span>
+                            </td>
                             <td class="response-actions">
-                                <button class="btn btn-primary btn-small" onclick="viewResponse({{ respuesta.id }})">👁️ Ver</button>
-                                <a href="{% url 'admin:encuestas_respuestaencuesta_change' respuesta.id %}" class="btn btn-secondary btn-small">✏️ Editar</a>
+                                <button class="btn btn-primary btn-small" onclick="viewResponse({{ respuesta.id }})">Ver</button>
+                                <a href="{% url 'admin:encuestas_respuestaencuesta_change' respuesta.id %}" class="btn btn-secondary btn-small">Editar</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -197,12 +192,26 @@
             {% else %}
             <div class="no-responses">
                 <div style="text-align: center; padding: 60px 20px; background: rgba(255, 255, 255, 0.9); border-radius: 20px;">
-                    <h3 style="color: #7f8c8d; margin-bottom: 15px;">📊 No hay respuestas disponibles</h3>
+                    <h3 style="color: #7f8c8d; margin-bottom: 15px;">No hay respuestas disponibles</h3>
                     <p style="color: #95a5a6;">Las respuestas aparecerán aquí cuando los usuarios completen la encuesta.</p>
-                    <a href="{% url 'encuestas:formulario' %}" class="btn btn-primary" style="margin-top: 20px;">📝 Ir al Formulario</a>
+                    <a href="{% url 'encuestas:formulario' %}" class="btn btn-primary" style="margin-top: 20px;">Ir al Formulario</a>
                 </div>
             </div>
             {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal para comentarios completos -->
+    <div id="commentsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCommentsModal()">&times;</span>
+            <h2>Comentario Completo</h2>
+            <div id="fullCommentContent">
+                <!-- El comentario completo se cargará aquí -->
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-secondary" onclick="closeCommentsModal()">Cerrar</button>
+            </div>
         </div>
     </div>
 
@@ -218,26 +227,38 @@
     </div>
 
     <script>
-        // Función para ver detalles de respuesta
-        function viewResponse(responseId) {
-            document.getElementById('responseDetails').innerHTML = `
-                <p>Cargando detalles de la respuesta ${responseId}...</p>
-                <p>Para ver todos los detalles completos, use el botón "Editar" que lo llevará al admin de Django.</p>
-                <div style="margin-top: 20px;">
-                    <a href="/admin/encuestas/respuestaencuesta/${responseId}/change/" class="btn btn-primary" target="_blank">📊 Ver en Admin</a>
-                </div>
-            `;
-            document.getElementById('responseModal').style.display = 'block';
-        }
         // Función para mostrar comentario completo
         function showFullComment(comment) {
-            document.getElementById('fullCommentContent').textContent = comment;
+            document.getElementById('fullCommentContent').innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #3498db;">
+                    <p style="line-height: 1.6; color: #2c3e50; margin: 0;">${comment}</p>
+                </div>
+            `;
             document.getElementById('commentsModal').style.display = 'block';
         }
 
         // Función para cerrar modal de comentarios
         function closeCommentsModal() {
             document.getElementById('commentsModal').style.display = 'none';
+        }
+
+        // Función para ver detalles de respuesta
+        function viewResponse(responseId) {
+            document.getElementById('responseDetails').innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                    <p><strong>🔍 Cargando detalles de la respuesta ${responseId}...</strong></p>
+                    <p>Para ver todos los detalles completos, use el botón "✏️ Editar" que lo llevará al admin de Django.</p>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <a href="/admin/encuestas/respuestaencuesta/${responseId}/change/" class="btn btn-primary" target="_blank">📊 Ver en Admin</a>
+                        <button class="btn btn-secondary" onclick="closeModal()" style="margin-left: 10px;">Cerrar</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('responseModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('responseModal').style.display = 'none';
         }
 
         // Actualizar el event listener para cerrar modales
@@ -260,31 +281,44 @@
                 closeCommentsModal();
             }
         });
-
-        function closeModal() {
-            document.getElementById('responseModal').style.display = 'none';
-        }
-
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('responseModal');
-            if (event.target === modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        
     </script>
 
     <style>
-        /* Estilos específicos para el dashboard */
-        .eval-badge {
+        /* Estilos específicos para el dashboard actualizado */
+        .promedio-badge {
+            display: inline-block;
             padding: 4px 8px;
             border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .responses-table th {
             font-size: 0.8rem;
+            padding: 8px 4px;
+            text-align: center;
+        }
+        
+        .responses-table td {
+            font-size: 0.75rem;
+            padding: 6px 4px;
+            text-align: center;
+        }
+        
+        .eval-badge {
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: capitalize;
             white-space: nowrap;
+            display: inline-block;
+            min-width: 25px;
+            text-align: center;
         }
         
         .eval-muy_buena {
@@ -307,64 +341,50 @@
             color: #6c757d;
         }
         
+        .comment-preview {
+            max-width: 150px;
+            text-align: left;
+            font-size: 0.7rem;
+            line-height: 1.2;
+        }
+        
+        .btn-show-more {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            font-size: 0.7rem;
+            text-decoration: underline;
+        }
+        
         .admin-controls {
             display: flex;
             gap: 15px;
             align-items: center;
             flex-wrap: wrap;
             justify-content: space-between;
+            margin-bottom: 20px;
         }
         
         .admin-actions {
             display: flex;
             gap: 10px;
-        }
-        
-        .current-page {
-            padding: 8px 12px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            font-weight: 600;
+            flex-wrap: wrap;
         }
         
         .table-responsive {
             overflow-x: auto;
-        }
-        
-        .average-score {
-            font-weight: bold;
-            padding: 4px 8px;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
-            display: inline-block;
-            min-width: 30px;
-            text-align: center;
-        }
-        
-        .score-3 {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .score-2 {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .score-1 {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .score-empty {
-            background: #f8f9fa;
-            color: #6c757d;
         }
         
         .status-badge {
-            padding: 4px 8px;
+            padding: 3px 8px;
             border-radius: 12px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 600;
+            white-space: nowrap;
         }
         
         .status-complete {
@@ -377,17 +397,73 @@
             color: #856404;
         }
         
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            cursor: pointer;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+        
         @media (max-width: 768px) {
             .admin-controls {
                 flex-direction: column;
+                align-items: stretch;
             }
             
             .admin-controls form {
                 flex-direction: column !important;
+                gap: 10px !important;
+            }
+            
+            .admin-actions {
+                justify-content: center;
             }
             
             .responses-table {
-                font-size: 0.8rem;
+                font-size: 0.7rem;
+            }
+            
+            .responses-table th,
+            .responses-table td {
+                padding: 4px 2px;
+            }
+            
+            .eval-badge {
+                font-size: 0.6rem;
+                padding: 2px 4px;
             }
         }
     </style>
