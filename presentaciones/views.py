@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.utils import timezone
 from encuestas.models import RespuestaEncuesta
-from .models import Presentacion, VideoBienvenida  
+from .models import Presentacion, VideoEvento  
 from io import BytesIO
 
 def portal_presentaciones(request):
@@ -16,7 +16,9 @@ def portal_presentaciones(request):
     presentaciones = Presentacion.objects.filter(activa=True).select_related(
         'administracion'
     ).order_by('orden', 'fecha')
-    video_bienvenida = VideoBienvenida.objects.filter(activo=True).first()
+    
+    # Cambio: Obtener TODOS los videos activos ordenados
+    videos_evento = VideoEvento.objects.filter(activo=True).order_by('orden')
     
     # Estadísticas del evento
     total_presentaciones = presentaciones.count()
@@ -27,10 +29,28 @@ def portal_presentaciones(request):
         'presentaciones': presentaciones,
         'total_presentaciones': total_presentaciones,
         'total_participantes': total_participantes,
-        'video_bienvenida': video_bienvenida,
+        'videos_evento': videos_evento,  # Cambio: videos_evento en lugar de video_bienvenida
         'dias_evento': dias_evento,
     }
     return render(request, 'presentaciones/portal_ppt.html', context)
+
+def api_video_detalle(request, video_id):
+    """API para obtener detalles de un video del evento"""
+    try:
+        video = VideoEvento.objects.get(id=video_id, activo=True)
+        
+        data = {
+            'id': video.id,
+            'titulo': video.titulo,
+            'descripcion': video.descripcion,
+            'video_url': video.video.url if video.video else None,
+            'thumbnail_url': video.imagen_thumbnail.url if video.imagen_thumbnail else None,
+            'orden': video.orden,
+        }
+        
+        return JsonResponse(data)
+    except VideoEvento.DoesNotExist:
+        return JsonResponse({'error': 'Video no encontrado'}, status=404)
 
 @staff_member_required
 def dashboard_admin(request):

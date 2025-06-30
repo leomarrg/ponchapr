@@ -323,18 +323,20 @@
         </div>
 
         <!-- SECCIÓN DE VIDEO DE BIENVENIDA -->
-        {% if video_bienvenida %}
-        <div class="welcome-video-section">
-            <h2>Video de Bienvenida</h2>
-            <div class="welcome-video-container">
-                <video class="welcome-video" controls preload="metadata">
-                    <source src="{{ video_bienvenida.video.url }}" type="video/mp4">
-                    <source src="{{ video_bienvenida.video.url }}" type="video/webm">
-                    <source src="{{ video_bienvenida.video.url }}" type="video/ogg">
-                    Tu navegador no soporta video HTML5.
-                </video>
+        {% if videos_evento %}
+            <div class="videos-evento">
+                {% for video in videos_evento %}
+                    <div class="video-item">
+                        <h3>{{ video.titulo }}</h3>
+                        {% if video.descripcion %}
+                            <p>{{ video.descripcion }}</p>
+                        {% endif %}
+                        <video controls>
+                            <source src="{{ video.video.url }}" type="video/mp4">
+                        </video>
+                    </div>
+                {% endfor %}
             </div>
-        </div>
         {% endif %}
 
         <div class="presentations-grid">

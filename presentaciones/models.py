@@ -35,15 +35,19 @@ class TipoPresentacion(models.Model):
     def __str__(self):
         return self.nombre
 
-class VideoBienvenida(models.Model):
-    titulo = models.CharField(max_length=200, default="Video de Bienvenida")
-    video = models.FileField(upload_to='videos_bienvenida/', help_text="Video de bienvenida del evento")
+class VideoEvento(models.Model):  # Cambio de VideoBienvenida a VideoEvento
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True, null=True)
+    video = models.FileField(upload_to='videos_evento/')
+    imagen_thumbnail = models.ImageField(upload_to='thumbnails_videos/', blank=True, null=True)
+    orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en el portal")
     activo = models.BooleanField(default=True)
     creado_en = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name = 'Video de Bienvenida'
-        verbose_name_plural = 'Videos de Bienvenida'
+        verbose_name = "Video del Evento"
+        verbose_name_plural = "Videos del Evento"
+        ordering = ['orden', 'creado_en']
     
     def __str__(self):
         return self.titulo

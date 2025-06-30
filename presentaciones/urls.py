@@ -10,4 +10,5 @@ urlpatterns = [
     path('presentacion/<int:presentacion_id>/', views.api_presentacion_detalle, name='api_presentacion'),
 
     path('informe/pdf/', views.exportar_informe_pdf, name='exportar_pdf'),
+    path('api/video/<int:video_id>/', views.api_video_detalle, name='api_video_detalle'),
 ]
