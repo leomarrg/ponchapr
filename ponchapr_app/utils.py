@@ -113,7 +113,7 @@ def send_welcome_email(attendee):
     Send welcome email to an attendee synchronously
     """
     try:
-        subject = 'Bienvenido al Evento ADSEF - Confirmación de Registro'
+        subject = 'Bienvenido al 1er Conversatorio de la Erradicación para la Pobreza Infantil en Puerto Rico'
         from_email = settings.EMAIL_HOST_USER
         to_email = attendee.email
         
@@ -125,7 +125,7 @@ def send_welcome_email(attendee):
         try:
             html_content = render_to_string('ponchapr_app/email/welcome_email.html', {
                 'attendee': attendee,
-                'event_name': 'Compromiso en Acción - ADSEF',
+                'event_name': '1er Conversatorio de la Erradicación para la Pobreza Infantil en Puerto Rico',
                 'event_date': attendee.event.date if attendee.event else None,
             })
             text_content = strip_tags(html_content)
@@ -136,7 +136,7 @@ def send_welcome_email(attendee):
             text_content = f"""
 Estimado/a {attendee.name} {attendee.last_name},
 
-¡Gracias por registrarte en nuestro evento "Compromiso en Acción"!
+¡Gracias por registrarte en nuestro evento "Primer Conversatorio de la Erradicación para la Pobreza Infantil en Puerto Rico"!
 
 Detalles de tu registro:
 - Nombre: {attendee.name} {attendee.last_name}
@@ -150,8 +150,7 @@ Tu registro ha sido confirmado exitosamente. Esperamos contar contigo en este im
 ¡Esperamos verte pronto!
 
 Atentamente,
-Equipo de ADSEF
-Administración de Servicios de Salud y Contra la Adicción
+Departamento de la Familia
 """
             html_content = None
         
