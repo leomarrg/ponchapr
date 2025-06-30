@@ -3,16 +3,12 @@ from django.utils import timezone
 
 class Administracion(models.Model):
     TIPOS_CHOICES = [
-        ('adfan', 'Administración de Familias y Niños (ADFAN)'),
-        ('acuden', 'Administración para el Cuidado y Desarrollo Integral de la Niñez (ACUDEN)'),
         ('adsef', 'Administración de Desarrollo Socioeconómico de la Familia (ADSEF)'),
-        ('asume', 'Administración para el Sustento de Menores (ASUME)'),
-        ('secretariado', 'Secretariado del Departamento de la Familia'),
-        ('ofi de lic.', 'Oficina de Licenciamiento'),
-        ('procurador', 'Programa Estatal del Procurador de Cuidado a Larga Duración'),
-        ('TRUC+', 'Proyecto TRUC+'),
-        ('emergency grant', 'Proyecto Emergency Situation Grant'), 
-        ('veterando', 'Procurador del Veterano')
+        ('comision combatir', 'Comisión para Combatir la Pobreza Infantil y la Desigualdad Social'),
+        ('inst desarrollo juv', 'Instituto del Desarrollo de la Juventud'),
+        ('MPG PR', 'ManpowerGroup Puerto Rico'),
+        ('acuden', 'Administración para el Cuidado y Desarrollo Integral de la Niñez'),
+        ('div analisis social', 'División de Análisis Social y Políticas, Estudios Técnicos, Inc.'),
     ]
     
     codigo = models.CharField(max_length=20, choices=TIPOS_CHOICES, unique=True)
