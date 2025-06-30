@@ -208,27 +208,71 @@
                 align-items: center;
                 justify-content: center;
                 height: 100%;
-                background: #f8f9fa;
+                background: linear-gradient(135deg, #f8fbff 0%, #e8f4fd 100%);
+                padding: 20px;
             }
 
             .no-pdf-content {
                 text-align: center;
-                padding: 40px;
-                max-width: 500px;
+                padding: 48px 32px;
+                max-width: 480px;
                 background: white;
-                border-radius: 15px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                border-radius: 16px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+                border: 1px solid #e8ecf0;
+            }
+
+            .no-pdf-icon {
+                width: 72px;
+                height: 72px;
+                background: linear-gradient(135deg, #e74c3c, #c0392b);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+                position: relative;
+            }
+
+            .no-pdf-icon::before {
+                content: "!";
+                color: white;
+                font-weight: 700;
+                font-size: 32px;
             }
 
             .no-pdf-content h3 {
-                color: #e67e22;
-                margin-bottom: 15px;
+                color: #1c2854;
+                margin-bottom: 16px;
+                font-size: 1.4rem;
+                font-weight: 600;
+                letter-spacing: -0.5px;
             }
 
             .no-pdf-content p {
-                color: #7f8c8d;
-                margin-bottom: 10px;
+                color: #6c7b7f;
+                margin-bottom: 12px;
                 line-height: 1.6;
+                font-size: 0.95rem;
+            }
+
+            .no-pdf-content .btn {
+                margin-top: 24px;
+                padding: 14px 28px;
+                background: #3498db;
+                border: none;
+                border-radius: 10px;
+                color: white;
+                font-weight: 600;
+                font-size: 0.95rem;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .no-pdf-content .btn:hover {
+                background: #2980b9;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
             }
 
             .btn-small {
@@ -236,72 +280,116 @@
                 font-size: 0.85rem;
             }
 
-            /* ESTILOS PARA VISTA MÓVIL DE PDF */
+            /* ESTILOS PARA VISTA MÓVIL DE PDF - DISEÑO MODERNO */
             .mobile-pdf-viewer {
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 height: 100%;
                 padding: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #1c2854 0%, #2c3e50 100%);
             }
 
             .mobile-pdf-content {
                 background: white;
-                border-radius: 20px;
-                padding: 30px;
+                border-radius: 16px;
+                padding: 40px 30px;
                 text-align: center;
-                max-width: 400px;
+                max-width: 420px;
                 width: 100%;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                border: 1px solid #e8ecf0;
             }
 
             .pdf-preview-icon {
-                font-size: 4rem;
-                margin-bottom: 20px;
-                opacity: 0.8;
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 24px;
+                position: relative;
+            }
+
+            .pdf-preview-icon::before {
+                content: "PDF";
+                color: white;
+                font-weight: 700;
+                font-size: 18px;
+                letter-spacing: 1px;
             }
 
             .mobile-pdf-content h3 {
-                color: #2c3e50;
-                margin-bottom: 15px;
-                font-size: 1.4rem;
+                color: #1c2854;
+                margin-bottom: 16px;
+                font-size: 1.5rem;
+                font-weight: 600;
+                letter-spacing: -0.5px;
             }
 
             .mobile-pdf-content p {
-                color: #7f8c8d;
-                margin-bottom: 20px;
+                color: #6c7b7f;
+                margin-bottom: 32px;
                 line-height: 1.6;
+                font-size: 0.95rem;
             }
 
             .mobile-options {
                 display: flex;
                 flex-direction: column;
-                gap: 15px;
-                margin-bottom: 25px;
+                gap: 12px;
+                margin-bottom: 32px;
             }
 
             .mobile-btn {
-                padding: 15px 20px !important;
-                font-size: 1rem !important;
+                padding: 16px 24px !important;
+                font-size: 0.95rem !important;
                 border-radius: 12px !important;
                 text-decoration: none !important;
-                display: block !important;
-                transition: all 0.3s ease !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 8px !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
                 font-weight: 600 !important;
+                border: 2px solid transparent !important;
+                position: relative !important;
+                overflow: hidden !important;
             }
 
-            .mobile-btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            .mobile-btn.btn-primary {
+                background: #3498db !important;
+                color: white !important;
+            }
+
+            .mobile-btn.btn-primary:hover {
+                background: #2980b9 !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3) !important;
+            }
+
+            .mobile-btn.btn-secondary {
+                background: transparent !important;
+                color: #3498db !important;
+                border-color: #3498db !important;
+            }
+
+            .mobile-btn.btn-secondary:hover {
+                background: #3498db !important;
+                color: white !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 25px rgba(52, 152, 219, 0.2) !important;
             }
 
             .mobile-note {
-                background: #f8f9fa;
+                background: #f8fbff;
+                border: 1px solid #e3f2fd;
                 border-left: 4px solid #3498db;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 20px;
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 24px;
                 text-align: left;
             }
 
@@ -309,41 +397,60 @@
                 margin: 0;
                 color: #2c3e50;
                 font-size: 0.9rem;
+                line-height: 1.5;
+            }
+
+            .mobile-note strong {
+                color: #1c2854;
+                font-weight: 600;
             }
 
             .mobile-actions {
                 display: flex;
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
             }
 
             .btn-tertiary {
-                background: #95a5a6 !important;
-                color: white !important;
-                border: none !important;
-                padding: 10px 15px !important;
+                background: #f8f9fa !important;
+                color: #6c7b7f !important;
+                border: 1px solid #e9ecef !important;
+                padding: 12px 20px !important;
                 border-radius: 8px !important;
                 cursor: pointer !important;
                 transition: all 0.3s ease !important;
                 font-size: 0.9rem !important;
+                font-weight: 500 !important;
             }
 
             .btn-tertiary:hover {
-                background: #7f8c8d !important;
+                background: #e9ecef !important;
+                color: #495057 !important;
+                border-color: #dee2e6 !important;
             }
 
             .mobile-desktop-warning {
-                background: #fff3cd;
-                color: #856404;
-                padding: 10px;
+                background: linear-gradient(135deg, #fff8e1, #fff3c4);
+                color: #f57f17;
+                padding: 16px;
                 text-align: center;
-                border-radius: 8px 8px 0 0;
-                font-size: 0.85rem;
+                border-radius: 12px 12px 0 0;
+                font-size: 0.9rem;
                 font-weight: 600;
+                border-bottom: 1px solid #ffecb3;
             }
 
             .mobile-desktop-warning p {
                 margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .mobile-desktop-warning::before {
+                content: "⚠";
+                font-size: 16px;
             }
 
             /* NUEVOS ESTILOS PARA VIDEOS DEL EVENTO */
