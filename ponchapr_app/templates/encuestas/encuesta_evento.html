@@ -276,7 +276,7 @@
             
             // Verificar comentarios obligatorios
             const comentarios = document.querySelector('textarea[name="comentarios"]');
-            if (!comentarios.value.trim() || comentarios.value.trim().length < 10) {
+            if (!comentarios.value.trim() || comentarios.value.trim().length < 1) {
                 isValid = false;
                 if (!document.querySelector('.comments-section .validation-message')) {
                     const errorDiv = document.createElement('div');
@@ -348,7 +348,7 @@
                     updateCharCounter(this);
                     // Limpiar mensajes de error de comentarios cuando el usuario empiece a escribir
                     const errorMsg = this.parentElement.querySelector('.validation-message');
-                    if (errorMsg && this.value.trim().length >= 0) {
+                    if (errorMsg && this.value.trim().length >= 10) {
                         errorMsg.style.display = 'none';
                     }
                 });
