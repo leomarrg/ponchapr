@@ -261,7 +261,6 @@
             }
         }
 
-        // Validar formulario
         function validateForm() {
             let isValid = true;
             
@@ -274,15 +273,15 @@
                 }
             }
             
-            // Verificar comentarios obligatorios
+            // Verificar que hay comentarios (obligatorio pero sin mínimo)
             const comentarios = document.querySelector('textarea[name="comentarios"]');
-            if (!comentarios.value.trim() || comentarios.value.trim().length < 1) {
+            if (!comentarios.value.trim()) {
                 isValid = false;
                 if (!document.querySelector('.comments-section .validation-message')) {
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'validation-message';
                     errorDiv.style.display = 'block';
-                    errorDiv.textContent = 'Los comentarios son obligatorios y deben tener al menos 10 caracteres.';
+                    errorDiv.textContent = 'Los comentarios son obligatorios.'; // ← SIN MENCIÓN DE 10 CARACTERES
                     comentarios.parentElement.appendChild(errorDiv);
                 }
             }
