@@ -15,8 +15,6 @@
         th { background-color: #f2f2f2; padding: 8px; text-align: left; }
         td { padding: 8px; }
         .page-break { page-break-before: always; }
-        .region-header { background-color: #e8eaf6; font-weight: bold; padding: 8px; margin-top: 15px; }
-        .region-section { margin-top: 20px; border: 1px solid #ddd; padding: 10px; }
         
         /* Simple footer with logo */
         .footer { text-align: right; margin-top: 20px; }
@@ -36,130 +34,181 @@
         .event-info p {
             margin: 5px 0;
         }
+        
+        .summary-box {
+            background-color: #f0f8ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
-    <h1>PonchaPR Event Report</h1>
-    <p style="text-align: center">Generated on: {{ generated_at|date:"F d, Y g:i A" }}</p>
+    <h1>Reporte del Evento - PonchaPR</h1>
+    <p style="text-align: center">Generado el: {{ generated_at|date:"d/m/Y g:i A" }}</p>
     
-    <!-- New Event Information Section -->
+    <!-- Event Information Section -->
     <div class="event-info">
-        <h3>Event Information</h3>
-        <p><strong>Name:</strong> {{ event.name }}</p>
-        <p><strong>Date:</strong> {{ event.date|date:"F d, Y" }}</p>
-        <p><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</p>
-        <p><strong>Expected Attendance:</strong> 200</p>
+        <h3>Información del Evento</h3>
+        <p><strong>Nombre:</strong> {{ event.name }}</p>
+        <p><strong>Fecha:</strong> {{ event.date|date:"d/m/Y" }}</p>
+        {% if event.start_time and event.end_time %}
+        <p><strong>Horario:</strong> {{ event.start_time }} - {{ event.end_time }}</p>
+        {% endif %}
+        <p><strong>Asistencia Esperada:</strong> 200</p>
     </div>
     
-    <h2>Attendance Summary</h2>
+    <h2>Resumen de Asistencia</h2>
     <table>
         <tr>
-            <th>Total Registered</th>
+            <th>Total Registrados</th>
             <td>{{ total_attendees }}</td>
         </tr>
         <tr>
-            <th>Checked In</th>
+            <th>Check-In Realizados</th>
             <td>{{ arrived_attendees }}</td>
         </tr>
         <tr>
-            <th>Checked Out</th>
+            <th>Check-Out Realizados</th>
             <td>{{ checked_out_attendees }}</td>
         </tr>
         <tr>
-            <th>Check-in Rate</th>
+            <th>Tasa de Check-in</th>
             <td>{{ arrival_percentage }}%</td>
+        </tr>
+        <tr>
+            <th>Pre-registrados</th>
+            <td>{{ pre_registered_count }}</td>
+        </tr>
+        <tr>
+            <th>Registrados en Sitio</th>
+            <td>{{ front_desk_count }}</td>
         </tr>
         {% if avg_time_spent %}
         <tr>
-            <th>Average Time Spent</th>
+            <th>Tiempo Promedio en el Evento</th>
             <td>{{ avg_time_spent }}</td>
         </tr>
         {% endif %}
     </table>
     
-    {% if region_distribution %}
-    <h2>Regional Distribution</h2>
+    {% if organization_list %}
+    <h2>Distribución por Organización</h2>
     <table>
         <tr>
-            <th>Region</th>
-            <th>Attendee Count</th>
-            <th>Percentage</th>
+            <th>Organización</th>
+            <th>Cantidad de Asistentes</th>
+            <th>Porcentaje</th>
         </tr>
-        {% for region, percentage in region_distribution.items %}
+        {% for org in organization_list %}
         <tr>
-            <td>{{ region }}</td>
-            <td>{{ region_counts|get_item:region }}</td>
-            <td>{{ percentage|floatformat:1 }}%</td>
+            <td>{{ org.name }}</td>
+            <td>{{ org.count }}</td>
+            <td>{{ org.percentage|floatformat:1 }}%</td>
         </tr>
         {% endfor %}
     </table>
     {% endif %}
     
-    <!-- Logo at the bottom of first page -->
-    <div class="footer">
-        <img src="file://{{ logo_path }}" width="100">
-    </div>
+    {% if top_organizations %}
+    <h2>Top 10 Organizaciones por Participación</h2>
+    <table>
+        <tr>
+            <th>Organización</th>
+            <th>Número de Asistentes</th>
+        </tr>
+        {% for org in top_organizations %}
+        <tr>
+            <td>{{ org.organization }}</td>
+            <td>{{ org.count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+    
+    {% if registration_dates %}
+    <h2>Registro por Fecha</h2>
+    <table>
+        <tr>
+            <th>Fecha</th>
+            <th>Cantidad de Registros</th>
+        </tr>
+        {% for item in registration_dates %}
+        <tr>
+            <td>{{ item.date|date:"d/m/Y" }}</td>
+            <td>{{ item.count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
     
     <div class="page-break"></div>
-    <h2>Attendees by Region</h2>
-    <p>Each region is displayed on a separate page with its own table.</p>
     
-    {% regroup attendees by region.name as region_list %}
+    <h2>Lista Completa de Asistentes</h2>
+    <p>Total de registros: {{ total_attendees }}</p>
     
-    {% for region_group in region_list %}
-        <div class="page-break"></div>
-        <h2>Region: {{ region_group.grouper|default:"No Region" }}</h2>
-        
-        <p>Total attendees in this region: {{ region_counts|get_item:region_group.grouper|default:"0" }}</p>
-        
-        <table>
+    <table>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellidos</th>
+            <th>Organización</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+        </tr>
+        {% for attendee in attendees %}
+            {% if forloop.counter0|divisibleby:25 and forloop.counter0 > 0 %}
+                </table>
+                
+                <div class="page-break"></div>
+                <h3>Lista Completa de Asistentes (continuación)</h3>
+                
+                <table>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Organización</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Estado</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                    </tr>
+            {% endif %}
             <tr>
-                <th>Name</th>
-                <th>Last Name</th>
-                <th>Status</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
+                <td>{{ attendee.name }}</td>
+                <td>{{ attendee.last_name }}</td>
+                <td>{{ attendee.organization|default:"-" }}</td>
+                <td>{{ attendee.email }}</td>
+                <td>{{ attendee.phone_number|default:"-" }}</td>
+                <td>
+                    {% if attendee.checked_out %}
+                        Salió
+                    {% elif attendee.arrived %}
+                        Llegó
+                    {% elif attendee.pre_registered %}
+                        Pre-registrado
+                    {% elif attendee.registered_at_event %}
+                        Registro en Sitio
+                    {% else %}
+                        Registrado
+                    {% endif %}
+                </td>
+                <td>{{ attendee.arrival_time|date:"d/m/Y g:i A"|default:"-" }}</td>
+                <td>{{ attendee.checkout_time|date:"d/m/Y g:i A"|default:"-" }}</td>
             </tr>
-            {% for attendee in region_group.list %}
-                {% if forloop.counter0|divisibleby:30 and forloop.counter0 > 0 %}
-                    </table>
-                    
-                    <!-- Logo at the bottom of continuation page -->
-                    <div class="footer">
-                        <img src="file://{{ logo_path }}" width="100">
-                    </div>
-                    
-                    <div class="page-break"></div>
-                    <h3>Region: {{ region_group.grouper|default:"No Region" }} (continued)</h3>
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th>Last Name</th>
-                            <th>Status</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                        </tr>
-                {% endif %}
-                <tr>
-                    <td>{{ attendee.name }}</td>
-                    <td>{{ attendee.last_name }}</td>
-                    <td>
-                        {% if attendee.checked_out %}Checked Out
-                        {% elif attendee.arrived %}Checked In
-                        {% elif attendee.pre_registered %}Pre-Registered
-                        {% elif attendee.registered_at_event %}Front Desk
-                        {% else %}Registered{% endif %}
-                    </td>
-                    <td>{{ attendee.arrival_time|date:"M d, Y g:i A"|default:"-" }}</td>
-                    <td>{{ attendee.checkout_time|date:"M d, Y g:i A"|default:"-" }}</td>
-                </tr>
-            {% endfor %}
-        </table>
-        
-        <!-- Logo at the bottom of each region page -->
-        <div class="footer">
-            <img src="file://{{ logo_path }}" width="100">
-        </div>
-    {% endfor %}
+        {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center;">No hay asistentes registrados</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <div style="margin-top: 30px; text-align: center; color: #666; font-size: 10px;">
+        <p>Departamento de la Familia - Gobierno de Puerto Rico</p>
+        <p>Reporte generado automáticamente por PonchaPR</p>
+    </div>
 </body>
 </html>
